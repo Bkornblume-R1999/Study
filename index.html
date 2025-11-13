@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+  const host = window.location.hostname;
+
+  if (host.includes("tablet")) {
+    window.location.replace("Tablet.html");
+  } else if (host.includes("driver")) {
+    window.location.replace("Driver.html");
+  } else if (host.includes("server")) {
+    window.location.replace("Server.html");
+  } else {
+    window.location.replace("Tablet.html"); // fallback
+  }
+</script>
+  </head>
+  <body>
+    <p>Redirecting based on domain...</p>
+  </body>
+</html>
