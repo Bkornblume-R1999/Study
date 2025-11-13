@@ -1,0 +1,117 @@
+<!-- server.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Server – Logic Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      background: #0b0f1a;
+      color: #eaf0ff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 2px solid #1e2b4a;
+    }
+    .panel:last-child {
+      border-bottom: none;
+    }
+    .label {
+      color: #9fb3d9;
+      font-size: 1.5em;
+      margin-bottom: 12px;
+    }
+    .value {
+      font-size: 2em;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel" id="gpsPanel">
+    <div class="label">Current GPS</div>
+    <div class="value" id="gps">Waiting...</div>
+  </div>
+  <div class="panel" id="dropoffPanel">
+    <div class="label">Next Drop-Off</div>
+    <div class="value" id="next">None</div>
+  </div>
+
+  <script>
+    const ws = new WebSocket('ws://192.168.1.61:3000');
+    ws.addEventListener('open', () => {
+      ws.send(JSON.stringify({ type: 'register', role: 'server' }));
+    });
+
+    let nextDestination = null;
+    let alertActive = false;
+    let alertTimer = null;
+
+    function setNext(dest) {
+      nextDestination = dest;
+      document.getElementById('next').textContent =
+        `${dest.name} (${dest.lat.toFixed(6)}, ${dest.lng.toFixed(6)})`;
+    }
+
+    function haversine(lat1, lon1, lat2, lon2) {
+      const toRad = x => x * Math.PI / 180;
+      const R = 6371000; // meters
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2 +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLon/2)**2;
+      const c = 2 * Math.asin(Math.sqrt(a));
+      return R * c;
+    }
+
+    function triggerDriverAlert(dest) {
+      if (alertActive) return; // prevent multiple triggers
+      alertActive = true;
+
+      ws.send(JSON.stringify({
+        type: 'driver_alert',
+        destination: dest,
+        message: `Arriving at ${dest.name}`,
+        durationMs: 30000
+      }));
+
+      alertTimer = setTimeout(() => {
+        alertActive = false;
+        ws.send(JSON.stringify({ type: 'dropoff_completed', destination: dest }));
+        // Optionally clear nextDestination here
+        // nextDestination = null;
+      }, 30000);
+    }
+
+    ws.addEventListener('message', (ev) => {
+      let msg;
+      try { msg = JSON.parse(ev.data); } catch { return; }
+
+      if (msg.type === 'destination_selected' && msg.destination) {
+        setNext(msg.destination);
+      }
+
+      if (msg.type === 'gps_update') {
+        document.getElementById('gps').textContent =
+          `${msg.lat.toFixed(6)}, ${msg.lng.toFixed(6)} @ ${new Date(msg.ts).toLocaleTimeString()}`;
+        if (nextDestination) {
+          const d = haversine(msg.lat, msg.lng, nextDestination.lat, nextDestination.lng);
+          if (d < 30) triggerDriverAlert(nextDestination);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Passenger – Drop-Off Selector</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 0; padding: 16px;
+      background: #f9f9f9; color: #333;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 640px;
+      margin: auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    h1 { margin-top: 0; color: #222; }
+    #search {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fff;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    .dest-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .dest-btn {
+      background: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #333;
+    }
+    .dest-btn:hover {
+      background: #e6e6e6;
+      transform: scale(1.03);
+    }
+    .dest-btn.selected {
+      background: #e0f7e9;
+      border-color: #1fa97a;
+      color: #0b5c3a;
+      font-weight: bold;
+    }
+    #confirmBtn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      background: #1fa97a;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #confirmBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .confirm-banner {
+      margin-top: 12px; padding: 10px;
+      border-radius: 8px; background: #e0f7e9; color: #0b5c3a;
+      display: none; animation: pop 250ms ease-out;
+    }
+    @keyframes pop {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .status { margin-top: 12px; font-size: 14px; color: #555; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Select Drop-Off</h1>
+    <input id="search" placeholder="Search destinations" />
+
+    <div class="dest-grid" id="destGrid"></div>
+
+    <button id="confirmBtn">Confirm</button>
+    <div class="confirm-banner" id="confirmedBanner">Confirmed ✅</div>
+    <div class="status" id="status">No selection yet.</div>
+  </div>
+  <button onclick="triggerGPS()">Enable GPS</button>
+  <script>
+    const WS_URL = 'ws://192.168.1.61:3000'; // change to your server IP
+    const ws = new WebSocket(WS_URL);
+
+    ws.addEventListener('open', () => {
+      ws.send(JSON.stringify({ type: 'register', role: 'passenger' }));
+      document.getElementById('status').textContent = 'Connected.';
+    });
+    ws.addEventListener('close', () => {
+      document.getElementById('status').textContent = 'Disconnected.';
+    });
+
+    const passengerId = 'p-' + Math.random().toString(36).slice(2);
+    let cooldown = false;
+    let selectedDest = null;
+
+    const destinations = [
+      { name: "SM City General Santos", lat: 6.1164, lng: 125.1716 },
+      { name: "KCC Mall of Gensan", lat: 6.1127, lng: 125.1710 },
+      { name: "Gensan Public Market", lat: 6.1169, lng: 125.1733 },
+      { name: "General Santos Airport", lat: 6.0583, lng: 125.0964 },
+      { name: "Notre Dame of Dadiangas University", lat: 6.1150, lng: 125.1740 }
+    ];
+
+    const grid = document.getElementById('destGrid');
+    destinations.forEach(dest => {
+      const btn = document.createElement('div');
+      btn.className = 'dest-btn';
+      btn.textContent = dest.name;
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.dest-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedDest = dest;
+      });
+      grid.appendChild(btn);
+    });
+
+    // Search filter
+    document.getElementById('search').addEventListener('input', (e) => {
+      const filter = e.target.value.toLowerCase();
+      document.querySelectorAll('.dest-btn').forEach(btn => {
+        btn.style.display = btn.textContent.toLowerCase().includes(filter) ? '' : 'none';
+      });
+    });
+
+    // Confirm button
+    document.getElementById('confirmBtn').addEventListener('click', () => {
+      if (cooldown) return;
+      if (!selectedDest) {
+        alert('Please select a destination.');
+        return;
+      }
+
+      ws.send(JSON.stringify({
+        type: 'destination_selected',
+        passengerId,
+        destination: selectedDest
+      }));
+
+      const banner = document.getElementById('confirmedBanner');
+      banner.style.display = 'block';
+      setTimeout(() => banner.style.display = 'none', 1200);
+
+      const btn = document.getElementById('confirmBtn');
+      btn.disabled = true;
+      cooldown = true;
+      setTimeout(() => { btn.disabled = false; cooldown = false; }, 3000);
+
+      document.getElementById('status').textContent = `Next Drop-Off: ${selectedDest.name}`;
+    });
+
+    // GPS streaming
+    function sendGPS(position) {
+      const { latitude, longitude } = position.coords;
+      ws.send(JSON.stringify({
+        type: 'gps_update',
+        passengerId,
+        lat: latitude,
+        lng: longitude,
+        ts: Date.now()
+      }));
+    }
+    if ('geolocation' in navigator) {
+  navigator.geolocation.watchPosition(
+    sendGPS,
+    (err) => console.error('GPS error:', err),
+    {
+      enableHighAccuracy: true,
+      maximumAge: 1000,
+      timeout: 5000
+    }
+  );
+}
+  function triggerGPS() {
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        alert('Location access granted!');
+        sendGPS(pos);
+      },
+      (err) => {
+        alert('Location error: ' + err.message);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 5000
+      }
+    );
+  } else {
+    alert('Geolocation not supported on this device.');
+  }
+}
+  </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Driver – Drop-Off Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        crossorigin="anonymous"/>
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #topbar {
+      display: flex; align-items: center; gap: 12px;
+      height: 56px; padding: 0 16px;
+      background: #11182a; color: #eaf0ff; font-family: system-ui, sans-serif;
+      border-bottom: 1px solid #1e2b4a;
+    }
+    #status { font-size: 14px; color: #9fb3d9; flex: 1; }
+    #map { width: 100%; height: calc(100% - 56px); }
+    .pin-label {
+      background: #0e1424; color: #eaf0ff; padding: 4px 6px;
+      border-radius: 6px; border: 1px solid #334a7c;
+    }
+    .btn {
+      padding: 8px 10px; border-radius: 8px; border: 1px solid #334a7c;
+      background: #0e1424; color: #eaf0ff; cursor: pointer;
+    }
+    .btn:disabled { opacity: .6; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div id="topbar">
+    <div id="status">Starting…</div>
+    <button id="centerBtn" class="btn" title="Center on last alert">Center</button>
+  </div>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+  <script>
+    const WS_URL = 'ws://192.168.1.61:3000'; // change to your server IP if needed
+    const DEFAULT_VIEW = { lat: 6.1164, lng: 125.1716, zoom: 14 };
+    const ALERT_MS = 30000;
+
+    const $status = document.getElementById('status');
+    function setStatus(text) { $status.textContent = text; }
+
+    const map = L.map('map', { zoomControl: true });
+    let lastAlertDest = null;
+
+    // Tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 19,
+      subdomains: ['a','b','c']
+    }).addTo(map);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      map.setView([DEFAULT_VIEW.lat, DEFAULT_VIEW.lng], DEFAULT_VIEW.zoom);
+      setTimeout(() => map.invalidateSize(), 300);
+      setStatus('Map initialized');
+    });
+
+    document.getElementById('centerBtn').addEventListener('click', () => {
+      if (lastAlertDest) {
+        map.setView([lastAlertDest.lat, lastAlertDest.lng], 17, { animate: true });
+      } else {
+        map.setView([DEFAULT_VIEW.lat, DEFAULT_VIEW.lng], DEFAULT_VIEW.zoom, { animate: true });
+      }
+    });
+
+    // Marker management
+    const markers = new Map();
+    function keyFor(msg) {
+      return msg.passengerId || (msg.destination && msg.destination.name) || Math.random().toString(36).slice(2);
+    }
+    function addOrUpdatePin(key, dest) {
+      const labelHtml = `<div class="pin-label">${dest.name}</div>`;
+      if (!markers.has(key)) {
+        const m = L.marker([dest.lat, dest.lng]).addTo(map).bindPopup(labelHtml);
+        markers.set(key, m);
+      } else {
+        const m = markers.get(key);
+        m.setLatLng([dest.lat, dest.lng]).setPopupContent(labelHtml);
+      }
+    }
+    function removePin(key) {
+      const m = markers.get(key);
+      if (m) { map.removeLayer(m); markers.delete(key); }
+    }
+
+    // Alarm
+    const alarm = new Audio();
+    alarm.src = 'alarm.mp3'; // replace with a real sound file
+    alarm.loop = true;
+
+    function playAlarm(ms = ALERT_MS) {
+      alarm.play().catch(() => {});
+      setStatus(`Alerting driver… (${Math.round(ms/1000)}s)`);
+      setTimeout(() => stopAlarm(), ms);
+    }
+    function stopAlarm() {
+      alarm.pause(); alarm.currentTime = 0;
+      setStatus('Alert stopped.');
+    }
+
+    // WebSocket
+    let ws;
+    function connectWS() {
+      ws = new WebSocket(WS_URL);
+      ws.addEventListener('open', () => {
+        setStatus('Connected. Waiting for alerts…');
+        ws.send(JSON.stringify({ type: 'register', role: 'driver' }));
+      });
+      ws.addEventListener('message', (ev) => {
+        let msg; try { msg = JSON.parse(ev.data); } catch { return; }
+        if (msg.type === 'dropoff_pin' && msg.destination) {
+          const key = keyFor(msg);
+          addOrUpdatePin(key, msg.destination);
+          setStatus(`Pin added: ${msg.destination.name}`);
+        }
+        if (msg.type === 'driver_alert' && msg.destination) {
+          lastAlertDest = msg.destination;
+          map.setView([msg.destination.lat, msg.destination.lng], 17, { animate: true });
+          playAlarm(msg.durationMs || ALERT_MS);
+        }
+        if (msg.type === 'dropoff_completed' && msg.destination) {
+          const key = msg.destination.name;
+          removePin(key);
+          stopAlarm();
+          setStatus(`Completed: ${msg.destination.name}`);
+        }
+      });
+      ws.addEventListener('close', () => setStatus('Disconnected.'));
+    }
+    connectWS();
+  </script>
+</body>
+</html>
