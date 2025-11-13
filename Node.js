@@ -1,18 +1,27 @@
 // server.js
 // Run: npm init -y && npm install ws && node server.js
 const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
 
-const wss = new WebSocket.Server({ port: 3000 });
+wss.on('connection', socket => {
+  console.log('Client connected');
 
-// Simple roles: "passenger", "server", "driver"
-const clients = { passenger: new Set(), server: new Set(), driver: new Set() };
+  socket.on('message', msg => {
+    const data = JSON.parse(msg);
+    console.log('Received:', data);
 
-function broadcastTo(role, msgObj) {
-  const msg = JSON.stringify(msgObj);
-  for (const ws of clients[role]) {
-    if (ws.readyState === WebSocket.OPEN) ws.send(msg);
-  }
-}
+    // Broadcast to all clients
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(data));
+      }
+    });
+  });
+
+  socket.on('close', () => {
+    console.log('Client disconnected');
+  });
+});
 
 wss.on('connection', (ws) => {
   ws.role = 'unknown';
@@ -58,4 +67,4 @@ wss.on('connection', (ws) => {
   });
 });
 
-console.log('WebSocket relay running on ws://localhost:8080');
+console.log('WebSocket relay running on ws://10.166.28.236:8080');
