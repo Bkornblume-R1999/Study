@@ -1,270 +1,145 @@
+<!-- server.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Passenger – Drop-Off Selector</title>
+  <title>Server – Logic Hub</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Basic styling for layout and UI components -->
+  <!-- Basic styling for layout and visual clarity -->
   <style>
     body {
       font-family: system-ui, sans-serif;
-      margin: 0; padding: 16px;
-      background: #f9f9f9; color: #333;
+      margin: 0;
+      background: #0b0f1a;
+      color: #eaf0ff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
-    .card {
-      background: #ffffff;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 16px;
-      max-width: 640px;
-      margin: auto;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    .panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 2px solid #1e2b4a;
     }
 
-    h1 { margin-top: 0; color: #222; }
+    .panel:last-child {
+      border-bottom: none;
+    }
 
-    /* Search input styling */
-    #search {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: #fff;
-      color: #333;
+    .label {
+      color: #9fb3d9;
+      font-size: 1.5em;
       margin-bottom: 12px;
     }
 
-    /* Grid layout for destination buttons */
-    .dest-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 12px;
-    }
-
-    /* Destination button styling */
-    .dest-btn {
-      background: #f0f0f0;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 12px;
+    .value {
+      font-size: 2em;
+      font-weight: bold;
       text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      color: #333;
-    }
-
-    .dest-btn:hover {
-      background: #e6e6e6;
-      transform: scale(1.03);
-    }
-
-    .dest-btn.selected {
-      background: #e0f7e9;
-      border-color: #1fa97a;
-      color: #0b5c3a;
-      font-weight: bold;
-    }
-
-    /* Confirm button styling */
-    #confirmBtn {
-      margin-top: 16px;
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: #1fa97a;
-      color: #fff;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #confirmBtn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Confirmation banner styling */
-    .confirm-banner {
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 8px;
-      background: #e0f7e9;
-      color: #0b5c3a;
-      display: none;
-      animation: pop 250ms ease-out;
-    }
-
-    @keyframes pop {
-      from { transform: scale(0.95); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    /* Status text styling */
-    .status {
-      margin-top: 12px;
-      font-size: 14px;
-      color: #555;
     }
   </style>
 </head>
 <body>
 
-  <!-- Main card container -->
-  <div class="card">
-    <h1>Select Drop-Off</h1>
-
-    <!-- Search input for filtering destinations -->
-    <input id="search" placeholder="Search destinations" />
-
-    <!-- Grid container for destination buttons -->
-    <div class="dest-grid" id="destGrid"></div>
-
-    <!-- Confirm selection button -->
-    <button id="confirmBtn">Confirm</button>
-
-    <!-- Confirmation banner -->
-    <div class="confirm-banner" id="confirmedBanner">Confirmed ✅</div>
-
-    <!-- Status display -->
-    <div class="status" id="status">No selection yet.</div>
+  <!-- Panel to show current GPS coordinates -->
+  <div class="panel" id="gpsPanel">
+    <div class="label">Current GPS</div>
+    <div class="value" id="gps">Waiting...</div>
   </div>
 
-  <!-- Manual GPS trigger button -->
-  <button onclick="triggerGPS()">Enable GPS</button>
+  <!-- Panel to show the next drop-off destination -->
+  <div class="panel" id="dropoffPanel">
+    <div class="label">Next Drop-Off</div>
+    <div class="value" id="next">None</div>
+  </div>
 
   <script>
-    // WebSocket connection to backend server
-    const WS_URL = 'wss://https://bkornblume-r1999.github.io/GPS/Tablet.html'; // Replace with your server IP
-    const ws = new WebSocket(WS_URL);
+    // Connect to WebSocket server (update IP if needed)
+    const ws = new WebSocket('wss://https://bkornblume-r1999.github.io/GPS/Server.html');
 
-    // Register this client as a 'passenger' when connected
+    // Register this client as the 'server' role when connection opens
     ws.addEventListener('open', () => {
-      ws.send(JSON.stringify({ type: 'register', role: 'passenger' }));
-      document.getElementById('status').textContent = 'Connected.';
+      ws.send(JSON.stringify({ type: 'register', role: 'server' }));
     });
 
-    // Update status when disconnected
-    ws.addEventListener('close', () => {
-      document.getElementById('status').textContent = 'Disconnected.';
-    });
+    // Variables to track destination and alert state
+    let nextDestination = null;
+    let alertActive = false;
+    let alertTimer = null;
 
-    // Unique passenger ID for tracking
-    const passengerId = 'p-' + Math.random().toString(36).slice(2);
-    let cooldown = false;
-    let selectedDest = null;
-
-    // List of available destinations
-    const destinations = [
-      { name: "SM City General Santos", lat: 6.115971, lng: 125.606298 },
-      { name: "KCC Mall of Gensan", lat: 6.1127, lng: 125.1710 },
-      { name: "Gensan Public Market", lat: 6.1169, lng: 125.1733 },
-      { name: "General Santos Airport", lat: 6.0583, lng: 125.0964 },
-      { name: "Notre Dame of Dadiangas University", lat: 6.1150, lng: 125.1740 }
-    ];
-
-    // Render destination buttons dynamically
-    const grid = document.getElementById('destGrid');
-    destinations.forEach(dest => {
-      const btn = document.createElement('div');
-      btn.className = 'dest-btn';
-      btn.textContent = dest.name;
-
-      // Handle selection logic
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.dest-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedDest = dest;
-      });
-
-      grid.appendChild(btn);
-    });
-
-    // Filter destinations based on search input
-    document.getElementById('search').addEventListener('input', (e) => {
-      const filter = e.target.value.toLowerCase();
-      document.querySelectorAll('.dest-btn').forEach(btn => {
-        btn.style.display = btn.textContent.toLowerCase().includes(filter) ? '' : 'none';
-      });
-    });
-
-    // Confirm button logic
-    document.getElementById('confirmBtn').addEventListener('click', () => {
-      if (cooldown) return;
-      if (!selectedDest) {
-        alert('Please select a destination.');
-        return;
-      }
-
-      // Send selected destination to server
-      ws.send(JSON.stringify({
-        type: 'destination_selected',
-        passengerId,
-        destination: selectedDest
-      }));
-
-      // Show confirmation banner
-      const banner = document.getElementById('confirmedBanner');
-      banner.style.display = 'block';
-      setTimeout(() => banner.style.display = 'none', 1200);
-
-      // Disable button temporarily to prevent spam
-      const btn = document.getElementById('confirmBtn');
-      btn.disabled = true;
-      cooldown = true;
-      setTimeout(() => { btn.disabled = false; cooldown = false; }, 3000);
-
-      // Update status text
-      document.getElementById('status').textContent = `Next Drop-Off: ${selectedDest.name}`;
-    });
-
-    // Send GPS data to server continuously
-    function sendGPS(position) {
-      const { latitude, longitude } = position.coords;
-      ws.send(JSON.stringify({
-        type: 'gps_update',
-        passengerId,
-        lat: latitude,
-        lng: longitude,
-        ts: Date.now()
-      }));
+    // Update the drop-off panel with selected destination
+    function setNext(dest) {
+      nextDestination = dest;
+      document.getElementById('next').textContent =
+        `${dest.name} (${dest.lat.toFixed(6)}, ${dest.lng.toFixed(6)})`;
     }
 
-    // Start GPS streaming if supported
-    if ('geolocation' in navigator) {
-      navigator.geolocation.watchPosition(
-        sendGPS,
-        (err) => console.error('GPS error:', err),
-        {
-          enableHighAccuracy: true,
-          maximumAge: 1000,
-          timeout: 5000
+    // Calculate distance between two GPS coordinates using the Haversine formula
+    function haversine(lat1, lon1, lat2, lon2) {
+      const toRad = x => x * Math.PI / 180;
+      const R = 6371000; // Earth's radius in meters
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2 +
+                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                Math.sin(dLon/2)**2;
+      const c = 2 * Math.asin(Math.sqrt(a));
+      return R * c;
+    }
+
+    // Trigger alert to driver when close to destination
+    function triggerDriverAlert(dest) {
+      if (alertActive) return; // Prevent duplicate alerts
+      alertActive = true;
+
+      // Send alert message to driver
+      ws.send(JSON.stringify({
+        type: 'driver_alert',
+        destination: dest,
+        message: `Arriving at ${dest.name}`,
+        durationMs: 30000
+      }));
+
+      // Reset alert after 30 seconds and notify drop-off completion
+      alertTimer = setTimeout(() => {
+        alertActive = false;
+        ws.send(JSON.stringify({ type: 'dropoff_completed', destination: dest }));
+        // Optional: clear destination
+        // nextDestination = null;
+      }, 30000);
+    }
+
+    // Handle incoming WebSocket messages
+    ws.addEventListener('message', (ev) => {
+      let msg;
+      try {
+        msg = JSON.parse(ev.data);
+      } catch {
+        return; // Ignore malformed messages
+      }
+
+      // Update destination when selected by passenger
+      if (msg.type === 'destination_selected' && msg.destination) {
+        setNext(msg.destination);
+      }
+
+      // Update GPS panel and check proximity to destination
+      if (msg.type === 'gps_update') {
+        document.getElementById('gps').textContent =
+          `${msg.lat.toFixed(6)}, ${msg.lng.toFixed(6)} @ ${new Date(msg.ts).toLocaleTimeString()}`;
+
+        // If destination is set, check if within 30 meters
+        if (nextDestination) {
+          const d = haversine(msg.lat, msg.lng, nextDestination.lat, nextDestination.lng);
+          if (d < 30) triggerDriverAlert(nextDestination);
         }
-      );
-    }
-
-    // Manual GPS trigger (fallback or refresh)
-    function triggerGPS() {
-      if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            alert('Location access granted!');
-            sendGPS(pos);
-          },
-          (err) => {
-            alert('Location error: ' + err.message);
-          },
-          {
-            enableHighAccuracy: true,
-            maximumAge: 1000,
-            timeout: 5000
-          }
-        );
-      } else {
-        alert('Geolocation not supported on this device.');
       }
-    }
+    });
   </script>
 </body>
 </html>
