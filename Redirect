@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+      const host = window.location.hostname;
+
+      if (host.includes("site1.com")) {
+        window.location.replace("site1.html");
+      } else if (host.includes("site2.net")) {
+        window.location.replace("site2.html");
+      } else if (host.includes("site3.org")) {
+        window.location.replace("site3.html");
+      } else {
+        window.location.replace("default.html"); // fallback
+      }
+    </script>
+  </head>
+  <body>
+    <p>Redirecting based on domain...</p>
+  </body>
+</html>
