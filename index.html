@@ -6,368 +6,246 @@
 <title>STI Study Guide — ICT & Research</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0e0f13;
-  --bg2: #161820;
-  --bg3: #1e2028;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.12);
-  --text: #f0f0f0;
-  --muted: #8a8c96;
-  --ict: #4fc3ff;
-  --ict-bg: rgba(79,195,255,0.08);
-  --ict-border: rgba(79,195,255,0.2);
-  --res: #67e8a0;
-  --res-bg: rgba(103,232,160,0.08);
-  --res-border: rgba(103,232,160,0.2);
-  --accent: #a78bfa;
-  --accent-bg: rgba(167,139,250,0.1);
-  --warn: #fbbf24;
-  --danger: #f87171;
-  --success: #4ade80;
-  --radius: 12px;
-  --radius-sm: 8px;
+:root{
+  --bg:#0e0f13;--bg2:#161820;--bg3:#1e2028;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --text:#f0f0f0;--muted:#8a8c96;
+  --ict:#4fc3ff;--ict-bg:rgba(79,195,255,0.08);--ict-border:rgba(79,195,255,0.2);
+  --res:#67e8a0;--res-bg:rgba(103,232,160,0.08);--res-border:rgba(103,232,160,0.2);
+  --accent:#a78bfa;--accent-bg:rgba(167,139,250,0.1);
+  --warn:#fbbf24;--radius:12px;--radius-sm:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  font-size:15px;
-  line-height:1.7;
-}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.7}
 h1,h2,h3,h4{font-family:'Syne',sans-serif;font-weight:700;line-height:1.2}
-
-/* NOISE OVERLAY */
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events:none;z-index:0;opacity:0.4;
-}
-
-/* LAYOUT */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4}
 .app{position:relative;z-index:1}
-
-/* NAV */
-nav{
-  position:sticky;top:0;z-index:100;
-  background:rgba(14,15,19,0.85);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
-  padding:0 2rem;
-  display:flex;align-items:center;gap:0;
-  height:60px;
-}
-.nav-brand{
-  font-family:'Syne',sans-serif;font-weight:800;font-size:16px;
-  color:var(--text);margin-right:2rem;white-space:nowrap;
-  display:flex;align-items:center;gap:8px;
-}
+nav{position:sticky;top:0;z-index:100;background:rgba(14,15,19,0.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;height:60px}
+.nav-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--text);margin-right:1.5rem;white-space:nowrap}
 .nav-brand span{color:var(--accent)}
 .nav-links{display:flex;gap:2px;flex:1;overflow-x:auto}
 .nav-links::-webkit-scrollbar{display:none}
-.nav-btn{
-  padding:6px 14px;border-radius:var(--radius-sm);
-  background:transparent;border:none;
-  color:var(--muted);cursor:pointer;
-  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:400;
-  white-space:nowrap;transition:all 0.15s;
-}
+.nav-btn{padding:6px 13px;border-radius:var(--radius-sm);background:transparent;border:none;color:var(--muted);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;white-space:nowrap;transition:all 0.15s}
 .nav-btn:hover{color:var(--text);background:rgba(255,255,255,0.04)}
 .nav-btn.active{color:var(--text);background:rgba(255,255,255,0.07);font-weight:500}
-
-/* PAGES */
 .page{display:none;animation:fadeIn 0.2s ease}
 .page.active{display:block}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-
-/* HERO */
-.hero{
-  padding:5rem 2rem 4rem;
-  max-width:900px;margin:0 auto;
-}
-.hero-eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
-  color:var(--accent);padding:4px 12px;
-  border:1px solid var(--accent-bg);
-  border-radius:100px;margin-bottom:1.5rem;
-  background:var(--accent-bg);
-}
-.hero h1{font-size:clamp(2.5rem,6vw,4rem);margin-bottom:1rem;
-  background:linear-gradient(135deg,#fff 0%,#a0a0b0 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{font-size:17px;color:var(--muted);max-width:560px;margin-bottom:2.5rem}
-.hero-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.hero-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius);padding:1.5rem;
-  cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;
-}
-.hero-card::before{
-  content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s;
-}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.hero{padding:4.5rem 2rem 3.5rem;max-width:900px;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);padding:4px 12px;border:1px solid var(--accent-bg);border-radius:100px;margin-bottom:1.5rem;background:var(--accent-bg)}
+.hero h1{font-size:clamp(2.2rem,6vw,3.8rem);margin-bottom:1rem;background:linear-gradient(135deg,#fff 0%,#9090a8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{font-size:16px;color:var(--muted);max-width:520px;margin-bottom:2.5rem}
+.hero-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.hero-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.hero-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s}
 .hero-card:hover{border-color:var(--border2);transform:translateY(-2px)}
-.hero-card.ict-card{border-color:var(--ict-border)}
-.hero-card.ict-card::before{background:radial-gradient(ellipse at top left,rgba(79,195,255,0.06),transparent 70%)}
-.hero-card.res-card{border-color:var(--res-border)}
-.hero-card.res-card::before{background:radial-gradient(ellipse at top left,rgba(103,232,160,0.06),transparent 70%)}
 .hero-card:hover::before{opacity:1}
-.hc-icon{font-size:28px;margin-bottom:0.75rem}
-.hc-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px}
-.hc-sub{font-size:13px;color:var(--muted)}
-.hc-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--accent);margin-bottom:4px}
-
-/* SUBJECT BADGE */
-.badge{
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;
-  padding:3px 10px;border-radius:100px;
-}
+.hero-card.ict-card{border-color:var(--ict-border)}
+.hero-card.ict-card::before{background:radial-gradient(ellipse at top left,rgba(79,195,255,0.07),transparent 70%)}
+.hero-card.res-card{border-color:var(--res-border)}
+.hero-card.res-card::before{background:radial-gradient(ellipse at top left,rgba(103,232,160,0.07),transparent 70%)}
+.hc-icon{font-size:26px;margin-bottom:0.6rem}
+.hc-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--accent);margin-bottom:4px}
+.hc-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;margin-bottom:3px}
+.hc-sub{font-size:12px;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;padding:3px 10px;border-radius:100px}
 .badge-ict{background:var(--ict-bg);color:var(--ict);border:1px solid var(--ict-border)}
 .badge-res{background:var(--res-bg);color:var(--res);border:1px solid var(--res-border)}
-
-/* CONTENT SECTIONS */
 .content{max-width:960px;margin:0 auto;padding:2.5rem 2rem}
 .section-header{margin-bottom:2rem}
-.section-header h2{font-size:28px;margin-bottom:6px}
+.section-header h2{font-size:26px;margin-top:10px;margin-bottom:6px}
 .section-header p{color:var(--muted);font-size:14px}
-
-/* FILTER TABS */
 .filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem}
-.filter-btn{
-  padding:5px 14px;border-radius:100px;
-  border:1px solid var(--border);
-  background:transparent;color:var(--muted);
-  cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;
-  transition:all 0.15s;
-}
+.filter-btn{padding:5px 14px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-family:'DM Sans',sans-serif;transition:all 0.15s}
 .filter-btn:hover{border-color:var(--border2);color:var(--text)}
-.filter-btn.active{background:rgba(255,255,255,0.08);border-color:var(--border2);color:var(--text);font-weight:500}
-
-/* TERM GRID */
+.filter-btn.active{background:rgba(255,255,255,0.07);border-color:var(--border2);color:var(--text);font-weight:500}
 .term-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.term-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius);padding:1.25rem;
-  transition:border-color 0.15s;
-}
+.term-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem;transition:border-color 0.15s}
 .term-card:hover{border-color:var(--border2)}
-.term-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;margin-bottom:6px;color:#e8e8f0}
+.term-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:600;margin-bottom:5px;color:#e8e8f0}
 .term-desc{font-size:13px;color:var(--muted);line-height:1.65}
-
-/* QUIZ */
-.quiz-start{max-width:640px;margin:0 auto;padding:3rem 2rem;text-align:center}
-.quiz-start h2{font-size:36px;margin-bottom:0.75rem}
-.quiz-start p{color:var(--muted);margin-bottom:2rem}
-.quiz-stats{display:flex;justify-content:center;gap:16px;margin-bottom:2.5rem;flex-wrap:wrap}
-.qstat{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius);padding:1rem 1.5rem;min-width:120px;
-}
-.qstat-num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800}
-.qstat-label{font-size:12px;color:var(--muted);margin-top:2px}
-.btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:10px 24px;border-radius:var(--radius-sm);
-  border:1px solid var(--border2);background:rgba(255,255,255,0.05);
-  color:var(--text);cursor:pointer;font-size:14px;font-weight:500;
-  font-family:'DM Sans',sans-serif;transition:all 0.15s;
-}
-.btn:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.18)}
-.btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn-accent:hover{background:#9370f0;border-color:#9370f0}
-.btn-lg{padding:13px 32px;font-size:16px;border-radius:var(--radius)}
-
-/* QUIZ ACTIVE */
+/* QUIZ HUB */
+.quiz-hub{max-width:760px;margin:0 auto;padding:3rem 2rem}
+.quiz-hub h2{font-size:32px;margin-bottom:8px}
+.quiz-hub .sub-label{color:var(--muted);font-size:15px;margin-bottom:2.5rem}
+.quiz-choices{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:2rem}
+.qchoice{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.qchoice::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s}
+.qchoice:hover{transform:translateY(-3px)}
+.qchoice:hover::before{opacity:1}
+.qchoice.ict-choice{border-color:var(--ict-border)}
+.qchoice.ict-choice::before{background:radial-gradient(ellipse at top left,rgba(79,195,255,0.09),transparent 70%)}
+.qchoice.res-choice{border-color:var(--res-border)}
+.qchoice.res-choice::before{background:radial-gradient(ellipse at top left,rgba(103,232,160,0.09),transparent 70%)}
+.qchoice-icon{font-size:32px;margin-bottom:1rem}
+.qchoice h3{font-size:18px;margin-bottom:6px}
+.qchoice p{font-size:13px;color:var(--muted)}
+.qchoice-stats{display:flex;gap:12px;margin-top:1rem;flex-wrap:wrap}
+.qstat-pill{font-size:12px;padding:3px 10px;border-radius:100px;background:var(--bg3);color:var(--muted);border:1px solid var(--border)}
+/* QUIZ SCREEN */
 .quiz-wrap{max-width:680px;margin:0 auto;padding:2rem}
 .quiz-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
-.q-num{font-size:13px;color:var(--muted)}
-.q-live-score{font-size:13px;color:var(--muted)}
-.progress-track{
-  height:4px;background:var(--bg3);
-  border-radius:2px;margin-bottom:1.5rem;overflow:hidden;
-}
-.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 0.4s ease}
-.section-announce{
-  padding:8px 14px;border-radius:var(--radius-sm);
-  font-size:12px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
-  margin-bottom:1rem;display:inline-block;
-}
-.announce-ict{background:var(--ict-bg);color:var(--ict);border:1px solid var(--ict-border)}
-.announce-res{background:var(--res-bg);color:var(--res);border:1px solid var(--res-border)}
-.q-box{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius);padding:1.75rem;margin-bottom:1rem;
-}
-.q-text{font-size:17px;font-weight:500;line-height:1.55;margin-bottom:1.25rem;font-family:'Syne',sans-serif}
-.opt{
-  display:block;width:100%;text-align:left;
-  padding:11px 16px;margin:6px 0;
-  border:1px solid var(--border);border-radius:var(--radius-sm);
-  background:transparent;color:var(--text);
-  cursor:pointer;font-size:14px;line-height:1.5;
-  font-family:'DM Sans',sans-serif;transition:all 0.15s;
-}
+.q-num-lbl{font-size:13px;color:var(--muted)}
+.q-score-lbl{font-size:13px;color:var(--muted)}
+.progress-track{height:4px;background:var(--bg3);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.progress-fill{height:100%;border-radius:2px;transition:width 0.4s ease}
+.pf-ict{background:var(--ict)}
+.pf-res{background:var(--res)}
+.q-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem;margin-bottom:1rem}
+.q-text{font-size:16px;font-weight:500;line-height:1.6;margin-bottom:1.25rem;font-family:'Syne',sans-serif}
+.opt{display:block;width:100%;text-align:left;padding:11px 16px;margin:6px 0;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;color:var(--text);cursor:pointer;font-size:13.5px;line-height:1.5;font-family:'DM Sans',sans-serif;transition:all 0.15s}
 .opt:hover:not(:disabled){background:rgba(255,255,255,0.04);border-color:var(--border2)}
 .opt:disabled{cursor:default}
 .opt.correct{background:rgba(74,222,128,0.08);border-color:rgba(74,222,128,0.35);color:#4ade80}
 .opt.wrong{background:rgba(248,113,113,0.08);border-color:rgba(248,113,113,0.3);color:#f87171}
-.feedback-box{
-  padding:10px 14px;border-radius:var(--radius-sm);
-  font-size:13px;margin-top:10px;display:none;
-}
+.feedback-box{padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;margin-top:10px;display:none}
 .feedback-box.correct{background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);color:#4ade80}
 .feedback-box.wrong{background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.2);color:#f87171}
 .quiz-nav{display:flex;justify-content:flex-end;margin-top:1rem}
-
 /* RESULTS */
-.results-wrap{max-width:640px;margin:0 auto;padding:3rem 2rem;text-align:center}
-.results-circle{
-  width:140px;height:140px;border-radius:50%;
-  border:4px solid var(--accent);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  margin:0 auto 2rem;
-  background:var(--accent-bg);
-}
-.results-score{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;color:var(--accent);line-height:1}
-.results-denom{font-size:13px;color:var(--muted);margin-top:4px}
-.results-grade{font-size:16px;color:var(--muted);margin-bottom:2rem}
-.breakdown{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:2rem}
-.bk-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
-.bk-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:700}
-.bk-label{font-size:13px;color:var(--muted);margin-top:4px}
-.result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-
+.results-wrap{max-width:580px;margin:0 auto;padding:3rem 2rem;text-align:center}
+.results-circle{width:130px;height:130px;border-radius:50%;border:4px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 1.5rem;background:var(--accent-bg)}
+.results-circle.ict-circle{border-color:var(--ict);background:var(--ict-bg)}
+.results-circle.res-circle{border-color:var(--res);background:var(--res-bg)}
+.r-num{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;line-height:1}
+.r-denom{font-size:12px;color:var(--muted);margin-top:3px}
+.r-grade{font-size:15px;color:var(--muted);margin-bottom:2rem}
+.r-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+/* BTN */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:rgba(255,255,255,0.05);color:var(--text);cursor:pointer;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.btn:hover{background:rgba(255,255,255,0.09);border-color:rgba(255,255,255,0.18)}
+.btn-ict{background:var(--ict-bg);border-color:var(--ict-border);color:var(--ict)}
+.btn-ict:hover{background:rgba(79,195,255,0.15)}
+.btn-res{background:var(--res-bg);border-color:var(--res-border);color:var(--res)}
+.btn-res:hover{background:rgba(103,232,160,0.15)}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-accent:hover{background:#9370f0;border-color:#9370f0}
+.btn-lg{padding:13px 30px;font-size:15px;border-radius:var(--radius)}
 /* ESSAYS */
+.essays-hub{max-width:760px;margin:0 auto;padding:3rem 2rem}
+.essays-hub h2{font-size:32px;margin-bottom:8px}
+.essays-hub .sub-label{color:var(--muted);font-size:15px;margin-bottom:2.5rem}
+.essay-choices{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.5rem}
+.echoice{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:2rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.echoice::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity 0.2s}
+.echoice:hover{transform:translateY(-3px)}
+.echoice:hover::before{opacity:1}
+.echoice.ict-choice{border-color:var(--ict-border)}
+.echoice.ict-choice::before{background:radial-gradient(ellipse at top left,rgba(79,195,255,0.09),transparent 70%)}
+.echoice.res-choice{border-color:var(--res-border)}
+.echoice.res-choice::before{background:radial-gradient(ellipse at top left,rgba(103,232,160,0.09),transparent 70%)}
+.echoice-icon{font-size:30px;margin-bottom:0.75rem}
+.echoice h3{font-size:17px;margin-bottom:5px}
+.echoice p{font-size:13px;color:var(--muted)}
 .essays-wrap{max-width:760px;margin:0 auto;padding:2rem}
-.essay-card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--radius);padding:1.75rem;margin-bottom:16px;
-}
+.essay-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.75rem;margin-bottom:16px}
 .essay-top{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
-.essay-num-badge{
-  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
-  width:30px;height:30px;border-radius:50%;
-  background:var(--bg3);border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  color:var(--muted);flex-shrink:0;
-}
+.essay-num-b{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;width:28px;height:28px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0}
 .essay-prompt{font-size:15px;font-weight:500;line-height:1.65;margin-bottom:1rem;font-family:'Syne',sans-serif}
-.essay-area{
-  width:100%;min-height:150px;padding:12px 14px;
-  border:1px solid var(--border);border-radius:var(--radius-sm);
-  background:var(--bg3);color:var(--text);
-  resize:vertical;font-size:14px;line-height:1.7;
-  font-family:'DM Sans',sans-serif;transition:border-color 0.15s;
-}
+.essay-area{width:100%;min-height:150px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);resize:vertical;font-size:14px;line-height:1.7;font-family:'DM Sans',sans-serif;transition:border-color 0.15s}
 .essay-area:focus{outline:none;border-color:var(--border2)}
 .essay-area::placeholder{color:var(--muted);opacity:0.5}
 .essay-guide{font-size:12px;color:var(--muted);margin-top:8px;opacity:0.6}
-.essay-actions{margin-top:1.5rem;display:flex;gap:10px}
-
-/* DIVIDER */
-.divider{height:1px;background:var(--border);margin:2rem 0}
-
-/* FOOTER */
-footer{
-  text-align:center;padding:2rem;
-  color:var(--muted);font-size:12px;
-  border-top:1px solid var(--border);
-  margin-top:4rem;
-}
-
-/* SCROLLBAR */
+.essay-back{margin-bottom:1.5rem;display:flex;align-items:center;gap:12px}
+.essay-back-actions{margin-top:1.5rem;display:flex;gap:10px}
+footer{text-align:center;padding:2rem;color:var(--muted);font-size:12px;border-top:1px solid var(--border);margin-top:4rem}
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
-
-/* RESPONSIVE */
 @media(max-width:600px){
   nav{padding:0 1rem}
-  .hero{padding:3rem 1rem 2rem}
-  .content,.quiz-wrap,.quiz-start,.essays-wrap,.results-wrap{padding:1.5rem 1rem}
-  .hero h1{font-size:2rem}
+  .hero,.content,.quiz-wrap,.quiz-hub,.essays-hub,.essays-wrap,.results-wrap{padding-left:1rem;padding-right:1rem}
+  .hero{padding-top:2.5rem;padding-bottom:2rem}
+  .quiz-choices,.essay-choices{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 <div class="app">
-
 <nav>
-  <div class="nav-brand">✦ <span>STI</span> Study Guide</div>
+  <div class="nav-brand">✦ <span>STI</span> Study</div>
   <div class="nav-links">
     <button class="nav-btn active" onclick="showPage('home')">Home</button>
-    <button class="nav-btn" onclick="showPage('ict')">ICT Terms</button>
-    <button class="nav-btn" onclick="showPage('research')">Research Terms</button>
-    <button class="nav-btn" onclick="showPage('quiz')">Quiz</button>
-    <button class="nav-btn" onclick="showPage('essays')">Essays</button>
+    <button class="nav-btn" onclick="showPage('ict-terms')">ICT Terms</button>
+    <button class="nav-btn" onclick="showPage('res-terms')">Research Terms</button>
+    <button class="nav-btn" onclick="showPage('quiz-hub')">Quiz</button>
+    <button class="nav-btn" onclick="showPage('essays-hub')">Essays</button>
   </div>
 </nav>
 
 <!-- HOME -->
 <div id="home" class="page active">
   <div class="hero">
-    <div class="hero-eyebrow">✦ Senior High School · ITSH2301 &amp; SH1728</div>
+    <div class="hero-eyebrow">✦ ITSH2301 &amp; SH1728 · Senior High School</div>
     <h1>Study Smarter,<br>Not Harder.</h1>
-    <p>All your ICT and Research terms, a 30-question quiz, and essay prompts — in one place.</p>
+    <p>All your ICT and Research terms, two separate 30-question quizzes drawn from 50 each, and separate essay sets — all in one place.</p>
     <div class="hero-cards">
-      <div class="hero-card ict-card" onclick="showPage('ict')">
+      <div class="hero-card ict-card" onclick="showPage('ict-terms')">
         <div class="hc-icon">💻</div>
         <div class="hc-title">ICT Terms</div>
         <div class="hc-sub">3 handouts · Web, Tools, Design & Collaboration</div>
       </div>
-      <div class="hero-card res-card" onclick="showPage('research')">
+      <div class="hero-card res-card" onclick="showPage('res-terms')">
         <div class="hc-icon">📄</div>
         <div class="hc-title">Research Terms</div>
         <div class="hc-sub">1 handout · Process, Structure & Writing</div>
       </div>
-      <div class="hero-card" onclick="showPage('quiz')" style="border-color:rgba(167,139,250,0.25)">
-        <div class="hc-num">30</div>
-        <div class="hc-title">Quiz Questions</div>
-        <div class="hc-sub">Random draw from 50 — both subjects separate</div>
+      <div class="hero-card ict-card" onclick="showPage('quiz-hub')">
+        <div class="hc-num" style="color:var(--ict)">30</div>
+        <div class="hc-title">ICT Quiz</div>
+        <div class="hc-sub">30 of 50 questions · ICT only</div>
       </div>
-      <div class="hero-card" onclick="showPage('essays')" style="border-color:rgba(251,191,36,0.2)">
-        <div class="hc-num" style="color:var(--warn)">5</div>
-        <div class="hc-title">Essay Prompts</div>
-        <div class="hc-sub">Random draw from 10 across both subjects</div>
+      <div class="hero-card res-card" onclick="showPage('quiz-hub')">
+        <div class="hc-num" style="color:var(--res)">30</div>
+        <div class="hc-title">Research Quiz</div>
+        <div class="hc-sub">30 of 50 questions · Research only</div>
+      </div>
+      <div class="hero-card ict-card" onclick="showPage('essays-hub')">
+        <div class="hc-num" style="color:var(--ict)">5</div>
+        <div class="hc-title">ICT Essays</div>
+        <div class="hc-sub">5 of 10 prompts · ICT only</div>
+      </div>
+      <div class="hero-card res-card" onclick="showPage('essays-hub')">
+        <div class="hc-num" style="color:var(--res)">5</div>
+        <div class="hc-title">Research Essays</div>
+        <div class="hc-sub">5 of 10 prompts · Research only</div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- ICT TERMS -->
-<div id="ict" class="page">
+<div id="ict-terms" class="page">
   <div class="content">
     <div class="section-header">
       <span class="badge badge-ict">ICT</span>
-      <h2 style="margin-top:10px">ICT Terms & Concepts</h2>
+      <h2>ICT Terms &amp; Concepts</h2>
       <p>From 3 handouts: Introduction to ICT, Applied Productivity Tools, and Collaborative Development</p>
     </div>
-    <div class="filter-row" id="ict-filters">
+    <div class="filter-row">
       <button class="filter-btn active" onclick="filterICT('all',this)">All</button>
-      <button class="filter-btn" onclick="filterICT('web',this)">Web & Platforms</button>
+      <button class="filter-btn" onclick="filterICT('web',this)">Web &amp; Platforms</button>
       <button class="filter-btn" onclick="filterICT('tools',this)">Productivity Tools</button>
       <button class="filter-btn" onclick="filterICT('design',this)">Design</button>
       <button class="filter-btn" onclick="filterICT('collab',this)">Collaboration</button>
+      <button class="filter-btn" onclick="filterICT('safety',this)">Safety &amp; Security</button>
     </div>
     <div class="term-grid" id="ict-grid"></div>
   </div>
 </div>
 
 <!-- RESEARCH TERMS -->
-<div id="research" class="page">
+<div id="res-terms" class="page">
   <div class="content">
     <div class="section-header">
       <span class="badge badge-res">Research</span>
-      <h2 style="margin-top:10px">Research Terms & Concepts</h2>
+      <h2>Research Terms &amp; Concepts</h2>
       <p>From 1 handout: Research — Methods, Structure, Writing</p>
     </div>
-    <div class="filter-row" id="res-filters">
+    <div class="filter-row">
       <button class="filter-btn active" onclick="filterRes('all',this)">All</button>
-      <button class="filter-btn" onclick="filterRes('brainstorm',this)">Topic Selection</button>
+      <button class="filter-btn" onclick="filterRes('topic',this)">Topic &amp; Brainstorming</button>
       <button class="filter-btn" onclick="filterRes('parts',this)">Paper Parts</button>
       <button class="filter-btn" onclick="filterRes('method',this)">Methodology</button>
       <button class="filter-btn" onclick="filterRes('findings',this)">Findings</button>
@@ -376,279 +254,359 @@ footer{
   </div>
 </div>
 
-<!-- QUIZ -->
-<div id="quiz" class="page">
-  <div id="quiz-start-screen">
-    <div class="quiz-start">
-      <h2>Ready to Test?</h2>
-      <p>30 questions randomly selected from a pool of 50. ICT and Research are kept in separate sections so you always know which subject you're on.</p>
-      <div class="quiz-stats">
-        <div class="qstat"><div class="qstat-num">30</div><div class="qstat-label">Total Questions</div></div>
-        <div class="qstat"><div class="qstat-num" style="color:var(--ict)">15</div><div class="qstat-label">ICT Questions</div></div>
-        <div class="qstat"><div class="qstat-num" style="color:var(--res)">15</div><div class="qstat-label">Research Questions</div></div>
-      </div>
-      <button class="btn btn-accent btn-lg" onclick="startQuiz()">Start Quiz →</button>
-    </div>
-  </div>
-  <div id="quiz-active-screen" style="display:none">
-    <div class="quiz-wrap">
-      <div class="quiz-top">
-        <span class="q-num" id="q-num-display">Question 1 of 30</span>
-        <span class="q-live-score" id="q-live-score">Score: 0</span>
-      </div>
-      <div class="progress-track"><div class="progress-fill" id="q-progress" style="width:0%"></div></div>
-      <div id="section-announce"></div>
-      <div class="q-box">
-        <div class="q-text" id="q-text"></div>
-        <div id="q-opts"></div>
-        <div class="feedback-box" id="q-feedback"></div>
-      </div>
-      <div class="quiz-nav">
-        <button class="btn btn-accent" id="q-next-btn" onclick="nextQ()" style="display:none">Next →</button>
-      </div>
-    </div>
-  </div>
-  <div id="quiz-results-screen" style="display:none">
-    <div class="results-wrap">
-      <h2 style="margin-bottom:1.5rem">Quiz Complete</h2>
-      <div class="results-circle">
-        <div class="results-score" id="r-score"></div>
-        <div class="results-denom">out of 30</div>
-      </div>
-      <div class="results-grade" id="r-grade"></div>
-      <div class="breakdown">
-        <div class="bk-card">
-          <span class="badge badge-ict" style="margin-bottom:8px">ICT</span>
-          <div class="bk-num" id="r-ict"></div>
-          <div class="bk-label">out of 15</div>
-        </div>
-        <div class="bk-card">
-          <span class="badge badge-res" style="margin-bottom:8px">Research</span>
-          <div class="bk-num" id="r-res"></div>
-          <div class="bk-label">out of 15</div>
+<!-- QUIZ HUB -->
+<div id="quiz-hub" class="page">
+  <div class="quiz-hub">
+    <h2>Choose a Quiz</h2>
+    <div class="sub-label">Each quiz draws 30 random questions from a pool of 50. Questions are never mixed between subjects.</div>
+    <div class="quiz-choices">
+      <div class="qchoice ict-choice" onclick="initQuiz('ict')">
+        <div class="qchoice-icon">💻</div>
+        <h3>ICT Quiz</h3>
+        <p>Tests concepts from Web Technology, Productivity Tools, Graphic Design, and Online Collaboration.</p>
+        <div class="qchoice-stats">
+          <span class="qstat-pill">50 question pool</span>
+          <span class="qstat-pill">30 per session</span>
+          <span class="qstat-pill">4 choices each</span>
         </div>
       </div>
-      <div class="result-actions">
-        <button class="btn" onclick="showPage('essays')">Try Essays</button>
-        <button class="btn btn-accent" onclick="retakeQuiz()">Retake Quiz</button>
+      <div class="qchoice res-choice" onclick="initQuiz('res')">
+        <div class="qchoice-icon">📄</div>
+        <h3>Research Quiz</h3>
+        <p>Tests concepts from Topic Selection, Paper Structure, Methodology, and Findings.</p>
+        <div class="qchoice-stats">
+          <span class="qstat-pill">50 question pool</span>
+          <span class="qstat-pill">30 per session</span>
+          <span class="qstat-pill">4 choices each</span>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ESSAYS -->
-<div id="essays" class="page">
+<!-- QUIZ ACTIVE -->
+<div id="quiz-active" class="page">
+  <div class="quiz-wrap">
+    <div class="quiz-top">
+      <span class="q-num-lbl" id="q-num-lbl">Question 1 of 30</span>
+      <span class="q-score-lbl" id="q-score-lbl">Score: 0</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="q-progress" style="width:0%"></div></div>
+    <div id="q-badge-area" style="margin-bottom:12px"></div>
+    <div class="q-box">
+      <div class="q-text" id="q-text"></div>
+      <div id="q-opts"></div>
+      <div class="feedback-box" id="q-feedback"></div>
+    </div>
+    <div class="quiz-nav">
+      <button class="btn btn-accent" id="q-next-btn" onclick="nextQ()" style="display:none">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ RESULTS -->
+<div id="quiz-results" class="page">
+  <div class="results-wrap">
+    <h2 style="margin-bottom:1.5rem">Quiz Complete</h2>
+    <div class="results-circle" id="r-circle">
+      <div class="r-num" id="r-num"></div>
+      <div class="r-denom">out of 30</div>
+    </div>
+    <div class="r-grade" id="r-grade"></div>
+    <div class="r-actions">
+      <button class="btn" onclick="showPage('quiz-hub')">← Back to Quizzes</button>
+      <button class="btn btn-accent" id="r-retake-btn">Retake</button>
+    </div>
+  </div>
+</div>
+
+<!-- ESSAYS HUB -->
+<div id="essays-hub" class="page">
+  <div class="essays-hub">
+    <h2>Choose an Essay Set</h2>
+    <div class="sub-label">Each set draws 5 random prompts from a pool of 10. ICT and Research are completely separate.</div>
+    <div class="essay-choices">
+      <div class="echoice ict-choice" onclick="loadEssays('ict')">
+        <div class="echoice-icon">💻</div>
+        <h3>ICT Essays</h3>
+        <p>5 of 10 prompts on Web Technology, Design, Tools, Safety, and Collaboration.</p>
+      </div>
+      <div class="echoice res-choice" onclick="loadEssays('res')">
+        <div class="echoice-icon">📄</div>
+        <h3>Research Essays</h3>
+        <p>5 of 10 prompts on Topic Selection, Paper Structure, Methodology, and Findings.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ESSAYS ACTIVE -->
+<div id="essays-active" class="page">
   <div class="essays-wrap">
-    <div class="section-header">
-      <h2>Essay Questions</h2>
-      <p>5 prompts randomly selected from a pool of 10. Write in full paragraphs using specific concepts from your handouts.</p>
+    <div class="essay-back">
+      <button class="btn" onclick="showPage('essays-hub')">← Back</button>
+      <span id="essay-set-badge"></span>
     </div>
     <div id="essay-list"></div>
-    <div class="essay-actions">
-      <button class="btn btn-accent" onclick="loadEssays()">New Set of Essays</button>
+    <div class="essay-back-actions">
+      <button class="btn btn-accent" id="essay-reload-btn">New Set</button>
     </div>
   </div>
 </div>
 
-<footer>STI Senior High School · ITSH2301 &amp; SH1728 · Study Guide · All content from official course handouts</footer>
-
+<footer>STI Senior High School · ITSH2301 &amp; SH1728 · All content from official course handouts</footer>
 </div>
 
 <script>
+// ─── TERMS DATA ───────────────────────────────────────────────
 const ictTerms=[
-{cat:'web',name:'ICT (Information and Communication Technology)',desc:'A range of technologies that advance communications, enabling broadcast media, networking components, and audiovisual processing and transmission systems allowing people and organizations to interact digitally.'},
-{cat:'web',name:'Web 1.0',desc:'The first generation of the Internet pioneered by Tim Berners-Lee in 1990. He wrote fundamental technologies that became the foundation of the world wide web and the first webpage browser.'},
-{cat:'web',name:'Web 2.0',desc:'A shift in how the internet is used over the past 15–20 years, making it possible for user-generated content to be viewed by people globally in real time, driven by social networks and expanded interactivity.'},
-{cat:'web',name:'Web 3.0',desc:'The next phase of internet evolution built on decentralization (data stored in multiple locations), openness (open-source software), and greater user utility via machine learning for faster, more relevant results.'},
-{cat:'web',name:'Convergent Technologies',desc:'Two or more independent technologies that combine to form a new device. A smartphone integrating a telephone, camera, multimedia player, and navigation tool is a classic example.'},
-{cat:'web',name:'Assistive Technology',desc:'Any device, application, or equipment that supports people with disabilities to learn, communicate, and function. Examples include ChromeVox (screen reader), Capti (text-to-speech), and magnifier apps.'},
-{cat:'web',name:'Online Marketplace',desc:'An e-commerce platform where sellers and buyers trade products and services. Examples in the Philippines include Lazada, Foodpanda, and Facebook Marketplace.'},
-{cat:'web',name:'Search Engine',desc:'A web-based tool that retrieves information by crawling, indexing, searching, and ranking web content. Examples: Google, Yahoo!, and Microsoft Bing.'},
-{cat:'web',name:'Phishing',desc:'An illegal method of pretending to be a legitimate website in order to steal personal or financial information from unsuspecting users. Cross-check links carefully before transacting online.'},
-{cat:'web',name:'Online Safety',desc:'Means by which users defend themselves against possible online dangers: not trusting strangers, limiting personal disclosures, verifying websites, and avoiding suspicious shortened links.'},
-{cat:'web',name:'Online Security',desc:'Safeguards confidential information against attacks and cybercrimes using strong passwords (8+ alphanumeric characters), multi-factor authentication, anti-virus software, and backup storage.'},
-{cat:'web',name:'Online Etiquette (Netiquette)',desc:'Behaving with kindness and respect online. Includes proper tone, proofreading messages, respecting privacy, being prepared for meetings, and avoiding spreading misinformation.'},
-{cat:'web',name:'Content Curation',desc:'The process of finding and sharing information relevant to a primary audience, collecting content from various sources and presenting it organized. Examples: sharing blog links, compiling expert quotes, creating image collages.'},
-{cat:'tools',name:'Productivity Tools',desc:'Internet resources that allow individuals and organizations to increase productivity through written, visual, or audio outputs. Used to produce professional documents, presentations, databases, charts, and graphs.'},
-{cat:'tools',name:'Word Processor',desc:'An application that lets users write, edit, and print documents. Examples: Microsoft Word, Google Docs, OpenOffice Writer. Key features include text formatting, spell check, multimedia insertion, and layout customization.'},
-{cat:'tools',name:'Spreadsheet',desc:'A file of rows and columns that sorts, organizes, arranges, and calculates numerical data. Examples: Microsoft Excel, Google Sheets. Uses include finance tracking, grade calculation, inventories, and simple lists.'},
-{cat:'tools',name:'Presentation Program',desc:'Software to create a slideshow for professional or educational purposes presented slide-by-slide. Examples: Microsoft PowerPoint, Canva, Google Slides, Prezi.'},
-{cat:'tools',name:'10-20-30 Rule',desc:'A presentation guideline by Guy Kawasaki (Apple marketing specialist): no more than 10 slides, discussed within 20 minutes, using a minimum font size of 30 for readability.'},
-{cat:'tools',name:'Graphic Design Tools',desc:'Programs and applications that let users design, edit, animate, and illustrate work online. Examples: Adobe Photoshop, Illustrator, PicsArt, GitHub, and Blender.'},
-{cat:'design',name:'Unity (Design Principle)',desc:'The prime principle and objective of all design. The coherence of elements such as line, shape, texture, color, and their positions gives a sense that all parts are working together to achieve overall harmony.'},
-{cat:'design',name:'Variety (Design Principle)',desc:'Provides visual interest in what would otherwise be ordinary and bland. This balance adds excitement and results in a creative, engaging design.'},
-{cat:'design',name:'Hierarchy (Design Principle)',desc:'Managing and arranging the order of design elements — including organization, positioning, and identifying the most important element — to provide a visual path for viewers and achieve effective communication.'},
-{cat:'design',name:'Proportion (Design Principle)',desc:'The size relationship between design elements, such as the height-to-width ratio of a shape. Vital in publications since common format and material sizes have set proportional ratios.'},
-{cat:'design',name:'Balance (Design Principle)',desc:'Visual weight distribution within a design. Symmetrical balance places elements of equal visual weight on either side. Asymmetrical balance uses contrasting visual weights to achieve equilibrium.'},
-{cat:'design',name:'Golden Ratio',desc:'A proportion of approximately 1.618 used in historical and modern design — seen in the Great Pyramids, Medieval church designs, and the Mona Lisa. The Fibonacci sequence closely replicates it.'},
-{cat:'design',name:'Grid (Layout)',desc:'Subdivides a page vertically and horizontally into margins, columns, lines of type, and image spaces. Provides repeatability, structured composition, and organized communication across a multi-page design.'},
-{cat:'design',name:'Visual Message',desc:'Communicates information and ideas using and combining various graphic design elements. Formats include advertisements, photographs, webpages, and infographics.'},
-{cat:'design',name:'Visual Literacy',desc:'The skills a viewer uses when reading images — including attention to attention span, visual cues, and symbolism — often underestimated as a form of communication.'},
-{cat:'collab',name:'Synchronous Collaboration',desc:'Real-time information exchange through video conferencing and instant messaging. The main benefit is instant feedback and spontaneous ideas, though it risks going off-topic.'},
-{cat:'collab',name:'Asynchronous Collaboration',desc:'Self-paced collaboration such as email conversations and voice messages. Best for projects requiring intensive thinking; allows participants to respond when prepared.'},
-{cat:'collab',name:'Project Management Tools',desc:'Designed for professional collaboration: assigning tasks, tracking progress, and sharing information. Example: Trello uses boards, lists, and cards to represent tasks and workflow.'},
-{cat:'collab',name:'Shared Calendars',desc:'Keep people up to date with synchronized calendars listing deadlines and to-do items. Often bundled in suites like Microsoft 365. Calendar plugins can simplify scheduling.'},
-{cat:'collab',name:'Instant Messaging Tools',desc:'Let people communicate instantly via text, voice, and file sharing. Platforms like Facebook Messenger and Discord serve as effective collaboration tools for the younger generation.'},
-{cat:'collab',name:'File Sharing Tools',desc:'Keep files securely backed up in cloud storage for real-time editing and collaboration. Google Drive and OneDrive are among the most popular, syncing data across multiple devices.'},
-{cat:'collab',name:'Video Conferencing Tools',desc:'The most-used online collaboration tool: enables audio/video meetings from anywhere with screen sharing and breakout rooms. Popular examples: Zoom, Google Meet, Skype for Business, Microsoft Teams.'},
+{cat:'web',name:'ICT (Information and Communication Technology)',desc:'A range of technologies that advance communications, enabling broadcast media, networking components, and audiovisual processing and transmission systems allowing people and organizations to interact in the digital world.'},
+{cat:'web',name:'Web 1.0',desc:'The first generation of the Internet, pioneered by Tim Berners-Lee in 1990 when he wrote fundamental technologies that became the foundation of the world wide web and the first webpage browser.'},
+{cat:'web',name:'Web 2.0',desc:'A shift in how the internet is used over the past 15–20 years, enabling user-generated content to be viewed globally in an instant, driven by social networks and applications that expanded online interactivity.'},
+{cat:'web',name:'Web 3.0',desc:'The next phase of internet evolution built on decentralization (data stored in multiple locations simultaneously), openness (open-source software), and greater user utility through machine learning for faster, more relevant results.'},
+{cat:'web',name:'Convergent Technologies',desc:'Technologies formed when two or more independent technologies combine to create a new device with blended purposes. A smartphone that integrates a phone, camera, multimedia player, and navigation tool is a classic example.'},
+{cat:'web',name:'Assistive Technology',desc:'Any device, application, or equipment that supports people with disabilities to learn, communicate, and function with ease according to their condition. Examples: ChromeVox (screen reader), Capti (text-to-speech), and magnifier apps.'},
+{cat:'web',name:'Online Marketplace',desc:'An e-commerce platform featuring sellers and buyers who trade products and services. Examples in the Philippines include Lazada, Foodpanda, and Facebook Marketplace, operating 24/7 with lower marketing costs.'},
+{cat:'web',name:'Search Engine',desc:'A web-based tool designed to retrieve information online specific to user needs, using crawling, indexing, searching, and ranking to return relevant results. Examples: Google, Yahoo!, and Microsoft Bing.'},
+{cat:'web',name:'Content Curation',desc:'The process of finding and sharing information relevant to a primary audience, collecting content from various sources and presenting it in an organized way. Examples include sharing blog links, compiling expert quotes, and creating image collages.'},
+{cat:'web',name:'Creative Content Outlets',desc:'Websites using different media types to communicate products, services, and brand identity. Types include blogs (written content), videos (brand/educational/vlogs), and infographics (visual data representations with minimal text).'},
+{cat:'web',name:'Communication Platforms',desc:'Tools used for faster information exchange across distances, commonly used by businesses, organizations, and individuals. Examples: Microsoft 365, Google Workspace, and Dropbox.'},
+{cat:'safety',name:'Online Safety',desc:'The means by which users defend themselves against possible online dangers, including never trusting strangers carelessly, not disclosing too much personal information, cross-checking websites, and clicking links only from reputable sources.'},
+{cat:'safety',name:'Online Security',desc:'Safeguards that protect confidential information against dangerous attacks and cybercrimes. Measures include strong passwords (8+ alphanumeric characters), multi-factor authentication, anti-virus software, and backup storage.'},
+{cat:'safety',name:'Online Etiquette (Netiquette)',desc:'The idea of behaving with kindness and respect online. Includes proper tone, proofreading before sending, respecting privacy, being prepared for online meetings, and avoiding spreading misinformation.'},
+{cat:'safety',name:'Phishing',desc:'An illegal method of pretending to be a legitimate website in order to steal personal or financial information. Users should cross-check the correct link and spelling before doing any communication or transaction online.'},
+{cat:'safety',name:'Multi-factor Authentication',desc:'A security measure requiring more than one form of verification (e.g., OTP, fingerprints, or facial recognition) in addition to a password, sending a notification each time a failed login attempt is made.'},
+{cat:'tools',name:'Productivity Tools',desc:'Resources on the Internet that allow individuals and organizations to increase productivity through written, visual, or audio outputs. Used to produce professional documents, presentations, databases, charts, and graphs.'},
+{cat:'tools',name:'Word Processor',desc:'An application or device that lets users write, edit, and print documents. Examples: Microsoft Word, Google Docs, OpenOffice Writer. Features include text copy/cut/paste, formatting, spell check, and multimedia insertion.'},
+{cat:'tools',name:'Spreadsheet',desc:'A file of rows and columns that helps sort, organize, arrange, and calculate numerical data. Examples: Microsoft Excel, Google Sheets, iWork Numbers. Used for finance, school grades, inventories, and simple lists.'},
+{cat:'tools',name:'Presentation Program',desc:'Software to create a slideshow for professional or educational purposes, presented and explained one slide at a time. Examples: Microsoft PowerPoint, Canva, Google Slides, and Prezi.'},
+{cat:'tools',name:'10-20-30 Rule',desc:'A presentation guideline introduced by Guy Kawasaki, a marketing specialist for Apple: no more than 10 slides, discussed within 20 minutes, and using a minimum font size of 30 for readability.'},
+{cat:'tools',name:'Graphic Design Tools',desc:'Programs and applications that let users design, edit, animate, and illustrate their work online. Examples: Adobe Photoshop, Adobe Illustrator, PicsArt, GitHub, and Blender.'},
+{cat:'design',name:'Unity (Design Principle)',desc:'The prime principle and objective of all design. The coherence of design elements such as line, shape, texture, color, and their positions gives a sense that all parts are working together to achieve overall harmony.'},
+{cat:'design',name:'Variety (Design Principle)',desc:'Provides visual interest in what would otherwise be ordinary and bland, adding a balance of excitement that results in a creative and engaging design composition.'},
+{cat:'design',name:'Hierarchy (Design Principle)',desc:'A primary task of managing and arranging the order of design elements — including organization, positioning, and identification of the most important part — to provide a visual path for viewers and achieve effective communication.'},
+{cat:'design',name:'Proportion (Design Principle)',desc:'Refers to the size relationship between design elements, such as the height and width ratio of a rectangle. Vital in publications since common formats and material sizes will have set proportional ratios.'},
+{cat:'design',name:'Balance (Design Principle)',desc:'The visual weight distribution of elements within a design. Symmetrical balance places equal visual weight on either side; asymmetrical balance uses contrasting weights on one side to balance "heavier" elements on the other.'},
+{cat:'design',name:'Golden Ratio',desc:'A proportion of approximately 1.618 used throughout historical and modern design — seen in the Great Pyramids, Medieval church designs, and the Mona Lisa painting. The Fibonacci sequence closely replicates it.'},
+{cat:'design',name:'Grid (Layout)',desc:'Subdivides a page vertically and horizontally into margins, columns, lines of type, and spaces between image blocks. Provides repeatability, structured composition, and organized communication across multi-page designs.'},
+{cat:'design',name:'Visual Message',desc:'Communicates information and ideas by using and combining various graphic design elements. It can appear in multiple formats such as advertisements, photographs, webpages, and infographics.'},
+{cat:'design',name:'Visual Literacy',desc:'The skills a viewer uses when reading images, which are often underestimated given factors such as attention span and different understandings of visual cues and symbolism.'},
+{cat:'collab',name:'Synchronous Collaboration',desc:'Collaboration that happens when everyone exchanges information in real-time through video conferencing and instant messaging. Main benefit is instantaneous discussion and spontaneity of ideas; risk is going off-topic.'},
+{cat:'collab',name:'Asynchronous Collaboration',desc:'Self-paced collaboration with a sense of urgency but no requirement for real-time response, such as email conversations and voice messages. Best for non-priority or intensive-thinking projects.'},
+{cat:'collab',name:'Project Management Tools',desc:'Designed for professional collaboration to help assign tasks and create an information-sharing hub. Features include task tracking, calendar functions, messaging, and file sharing. Example: Trello with boards, lists, and cards.'},
+{cat:'collab',name:'Shared Calendars',desc:'Keep people up to date with synchronized calendars that list and schedule deadlines and to-do lists. Usually included in collaborative software suites like Microsoft Teams for Microsoft 365.'},
+{cat:'collab',name:'File Sharing Tools',desc:'Keep files securely backed up and remotely stored in cloud storage for real-time editing and collaboration on documents. Google Drive and OneDrive are two of the most popular, syncing data across multiple devices.'},
+{cat:'collab',name:'Video Conferencing Tools',desc:'The most used online collaboration tool, making audio and video meetings and seminars possible from anywhere. Offers real-time conversation, screen sharing for interactive visual collaboration, and simultaneous breakout rooms. Examples: Zoom, Google Meet, Microsoft Teams.'},
+{cat:'collab',name:'Content Curation Tools',desc:'Applications that help find and organize content for sharing. Examples: Buzzsumo (most-shared content by keyword), Pocket (bookmarking plugin), Flipboard (mini magazine creator), Pinterest (image pinboards), Feedly (content aggregator).'},
 ];
 
 const resTerms=[
-{cat:'brainstorm',name:'Research',desc:'The culmination of an involved process of critical thinking, source evaluation, organization, and composition. It is a living thing that grows as you explore and interpret sources — not a summary, book report, or opinion piece.'},
-{cat:'brainstorm',name:'Manageable Topic',desc:'A topic that fits the researcher\'s time (deadline), skills (reading/writing level), available resources (books, journals, websites), and scope (not too wide, not too narrow).'},
-{cat:'brainstorm',name:'Primary Sources',desc:'Original, firsthand materials that are the heart of a research paper. Without them, the paper loses its nourishment and becomes a different genre of writing.'},
-{cat:'brainstorm',name:'Secondary Sources',desc:'Works that analyze, interpret, or summarize primary sources. Along with primary sources, they are central to building and supporting a research argument.'},
-{cat:'parts',name:'Title Page',desc:'The title should describe contents clearly and precisely so readers can decide whether to read. Avoid wasted words ("an investigation of"), abbreviations, jargon, or overly broad terms that don\'t convey the research focus.'},
-{cat:'parts',name:'Abstract',desc:'A concise summary stating main objectives, describing methods, summarizing the most important results, and stating major conclusions. Does NOT include references to figures, tables, or sources.'},
-{cat:'parts',name:'Background of the Problem',desc:'Describes the problem investigated, presents relevant background or contextual materials, and moves from general (real world / research literature) to specific (the researcher\'s study). Be selective, not exhaustive.'},
-{cat:'parts',name:'Theoretical & Conceptual Framework',desc:'The fundamental structure that best supports the purpose of quantitative research. A theoretical framework must also be presented as the basis of the conceptual framework and reveals the plan of organization.'},
-{cat:'parts',name:'Statement of the Problem',desc:'Based on the thesis/research statement, defines what the researcher wants to understand. Must align with the purpose of the research.'},
-{cat:'parts',name:'Scope and Limitations',desc:'Presents the boundaries of the research — what is covered (scope) and what is excluded (delimitations). Defines the range and coverage of the study.'},
-{cat:'parts',name:'Review of Related Literature (Ch. 2)',desc:'Summarizes, analyzes, explains, and evaluates published work rather than merely reporting it. Build the essay around your own points; integrate sources into discussions. Avoid letting sources organize your paper.'},
-{cat:'method',name:'Methodology (Ch. 3)',desc:'The core of the research paper. Fulfills basic scientific principles, allows verification and replication, and lets readers evaluate the quality and validity of data. Must be clear, direct, and concise.'},
-{cat:'method',name:'Research Design',desc:'Briefly explains the general type of scientific procedure used — how the researcher studied the problem.'},
-{cat:'method',name:'Sampling Method',desc:'Describes the materials and participants used in the research and how the sample was selected.'},
-{cat:'method',name:'Data Collection Procedure',desc:'Explains the specific steps taken in conducting the research and how information was gathered from participants or sources.'},
-{cat:'method',name:'Statistical Treatment of Data',desc:'Identifies the statistical tool used to analyze quantitative research data (e.g., mean, percentage, chi-square test).'},
-{cat:'method',name:'Data Analysis',desc:'Describes how qualitative research data will be analyzed and interpreted to answer the research questions.'},
-{cat:'findings',name:'Reporting Findings',desc:'Presenting key results that directly answer each research question using clear summaries, tables, or graphs. Include only relevant information — avoid personal opinions in this section.'},
-{cat:'findings',name:'Drawing Conclusions',desc:'Explaining what the findings mean in relation to the research problem. Summarize important patterns, connect to related studies, and keep everything evidence-based. Do not overgeneralize.'},
-{cat:'findings',name:'Recommendations',desc:'Realistic, specific actions suggested based on conclusions. Identifies who the recommendation is for (students, teachers, school, community) and may include suggestions for future research.'},
-{cat:'findings',name:'Plagiarism',desc:'Using another person\'s work or ideas without proper attribution. All borrowed ideas and quotes must be documented accurately. It is "definitely out of the question" in academic writing.'},
-{cat:'findings',name:'Bibliographical Information',desc:'Full source details (author, title, place of publication, publisher, date, page numbers, URL, access date) required for every cited source. An article without bibliographical information is useless since you cannot cite its source.'},
+{cat:'topic',name:'Research',desc:'The culmination and final product of an involved process of research, critical thinking, source evaluation, organization, and composition. It is a living thing that grows and changes as you explore, interpret, and evaluate sources. Its goal is to offer a unique perspective on an issue, not merely summarize what others say.'},
+{cat:'topic',name:'Manageable Topic',desc:'A research topic that fits the researcher\'s time (deadline), skills (reading/writing level), available resources (books, journals, reliable websites, reports), and scope (not too wide, not too narrow).'},
+{cat:'topic',name:'Primary Sources',desc:'Original, firsthand materials that are the heart of a research paper and provide its nourishment. Without the support of and interaction with these sources, the research paper would morph into a different genre of writing.'},
+{cat:'topic',name:'Secondary Sources',desc:'Works that analyze, interpret, or summarize primary sources. Along with primary sources, they are central to building and supporting a research argument and provide context for the study.'},
+{cat:'parts',name:'Title Page',desc:'The title should describe contents clearly and precisely so that readers can decide whether to read the report. Avoid wasted words ("an investigation of"), abbreviations, jargon, cute language, or overly broad terms. A good title provides information about the focus of the research study.'},
+{cat:'parts',name:'Abstract',desc:'Extracts key points from each section of the paper — stating main objectives, describing methods, summarizing the most important results, and stating major conclusions. Does NOT include references to figures, tables, or sources, and does not contain information not in the report.'},
+{cat:'parts',name:'Background of the Problem',desc:'Describes the problem investigated, presents relevant background or contextual materials, moves from general (real world/research literature) to specific (the researcher\'s focus), and is selective — not exhaustive — in citing studies.'},
+{cat:'parts',name:'Theoretical & Conceptual Framework',desc:'The fundamental structure that best supports the purpose of quantitative research. It reveals the plan of organization, and a theoretical framework must also be presented as the basis of the conceptual framework.'},
+{cat:'parts',name:'Statement of the Problem',desc:'Based on the thesis/research statement, defines what the researcher wants to understand. It should be in line with the purpose of the research and directly guides the direction of the entire study.'},
+{cat:'parts',name:'Definition of Terms',desc:'Provides operational definitions of terms used in the research that require clarification. These definitions explain how each term is specifically used within the context of the study, not general dictionary definitions.'},
+{cat:'parts',name:'Importance of the Study',desc:'Explains what conflict, unanswered question, untested population, or untried method the research addresses and what findings of others are being challenged or extended. It explains the focus and specific purpose of the paper.'},
+{cat:'parts',name:'Scope and Limitations',desc:'Presents the boundaries of the research — what is included (scope) and what is excluded (delimitations). Defines the range and coverage of the study and acknowledges what the study cannot address.'},
+{cat:'parts',name:'Review of Related Literature (Ch. 2)',desc:'Summarizes, analyzes, explains, and evaluates published work rather than merely reporting it. Build the essay around points you want to make — do not let your sources organize your paper. Integrate sources into discussions and move up and down the "ladder of abstraction."'},
+{cat:'method',name:'Methodology (Ch. 3)',desc:'Serves as the core of the research paper, fulfills one of the basic principles of the scientific method, allows verification, and lets readers evaluate the quality of results and make their own decision about the validity of the data. Must be clear, direct, and concise.'},
+{cat:'method',name:'Research Design',desc:'Briefly explains the general type of scientific procedure used — how the researcher studied the problem. It is part of Chapter 3 and sets the foundation for all other methodological decisions.'},
+{cat:'method',name:'Sampling Method',desc:'Describes what materials or who the subjects of the research are and how the sample was selected. It is a key component of the methodology that affects the generalizability of the research results.'},
+{cat:'method',name:'Data Collection Procedure',desc:'Explains the steps taken in conducting the research — how the data was gathered from participants or sources. It allows other researchers to replicate the exact process used in the study.'},
+{cat:'method',name:'Statistical Treatment of Data',desc:'Identifies the specific statistical tool used to analyze quantitative research data (e.g., mean, percentage, chi-square test, t-test). This section applies only to quantitative or mixed-method research.'},
+{cat:'method',name:'Data Analysis',desc:'Describes how qualitative research data will be analyzed and interpreted to answer the research questions. Typically involves thematic analysis, coding, and identification of patterns in responses.'},
+{cat:'findings',name:'Reporting Findings',desc:'Presenting the key results that directly answer each research question. Use clear summaries of what the data shows through tables or graphs. Include only relevant information and avoid opinions. Qualitative data may include short quotations as evidence.'},
+{cat:'findings',name:'Drawing Conclusions',desc:'Explaining what the findings mean in relation to the research problem. Summarize the most important patterns or relationships, connect to related studies, and keep conclusions strictly evidence-based — do not claim what the data cannot support.'},
+{cat:'findings',name:'Recommendations',desc:'Realistic, specific, and finding-based actions or suggestions. Identifies who the recommendation is for (students, teachers, schools, community) and may include suggestions for future research such as larger samples or alternative methods.'},
+{cat:'findings',name:'Plagiarism',desc:'The act of using another person\'s work or ideas without proper attribution. The handout states it is "definitely out of the question." All borrowed ideas and direct quotes must be documented accurately in citations and references.'},
+{cat:'findings',name:'Bibliographical Information',desc:'Full source details required for every cited source: author, title, place of publication, publisher, date of publication, page numbers, URLs, creation or modification dates on web pages, and date of access. An article without this information is useless since the source cannot be cited.'},
 ];
 
-const pool=[
-{sub:'ICT',q:'What does ICT stand for?',opts:['Information and Communication Technology','Internet and Computer Technology','Integrated Circuit Technology','Internal Communication Tools'],ans:0},
-{sub:'ICT',q:'Who pioneered Web 1.0 in 1990?',opts:['Bill Gates','Tim Berners-Lee','Steve Jobs','Mark Zuckerberg'],ans:1},
-{sub:'ICT',q:'Which web generation is characterized by decentralization and open-source software?',opts:['Web 1.0','Web 2.0','Web 3.0','Web 4.0'],ans:2},
-{sub:'ICT',q:'A smartphone combining a camera, GPS, and multimedia player is an example of:',opts:['Assistive Technology','Convergent Technology','Social Media','Web 2.0'],ans:1},
-{sub:'ICT',q:'ChromeVox is an example of which type of technology?',opts:['Convergent Technology','Graphic Design Tool','Assistive Technology','Project Management Tool'],ans:2},
-{sub:'ICT',q:'Which of the following is NOT a standard feature of a word processor?',opts:['Text Copy and Cut','Spell Check','Pivot Table analysis','Text Formatting'],ans:2},
-{sub:'ICT',q:'The 10-20-30 rule for presentations was created by:',opts:['Steve Jobs','Mark Zuckerberg','Guy Kawasaki','Tim Berners-Lee'],ans:2},
-{sub:'ICT',q:'According to the 10-20-30 rule, what is the maximum number of slides?',opts:['5','10','20','30'],ans:1},
-{sub:'ICT',q:'Which design principle is described as the "prime principle and objective of all design"?',opts:['Balance','Hierarchy','Unity','Proportion'],ans:2},
-{sub:'ICT',q:'The Golden Ratio is approximately:',opts:['1.414','1.618','2.718','3.141'],ans:1},
-{sub:'ICT',q:'Synchronous collaboration happens when:',opts:['Team members respond at their own pace','Information is exchanged in real-time','Emails are sent overnight','Tasks are assigned via project boards'],ans:1},
-{sub:'ICT',q:'Which tool uses boards, lists, and cards to organize team tasks?',opts:['Zoom','Trello','Flipboard','Pinterest'],ans:1},
-{sub:'ICT',q:'Google Drive and OneDrive are examples of:',opts:['Video Conferencing Tools','File Sharing Tools','Project Management Tools','Instant Messaging Tools'],ans:1},
-{sub:'ICT',q:'Content curation is best described as:',opts:['Creating original content for a blog','Finding and sharing relevant information organized from various sources','Building a website from scratch','Designing infographics'],ans:1},
-{sub:'ICT',q:'Phishing is described in the handout as:',opts:['A type of malware that deletes files','An illegal way of pretending to be a legitimate website','Sending bulk spam emails','A method of password cracking'],ans:1},
-{sub:'ICT',q:'Which domain extension typically represents a non-profit organization?',opts:['.edu','.gov','.org','.com'],ans:2},
-{sub:'ICT',q:'Asynchronous collaboration is best used for:',opts:['Emergency meetings requiring instant decisions','Projects that are not a priority or require intensive thinking','Real-time brainstorming sessions','Daily stand-up meetings'],ans:1},
-{sub:'ICT',q:'What is the primary purpose of a search engine\'s "crawl" function?',opts:['Rank search results by relevance','Store data in an index','Constantly search the internet and identify new sites and links','Translate user queries into index terms'],ans:2},
-{sub:'ICT',q:'Which content curation tool creates a "mini magazine" for the audience?',opts:['Buzzsumo','Pocket','Feedly','Flipboard'],ans:3},
-{sub:'ICT',q:'Symmetrical balance in graphic design means:',opts:['Elements of unequal weight contrast each other','Elements of equal visual weight are placed on either side of a layout','One side visually dominates the layout','The layout uses the golden ratio throughout'],ans:1},
-{sub:'ICT',q:'Which graphic design type involves planning and organizing how online content is displayed on a website?',opts:['Illustration','Publication Design','Web Design','Motion Design'],ans:2},
-{sub:'ICT',q:'Visual literacy refers to:',opts:['The ability to write captions for images','The skills a viewer uses when reading images','How fast a person reads text-based content','The tools used to create visual content'],ans:1},
-{sub:'ICT',q:'Which is an example of asynchronous collaboration?',opts:['Video conference call','Live group chat session','Email conversation','Virtual whiteboard session'],ans:2},
-{sub:'ICT',q:'The "Rank" step in search engine processing uses:',opts:['Web crawlers to find new pages','Natural language processing to translate queries','Algorithms to order results by relevance based on keywords and quality','An index to store all web data'],ans:2},
-{sub:'ICT',q:'Multi-factor authentication may include:',opts:['Only a username and password','OTP, fingerprints, and facial recognition','A security question alone','A backup email address only'],ans:1},
-{sub:'ICT',q:'Proportion in graphic design refers to:',opts:['How elements are arranged by importance','The size relationship between design elements','The visual weight distribution in a layout','The repetition of elements in a pattern'],ans:1},
-{sub:'ICT',q:'Which productivity tool is most appropriate for tracking student grades and performing calculations?',opts:['Word Processor','Spreadsheet','Presentation Program','Graphic Design Tool'],ans:1},
-{sub:'ICT',q:'Feedly is primarily used for:',opts:['Pinning images on a visual board','Collecting and organizing content from publications, tweets, blogs, and YouTube channels','Video conferencing with teams','Storing files in the cloud'],ans:1},
-{sub:'ICT',q:'What does NLP stand for in the context of search engines?',opts:['New Link Protocol','Natural Language Processing','Network Layer Protocol','Numerical Logic Program'],ans:1},
-{sub:'ICT',q:'Which of the following is a listed benefit of visual messaging?',opts:['It is cheaper to produce than text','Cross-cultural communication using more universal signs and symbols','It requires no design skill','It is always faster to create than written reports'],ans:1},
-{sub:'ICT',q:'Pocket is best described as:',opts:['A video editing platform','A plugin that bookmarks and stores content for later use','A social media image-pinning platform','A keyword analysis and trending-content tool'],ans:1},
-{sub:'ICT',q:'The "Index" step in search engine processing refers to:',opts:['Crawlers finding new web pages','Algorithms ranking results by relevance','Analyzed data organized and stored for quick retrieval when searched','Translating search queries using NLP'],ans:2},
-{sub:'ICT',q:'Which feature allows an identical piece of text to appear multiple times in a document?',opts:['Text Cut','Paste','Text Copy','Autocorrect'],ans:2},
-{sub:'ICT',q:'Social media apps like Facebook Messenger and Discord are considered what type of collaboration tool?',opts:['File Sharing Tools','Shared Calendars','Instant Messaging Tools','Video Conferencing Tools'],ans:2},
-{sub:'ICT',q:'The principle of Hierarchy in graphic design primarily:',opts:['Gives equal visual weight to all elements','Provides a visual path for viewers to follow through a layout','Adds variety and excitement through contrast','Provides structural repeatability across pages'],ans:1},
-{sub:'Research',q:'A research paper is best described as:',opts:['An informed summary of a topic using secondary sources','A book report on a published work','A genre requiring investigation and interpretation of sources to offer a unique perspective','An opinion essay about a topic of interest'],ans:2},
-{sub:'Research',q:'Which makes a research topic "manageable"?',opts:['It is highly technical and specialized','It fits the researcher\'s time, skills, resources, and scope','It has very few available sources','It is based solely on the researcher\'s opinion'],ans:1},
-{sub:'Research',q:'The Abstract of a research paper should:',opts:['Include references to all tables and figures','State objectives, describe methods, summarize key results, and state major conclusions','Be the longest section of the paper','Include the researcher\'s personal interpretations'],ans:1},
-{sub:'Research',q:'The Background of the Problem section should:',opts:['Present the researcher\'s conclusions first','Move from specific details to a general overview','Move from general context to the specific research problem','Only cite one or two references'],ans:2},
-{sub:'Research',q:'The Theoretical Framework is primarily used in:',opts:['Qualitative research only','Quantitative research data','All types of research equally','Only experimental studies'],ans:1},
-{sub:'Research',q:'Which chapter contains the Review of Related Literature?',opts:['Chapter 1','Chapter 2','Chapter 3','Chapter 4'],ans:1},
-{sub:'Research',q:'The Methodology section serves to:',opts:['Let readers enjoy the narrative of the research','Allow verification and replication of the study by other researchers','State the researcher\'s personal opinions about findings','Provide a summary of all previous related studies'],ans:1},
-{sub:'Research',q:'When reporting findings, which should be AVOIDED?',opts:['Using tables and graphs','Presenting key results per research question','Including personal opinions about the data','Citing evidence from the collected data'],ans:2},
-{sub:'Research',q:'Conclusions in a research paper should be:',opts:['Based on assumptions and predictions','Evidence-based and connected to the research questions','Broader in scope than what the data actually supports','Written before the data is analyzed'],ans:1},
-{sub:'Research',q:'Recommendations should be:',opts:['Vague and open to interpretation','Realistic, specific, and connected to the findings','Only directed at future researchers','Limited to theoretical implications only'],ans:1},
-{sub:'Research',q:'The .edu domain extension typically indicates:',opts:['A commercial website','A government agency','An educational institution','A non-profit organization'],ans:2},
-{sub:'Research',q:'In the Review of Related Literature, how should sources be integrated?',opts:['Let the sources determine the structure of the essay','Build the essay around your own points and integrate sources into discussions','List each source separately without connecting them','Copy and paste relevant sections verbatim with citation'],ans:1},
-{sub:'Research',q:'When writing the Methodology section, the writer should:',opts:['Mix results with procedures for a clear narrative','Include common statistical formulas in full detail','Be clear, direct, concise, and avoid straying into irrelevance','Present conclusions before the methods'],ans:2},
-{sub:'Research',q:'For quantitative data analysis, which approach is appropriate?',opts:['Grouping answers into themes','Computing totals, percentages, averages, or rankings','Identifying repeated narrative responses','Writing detailed story-like descriptions'],ans:1},
-{sub:'Research',q:'The Statement of the Problem should be:',opts:['A broad overview of a general field','In line with the purpose and objectives of the research','A list of all unanswered questions in the field','An introduction to the review of related literature'],ans:1},
-{sub:'Research',q:'Why is bibliographical information critical for every source?',opts:['It makes the paper appear more academic','Without it, the source cannot be cited or verified','It is required only for internet sources','It replaces the need for in-text citations'],ans:1},
-{sub:'Research',q:'When organizing notes, the handout recommends checking that information is:',opts:['As long as possible to demonstrate effort','Factual, up-to-date, and correct','From a .com domain only','Accompanied by colorful images or visuals'],ans:1},
-{sub:'Research',q:'Which of the following is a POOR research paper title according to the handout?',opts:['The Relationship of Luteinizing Hormone to Obesity in the Zucker Rat','Effects of Social Media on Academic Performance in High School','An Investigation of Hormone Secretion and Weight in Rats','Student Engagement and Online Learning Outcomes'],ans:2},
+// ─── ICT QUIZ: 50 QUESTIONS ───────────────────────────────────
+const ictPool=[
+{q:'What does ICT stand for in the context of this course?',opts:['Integrated Circuit and Transmission systems used in broadcasting networks','Information and Communication Technology enabling digital interaction','Internet Control and Transmission used in fiber-optic networking','Instructional Content and Technology for digital classroom tools'],ans:1},
+{q:'Tim Berners-Lee pioneered which generation of the internet in 1990?',opts:['Web 2.0, characterized by user-generated and social media content','Web 3.0, characterized by decentralized data and machine learning','Web 1.0, which established the foundational technologies of the world wide web','ARPANET, the precursor to the modern internet developed by the US military'],ans:2},
+{q:'Web 2.0 is best described as a shift that made which of the following possible?',opts:['Decentralized storage of data across multiple servers simultaneously','User-generated content that can be viewed globally in real time','Machine learning algorithms that personalize search results for each user','Open-source software development available to all registered developers'],ans:1},
+{q:'Which concept in Web 3.0 means that data is stored across multiple locations rather than a single server?',opts:['Openness, which allows any developer to freely access and modify source code','Decentralization, where data is distributed across many locations simultaneously','Greater utility, where machine learning provides more personalized experiences','Interoperability, where different platforms seamlessly share user information'],ans:1},
+{q:'A smartphone that combines a telephone, camera, GPS navigator, and media player is an example of what concept?',opts:['Assistive technology designed to help users with physical and cognitive disabilities','Convergent technology where multiple independent technologies combine into one device','Web 3.0 application that leverages machine learning for enhanced user experience','Synchronous collaboration tool allowing real-time communication across distances'],ans:1},
+{q:'ChromeVox and Capti are cited in the handout as examples of what type of technology?',opts:['Convergent technologies that merge multiple devices into a single portable unit','Content curation tools used to gather and organize information from various sources','Assistive technologies that support people with disabilities in communication and learning','Productivity tools that help individuals and organizations increase their work output'],ans:2},
+{q:'Which of the following correctly describes the "crawl" step in how a search engine works?',opts:['Translating user-inputted words into terms that relate to the engine\'s stored index','Ranking retrieved web pages based on keyword matching and content quality scores','Using web crawlers (also called spiders) to constantly find new sites and identify links','Storing gathered data in an organized index so the engine can retrieve it quickly'],ans:2},
+{q:'According to the handout, the "rank" step in a search engine organizes results based on which factors?',opts:['The number of images on the page, loading speed, and domain registration date','Matching keywords used, prioritizing high-quality page content, and using personal information to tailor results','The date of publication, author credentials, and number of external links to the page','Random ordering based on server availability and how recently the site was crawled'],ans:1},
+{q:'Which domain extension is described in the handout as representing educational institutions and tending to be more reliable?',opts:['.org, used exclusively by non-profit humanitarian and advocacy organizations','.gov, used by government agencies and therefore always politically neutral','.edu, used by educational institutions and generally considered more reliable','.com, used by large commercial companies with established reputations'],ans:2},
+{q:'Which statement from the handout best describes the danger of .com websites when researching?',opts:['They are always outdated because companies rarely update their published content','They are blocked by most school internet filters due to commercial advertising content','Many .com sites contain only product advertisements and lack substantial informational content','They require paid subscriptions before users can access their educational resources'],ans:2},
+{q:'What is the primary benefit of synchronous online collaboration over asynchronous methods?',opts:['It allows team members to respond whenever they are fully prepared with necessary information','It enables instantaneous discussion with real-time feedback and spontaneity of new ideas','It reduces the risk of going off-topic because participants have time to structure their responses','It is better suited for projects that require intensive individual thinking and concentration'],ans:1},
+{q:'According to the handout, asynchronous collaboration is best used for which type of project?',opts:['High-priority emergency projects that require real-time decision-making by all stakeholders','Projects requiring instant brainstorming sessions where ideas need to be generated quickly','Projects that are not a priority or that require intensive individual thinking and prepared responses','Daily operational meetings where team members provide short live updates to each other'],ans:2},
+{q:'Trello is given as an example of which type of online collaboration tool?',opts:['Video conferencing tool that enables audio and video meetings from any location','File sharing tool that stores documents securely in the cloud for remote access','Project management tool that helps assign tasks and track team progress with boards and cards','Instant messaging tool that lets people communicate via text, voice, and file attachments'],ans:2},
+{q:'Google Drive and OneDrive are described in the handout as examples of what type of tool?',opts:['Video conferencing tools that make audio and video meetings possible from anywhere','File sharing tools that let users sync and store information across multiple devices','Instant messaging platforms used by teams to communicate through text and voice','Project management tools with calendar functions, task assignment, and reporting features'],ans:1},
+{q:'According to the handout, which of the following is a key advantage of online marketplaces over traditional selling?',opts:['They eliminate the need for any marketing because customers find the business automatically','They allow the business to function 24/7, serve as additional income, and lessen marketing costs','They provide physical storefronts that improve customer trust and face-to-face interaction','They are exclusively available to large established companies with existing customer bases'],ans:1},
+{q:'The handout identifies Lazada, Foodpanda, and Facebook Marketplace as examples of what?',opts:['Creative content outlets that allow individuals to post and monetize original digital content','Communication platforms used by businesses for faster exchange of internal information','Leading online marketplaces in the Philippines offering a wide range of products and services','Content curation tools that help users find and organize trending information online'],ans:2},
+{q:'Content curation is defined in the handout as which of the following?',opts:['The process of creating completely original content that has never been published before','The process of finding and sharing information relevant to the primary audience by collecting and organizing content from various sources','The process of designing and coding websites that display information in an organized visual format','The process of evaluating and ranking existing content based on audience engagement metrics'],ans:1},
+{q:'Which content curation tool is described as feeding a list of the most shared content related to a subject entered as a keyword or domain name?',opts:['Pocket, a plugin tool for web and mobile browsers that bookmarks and stores content for later use','Flipboard, a user-friendly tool that lets users create a mini magazine with video, music, or text','Buzzsumo, which provides lists of the most shared content sortable by date, content type, and author','Feedly, which collects content from popular sources and displays them effortlessly for consumption'],ans:2},
+{q:'Flipboard is described in the handout as a content curation tool that allows users to do which of the following?',opts:['Store a significant amount of relevant content as bookmarks for personal reference later','Create a mini magazine for the audience that can include video, music, or textual information','Feed a list of the most shared content related to a subject by entering a keyword or domain name','Curate images online by pinning specific visual content on a virtual pinboard interface'],ans:1},
+{q:'According to the handout, what is the main risk associated with synchronous collaboration?',opts:['Team members may lack access to the necessary technology for real-time communication','It is prone to going off-topic and running over time whenever new ideas come up outside the scope','It requires participants to be prepared in advance which limits spontaneous creative brainstorming','It does not allow for immediate feedback which makes problem-solving significantly slower'],ans:1},
+{q:'Productivity Tools are defined in the handout as resources that allow individuals to increase productivity based on specific outputs. Which of the following is NOT listed as a type of output?',opts:['Written outputs such as professional documents, reports, and formatted text-based content','Visual outputs such as presentations, charts, graphs, and other graphical representations','Audio outputs such as podcast recordings, voice-over narrations, and sound files','Physical outputs such as printed brochures, laminated posters, and bound booklets'],ans:3},
+{q:'The word processor feature that removes text from its original position (unlike copying) is called:',opts:['Paste, which inserts previously copied or removed text into a new location in the document','Multimedia, which lets users insert images, video, clip art, and charts into the document','Text Copy, which duplicates text without removing it from the original position in the file','Text Cut, which differs from copying because it removes the text from its original position'],ans:3},
+{q:'According to the handout, which of the following is a use of spreadsheets in a school context?',opts:['Writing and formatting research papers with proper citations, headings, and bibliography sections','Creating animated slideshows with visual aids for presenting data to an audience','Tracking student performance, calculating grades, and quick data consolidation across subjects','Designing infographics that display survey results as colorful visual representations'],ans:2},
+{q:'The 10-20-30 Rule was introduced by Guy Kawasaki. What does the "30" specifically refer to?',opts:['The maximum number of words per slide to avoid overwhelming the audience with text content','The maximum total number of slides in a complete professional presentation regardless of topic','The minimum recommended font size of 30 points to ensure readability for all audience members','The recommended number of seconds to pause between slides for audience comprehension'],ans:2},
+{q:'Which type of graphic design involves promoting products and services through ads, logos, brochures, and packaging?',opts:['Motion design and animation, which makes inanimate objects appear to move in specific ways','Web design, which involves planning and organizing how online content is displayed on a website','Publication design, which focuses on designing printed materials such as books and magazines','Advertising and marketing design, which promotes products and services to attract customers'],ans:3},
+{q:'Unity in graphic design is described as the prime principle. How does it relate to other design principles?',opts:['It is an optional element that designers may choose to ignore in minimalist compositions','Other principles like variety, hierarchy, and balance all serve to achieve the overall result of unity','It applies only to print design and not to digital or screen-based visual communication','It refers specifically to the consistent use of a single color palette across all design elements'],ans:1},
+{q:'In the context of graphic design, what is the support principle of "Proximity" used for?',opts:['The placement of elements in a regular repeating pattern to create visual rhythm across a layout','The prescribed visual path that viewers must follow through a layout guided by the hierarchy','The placement of elements together and apart where closeness suggests similarity and distance implies unrelatedness','The size of elements within a composition used as a comparison to create variety and visual hierarchy'],ans:2},
+{q:'The Golden Ratio of approximately 1.618 is described as having been used in which historical designs?',opts:['The Colosseum in Rome, the Sistine Chapel ceiling, and Michelangelo\'s David sculpture','The Great Pyramids, Medieval church designs, and the Mona Lisa painting by Leonardo da Vinci','The Eiffel Tower in Paris, the Sydney Opera House, and the Guggenheim Museum in New York','The Parthenon in Athens, the Taj Mahal in India, and Stonehenge in England'],ans:1},
+{q:'A grid in layout design is described as providing three key benefits: repeatability, composition, and communication. What does "repeatability" mean in this context?',opts:['The ability to copy a single design element and paste it multiple times across different pages','Making similar pages in a multi-page design share the same structure across the entire document','Allowing designers to communicate the same message to different audiences in different languages','Creating variety by repeating the same visual pattern at regular intervals to establish rhythm'],ans:1},
+{q:'Visual literacy is defined in the handout as which of the following?',opts:['The ability to write descriptive captions and informative labels for photographs and illustrations','The skills a viewer uses when reading images, often underestimated given attention span and understanding of visual cues','The technical ability to create and edit high-quality visual content using professional design software','The capacity to memorize and recall visual information more efficiently than text-based content'],ans:1},
+{q:'In creating a visual message, the handout identifies three key factors to assess. Which of these is described as determining how readers interact with the message?',opts:['Audience understanding, which guides how the message will be communicated to specific viewers','Purpose and intention, which defines what the message is trying to achieve for the target viewers','Context, specifically which platform or tool the message will take, since this determines reader interaction','Visual literacy, which refers to how well the audience can interpret and decode visual symbols'],ans:2},
+{q:'According to the handout, what is one cross-cultural benefit of using visual messages over text-based communication?',opts:['Visual messages are cheaper to produce since they do not require hiring professional copywriters','Visual messages can go viral on social media more quickly than long-form written content','Visual messages remove language barriers by using more universal signs and symbols understood across cultures','Visual messages are legally protected under intellectual property law more easily than written content'],ans:2},
+{q:'Which of the following is listed as an effective principle for compelling visual design in the handout?',opts:['Using as many different colors and fonts as possible to maintain audience engagement and interest','Using contrasting colors effectively to draw attention to specific and necessary details in the design','Using low-resolution stock images to save file size and ensure fast loading on all devices','Using complex backgrounds with multiple competing patterns to add visual richness to the composition'],ans:1},
+{q:'Which video conferencing feature distinguishes it from basic instant messaging tools, according to the handout?',opts:['The ability to send text messages, emoji reactions, and file attachments to team members instantly','Screen sharing for interactive visual collaboration and simultaneous breakout rooms for smaller groups','The capacity to store and archive all past conversations in a searchable cloud-based database','Integration with spreadsheet and word processing tools for real-time document co-editing sessions'],ans:1},
+{q:'Zoom, Google Meet, Skype for Business, and Microsoft Teams are all cited as examples of what?',opts:['Project management tools designed to help teams assign tasks and monitor progress on timelines','File sharing platforms that allow users to collaborate on documents stored in cloud-based systems','Video conferencing tools that make audio and video meetings and seminars possible from anywhere','Content curation applications that help users organize and share relevant information with audiences'],ans:2},
+{q:'According to the handout, what is the key danger of clicking shortened links online?',opts:['Shortened links always redirect users to websites with heavy advertisements and tracking cookies','Shortened links cannot be bookmarked or shared because they expire after a set period of time','Links can be shortened to hide the full address and may contain malware that activates in a single click','Shortened links are slower to load because they require an additional redirect through a third-party server'],ans:2},
+{q:'The handout recommends what action to protect personal data in case a device is breached or compromised?',opts:['Changing passwords on all accounts every 30 days and never reusing any previous password','Deleting all personal files from the device immediately after completing work each session','Storing files in a backup — either cloud storage or a hard drive — as additional copies in case of breach','Installing multiple competing antivirus programs to provide layered protection against all threat types'],ans:2},
+{q:'Using the same password on multiple websites is discouraged in the handout because:',opts:['Password managers may not recognize duplicate passwords and will lock the user out permanently','It slows down the login process because the system needs to cross-reference multiple accounts','It increases the risk of a bigger data breach — if one account is compromised, others may be too','It violates the terms of service of most websites which require unique passwords for every account'],ans:2},
+{q:'In proper online etiquette, using ALL CAPS in a message is problematic because:',opts:['It reduces the character limit available in messaging platforms and may cut off the rest of the message','The text becomes harder to read and may trigger spam filters on email and messaging systems','It can convey either excitement or anger, making it difficult for the receiver to respond appropriately','It automatically marks the message as urgent, forcing the recipient to respond within a short time frame'],ans:2},
+{q:'According to the handout, which type of design involves the "process of making inanimate objects appear to move in a specific manner"?',opts:['Publication design, focused on designing printed materials such as books, magazines, and newspapers','Illustration, which involves creating visual outputs such as photographs, drawings, and graphs','Advertising and marketing design, which promotes products through visual branding and packaging','Motion design and animation, which makes inanimate objects appear to move in a specific manner'],ans:3},
+{q:'The Fibonacci sequence is mentioned in the handout in relation to which design concept?',opts:['The rule of thirds, a compositional guideline used in photography and graphic layout design','The color wheel, which organizes complementary, analogous, and triadic color relationships','The Golden Ratio, as the Fibonacci sequence of numbers closely replicates the golden section','The grid system, where rows and columns are mathematically derived from natural number patterns'],ans:2},
+{q:'What type of graphic design involves "planning, conceptualizing, and organizing how online content is displayed"?',opts:['Illustration, which involves creating visual outputs such as photographs, drawings, and visual art','Publication design, which involves designing printed materials such as books, magazines, and posters','Web design, which involves planning, conceptualizing, and organizing how online content is displayed','Motion design and animation, which makes static content appear to move on screen or in video'],ans:2},
+{q:'A spreadsheet file typically consists of which structural elements used to organize data?',opts:['Slides and transitions that present data one section at a time to a viewing audience','Paragraphs and sections that organize textual information with headers and sub-headers','Rows and columns that help sort, organize, arrange, and calculate numerical data entries','Layers and frames that allow designers to place visual elements at different depths on a canvas'],ans:2},
+{q:'Which statement about online marketplaces best reflects the buyer\'s perspective described in the handout?',opts:['Buyers prefer physical stores because they can inspect products before purchasing them in person','Buyers are attracted to online marketplaces for the ability to shop from home, compare prices, and access wide options','Buyers on online platforms must pay additional fees to access premium products not available in stores','Buyers are required to create verified accounts and submit identification before completing any purchase'],ans:1},
+{q:'According to the handout, Microsoft 365 includes which of the following?',opts:['Buzzsumo for content discovery, Feedly for RSS feeds, and Pocket for bookmarking content later','Google Meet for video calls, Google Drive for storage, and Google Sheets for collaboration','MS Teams, OneDrive cloud storage, and Office apps for browsing, editing, and storing documents','Zoom for conferencing, Dropbox for file sharing, and Trello for task and project management'],ans:2},
+{q:'The handout describes Dropbox as which of the following?',opts:['A video conferencing application that supports breakout rooms and screen sharing for large teams','A project management platform with boards, lists, and cards to represent tasks and workflows','A user-friendly cloud-sharing solution for managing shared files, reducing email needs, and improving collaboration','An instant messaging tool that creates channels and group chats for efficient team communication'],ans:2},
+{q:'Pinterest is described in the handout as a content curation tool that does which of the following specifically?',opts:['Collects content from popular publications, tweets, blogs, and YouTube channels for easy consumption','Stores a significant amount of relevant content for later use as a plugin for web and mobile browsers','Creates a mini magazine for the audience that can include video, music, and textual information','Curates images online by pinning specific visual content on a virtual pinboard for sharing'],ans:3},
+{q:'Feedly is described in the handout as a content curation tool that primarily helps users do what?',opts:['Pin images and visual content on organized virtual boards for sharing with online audiences','Store and bookmark websites and articles for reading at a later, more convenient time','Create mini magazines combining video, music, text, and other rich media into one publication','Collect content from popular sources and organize it from publications, tweets, blogs, and YouTube channels'],ans:3},
+{q:'The handout states that when using the Internet for research, one should pay attention to domain extensions. Which of the following correctly pairs an extension with its meaning?',opts:['.biz means a non-profit organization, .edu means a commercial business, .gov means educational institution','.gov means government, .edu means educational institution, .org means non-profit organization','.com means academic research, .net means government agency, .org means commercial business','.tv means technology vendor, .edu means e-commerce, .gov means global organization'],ans:1},
+{q:'According to the handout, what makes personal homepages on the internet potentially unreliable as research sources?',opts:['They are usually hidden behind paywalls requiring paid subscriptions to access the full content','Personal homepages are blocked by most academic search engines and citation databases','The quality of personal homepages varies greatly and many lack the credibility of institutional sources','They use .personal domain extensions that are automatically flagged as unreliable by search engines'],ans:2}
 ];
 
-const essayPool=[
-{sub:'ICT',prompt:'Explain the evolution from Web 1.0 to Web 3.0. What are the key characteristics of each generation, and how has each shift changed how people use the internet in their daily lives?'},
-{sub:'ICT',prompt:'Compare synchronous and asynchronous collaboration. Provide at least two examples of each type, and explain in what situations each is more appropriate for a student group project.'},
-{sub:'ICT',prompt:'Discuss the importance of online safety and security for students. Choose three specific safety or security measures from the handout and explain why each is essential in today\'s digital environment.'},
-{sub:'ICT',prompt:'Explain the five primary principles of graphic design: Unity, Variety, Hierarchy, Proportion, and Balance. For each principle, give an example of how it could be applied when designing a school event poster.'},
-{sub:'ICT',prompt:'Describe the concept of content curation. Why is choosing correct content and adding personalized thoughts important when sharing curated material on social media? Use specific examples to support your answer.'},
-{sub:'ICT',prompt:'Discuss the role of productivity tools in education and professional settings. Compare at least two types (such as a word processor vs. a spreadsheet) and explain scenarios where each would be the most appropriate choice.'},
-{sub:'ICT',prompt:'What is assistive technology, and why is it significant in today\'s digital society? Provide specific examples from the handout and explain how they support individuals with different types of needs.'},
-{sub:'Research',prompt:'Why is choosing the right research topic considered a crucial first step in the research process? Discuss all four guidelines from the handout and explain the consequences of ignoring any one of them.'},
-{sub:'Research',prompt:'Explain the difference between reporting findings, drawing conclusions, and making recommendations in a research paper. Why is it important to keep each stage separate, and what might happen if they are mixed together?'},
-{sub:'Research',prompt:'Describe the structure of a complete research paper from Chapter 1 through Chapter 5. For each chapter, explain its purpose and what a reader can expect to find there.'},
+// ─── RESEARCH QUIZ: 50 QUESTIONS ─────────────────────────────
+const resPool=[
+{q:'According to the handout, which of the following best describes what a research paper is NOT?',opts:['A genre requiring one to spend time investigating and evaluating sources with the intent to offer interpretations','The culmination of an involved process of research, critical thinking, source evaluation, and composition','An informed summary of a topic by means of primary and secondary sources, or merely a book report or opinion piece','A living thing that grows and changes as one explores, interprets, and evaluates sources related to a specific topic'],ans:2},
+{q:'A topic is considered "manageable" when it fits four criteria. Which of the following is NOT one of those four criteria from the handout?',opts:['Time — the topic can be researched and written within the given deadline for the assignment','Popularity — the topic must be widely discussed in mainstream media and social platforms','Resources — sufficient credible sources such as books, journals, and reliable websites are available','Scope — the topic is neither too wide nor too narrow for a research paper of the required length'],ans:1},
+{q:'The handout states that a good research topic should avoid being "too technical, learned, or specialized." What is the main consequence of ignoring this guideline?',opts:['The paper will receive a failing grade automatically because technical topics are prohibited in research','Readers will find the paper difficult to access, reducing its reach and academic impact significantly','The researcher may spend most of the time understanding basics, leaving little time to build a strong paper','The topic will be rejected by academic journals because highly technical subjects require laboratory settings'],ans:2},
+{q:'According to the handout, primary and secondary sources are described as the "heart" of a research paper because:',opts:['They increase the word count of the paper and satisfy minimum page requirements set by professors','They must be published within the last five years to be considered valid by academic standards','Without their support and interaction, the research paper would morph into a different genre of writing','They automatically generate proper citations when imported into reference management software programs'],ans:2},
+{q:'The handout states that research paper titles should NOT include certain elements. Which combination correctly lists what to avoid?',opts:['Subheadings, footnotes, author names, and institutional affiliations in the title field','Wasted words like "studies on" or "an investigation of," abbreviations, jargon, and "cute" language','Numerical data, statistical references, location names, and year of research publication','Quotation marks, italics, bullet points, and numbered lists within the title of the paper'],ans:1},
+{q:'According to the handout, the Abstract should contain four elements. Which option correctly lists all four?',opts:['Title, author credentials, funding sources, and an acknowledgment of ethical considerations','State main objectives, describe methods, summarize the most important results, and state major conclusions','Background of the problem, literature review summary, implications section, and appendix overview','Hypothesis, statistical tools, raw data tables, and graphical representations of all findings'],ans:1},
+{q:'The Abstract has two explicit restrictions according to the handout. What are they?',opts:['It must not exceed 250 words and must not include any direct quotations from cited sources','It must not include references to figures, tables, or sources; and must not include information not in the report','It must not be written in first person and must not contain any statistical figures or numerical data','It must not appear before the table of contents and must not be translated into another language'],ans:1},
+{q:'The Background of the Problem section is described as moving from general to specific. What does this mean in practice?',opts:['Beginning with the researcher\'s personal conclusions and working backward toward contextual details','Starting with the most narrow aspect of the study and broadening to discuss global implications','Moving from the broad real-world or research literature context toward the specific research being reported','Listing all related studies alphabetically before narrowing down to the most relevant single source'],ans:2},
+{q:'The Theoretical Framework must also be presented as the basis for what other component of the research paper?',opts:['The Scope and Limitations section that defines the boundaries and coverage of the research study','The Abstract, which extracts key points from all sections including the theoretical underpinnings','The Conceptual Framework, which is derived from the theoretical framework to organize the study\'s variables','The Statistical Treatment section that determines which mathematical tool will be applied to raw data'],ans:2},
+{q:'The handout describes the Statement of the Problem as being based on the thesis/research statement. What additional requirement does it specify?',opts:['It must list no fewer than three and no more than seven specific sub-problems or research questions','It must be written in null hypothesis form to allow for statistical testing of each research variable','It must be organized in chronological order matching the sequence of the data collection process','It should be in line with the purpose of the research and define what the researcher wants to understand'],ans:3},
+{q:'Definition of Terms in a research paper refers to which type of definitions?',opts:['General dictionary definitions copied from an authoritative source like Merriam-Webster or Oxford','Etymological definitions that trace the historical origin and development of each key term used','Operational definitions — how each term is specifically used within the context of the study','Theoretical definitions derived from the frameworks of cited philosophers and academic scholars'],ans:2},
+{q:'The Importance of the Study section asks researchers to address what types of gaps in existing research?',opts:['Lack of bibliography pages, missing page numbers, or inconsistent citation formatting errors','Conflicts or unanswered questions, untested populations, untried methods, or findings being challenged','Outdated writing styles, overused research designs, or the repetition of previously completed studies','The absence of visual aids, graphs, or tables in previous studies that addressed the same research topic'],ans:1},
+{q:'The Scope and Limitations section presents the "boundaries" of the research. What two elements does it address?',opts:['The length of the paper in pages and the number of participants included in the data collection','The financial budget allocated for the study and the time period during which data was collected','What is included in the study (scope) and what is deliberately excluded (delimitations/limitations)','The specific geographic location where the study was conducted and the demographic age range studied'],ans:2},
+{q:'Chapter 2 of a research paper is the Review of Related Literature and Studies. According to the handout, how should sources be used in this chapter?',opts:['Sources should be listed in the order they were discovered during the initial literature search phase','Let your sources organize your paper so that each source gets its own dedicated paragraph section','Build your essay around points you want to make; do not let your sources organize your paper','Only cite sources that directly contradict your hypothesis to demonstrate awareness of opposing evidence'],ans:2},
+{q:'The handout advises moving up and down the "ladder of abstraction" in Chapter 2. What does this mean?',opts:['Alternating between simple and complex vocabulary to make the paper accessible to different audiences','Moving from generalization to varying levels of detail and back to generalization throughout the review','Organizing sources from the oldest publication date to the most recently published in chronological order','Shifting between quantitative and qualitative evidence to create a balanced and comprehensive review'],ans:1},
+{q:'The Methodology chapter should NOT do which of the following, according to the handout?',opts:['Provide a completely accurate description of the equipment and techniques used for gathering data','Include details of common statistical procedures or mix results with procedures in the same section','Explain the general type of scientific procedure used and the steps taken in conducting the research','Describe the population, sampling method, and data collection procedure used in the study'],ans:1},
+{q:'A well-written Methodology section is described in the handout as providing what for the entire research paper?',opts:['An entertaining narrative that makes the scientific process engaging and accessible to general readers','A great backbone for the entire research paper that allows building an extremely strong results section','A comprehensive overview of all related literature reviewed during the initial stages of the study','A definitive conclusion that summarizes all findings before the Results and Discussions chapter'],ans:1},
+{q:'The handout states that any scientific research paper needs to be "verifiable." What two things must the researcher provide to ensure verifiability?',opts:['A signed ethical clearance form and a notarized consent letter from all research participants','Completely accurate descriptions of equipment and techniques; and thorough explanation of how raw data was compiled and analyzed','A detailed personal biography of the researcher and a list of all academic institutions attended','The original raw data files and a duplicate copy of the completed survey instrument or interview guide'],ans:1},
+{q:'In Chapter 4 (Results and Discussions), the handout specifies a four-step order for constructing the research report. What is the correct sequence?',opts:['Data collection, statistical computation, visual representation, and narrative explanation of each result','Introduction of findings, comparison with literature, limitations of results, and recommendations for practice','Explanation of the results, Analysis/Interpretation of the results, Justification of the analysis, and Implication of the findings','Summary of findings, drawing of conclusions, formulation of recommendations, and future research proposals'],ans:2},
+{q:'According to the handout, Chapter 4 should NOT do which of the following?',opts:['Present the results for each statement of the problem through graphs, tables, and figures','Include the data analysis method used for interpretation of the research data','Simply repeat the data from the table verbatim in the written narrative portion of the report','Emphasize important results as shown in the table, chart, or visual representation'],ans:2},
+{q:'In Chapter 5, the Summary section answers what specific question?',opts:['How does the study relate to the broader field of academic research globally?','What are the important results you obtained for each statement of the problem?','What practical applications can be derived from the theoretical implications of the study?','How do the findings of this study compare with the established literature reviewed in Chapter 2?'],ans:1},
+{q:'The handout lists several things the researcher should NOT do in Chapter 5 (Summary of Findings). Which of these is listed as something to avoid?',opts:['Summarizing the most important findings for each statement of the problem individually','Explaining how your results relate to expectations and to literature cited in the Introduction','Overgeneralizing findings beyond what the data actually collected and analyzed can support','Describing the patterns, principles, and relationships that your results show clearly'],ans:2},
+{q:'The Conclusions section of Chapter 5 should "move from a detailed to a general level of consideration." What is the purpose of this movement?',opts:['To make the paper progressively shorter so the reader does not feel overwhelmed near the end','To return the topic to the broader context provided by the introduction after discussing specific findings','To transition from complex statistical language to simpler terms that non-academic readers can understand','To summarize the bibliography and list the most influential sources that shaped the study\'s direction'],ans:1},
+{q:'The Recommendations section asks researchers to "extend your findings to other situations." What does this mean?',opts:['Apply the same research methodology to a completely unrelated field to test its universal validity','Suggest how the findings from this study might be relevant or applicable beyond the original context studied','Recommend that future researchers use larger sample sizes and longer data collection periods only','List all related studies from Chapter 2 and suggest which ones should be replicated or updated'],ans:1},
+{q:'According to the handout, why is bibliographical information described as essential for every source used?',opts:['It demonstrates academic professionalism and signals to readers that the researcher is thorough','It is required by law under intellectual property regulations governing academic publishing worldwide','An article without bibliographical information is useless because the source cannot be cited or verified','It helps readers understand the publication context and assess whether the source is peer-reviewed'],ans:2},
+{q:'The handout advises that when organizing research notes, opposing views should be noted if they meet what condition?',opts:['If they come from sources published within the last two years and are from peer-reviewed journals','If they help to support your thesis/research statement or provide context for your argument','If they represent the majority position in the academic field regarding the topic being studied','If they come from government or educational institution websites with .gov or .edu extensions'],ans:1},
+{q:'According to the handout, "plagiarism is definitely out of the question." What is the prescribed alternative to plagiarizing sources?',opts:['Paraphrasing loosely by changing only a few words in the original while keeping the same sentence structure','Making sure information noted is carefully recorded in your own words and that all borrowed ideas are accurately documented','Using quotation marks around everything taken from a source regardless of whether it is directly quoted or not','Avoiding all external sources entirely and relying only on personal knowledge and original observations'],ans:1},
+{q:'The handout provides a method for organizing notes using an alphanumeric code system. What does the code "IA3b" represent?',opts:['The third question in Section A of the research instrument numbered by the order they were written','A footnote reference for the third source in the first chapter of the review of related literature','A code indicating item "Accessing WWW" belongs under I. Understanding the Internet → A. History → B. Trends','A bibliography entry format for internet sources from the first alphabetical author with multiple works'],ans:2},
+{q:'When writing the first draft of the literature review, the handout recommends which three techniques for using each idea?',opts:['Copying, highlighting, and annotating each source to mark important passages for later reference','Summarize, paraphrase, or quote directly for each idea you plan to use in your literature review','Translate, adapt, and reformulate each source to fit the specific language level of your audience','Index, catalog, and cross-reference each source to build a comprehensive annotated bibliography'],ans:1},
+{q:'The handout advises using a symbol such as "#" or "%" when writing a draft. What is the purpose of this technique?',opts:['To mark sections that should be permanently deleted because they are irrelevant to the thesis','To indicate quoted material that requires a formal citation entry in the reference list section','To mark spots where the writer wants to check back later to edit a paragraph, then delete the symbol when done','To signal transitions between major sections that will be replaced by formal subheadings during revision'],ans:2},
+{q:'In revising the outline and draft, the handout specifies checking three levels of concern. What is the "sentence level" concern?',opts:['Logical flow of introduction, coherence and depth of discussion, and effectiveness of conclusion','Topic sentences, sequence of ideas within paragraphs, use of details to support generalizations','Sentence structure, word choices, punctuation, and spelling — the technical correctness of writing','Consistent use of one citation system and appropriate use of endnotes or footnotes throughout'],ans:2},
+{q:'The handout identifies "paragraph level concerns" in the revision process. Which of the following is a paragraph-level concern?',opts:['Sentence structure, word choices, punctuation, and the correct spelling of technical vocabulary','Consistent use of one citation system and the accuracy of the works cited list at the end','Topic sentences, sequence of ideas within paragraphs, use of details to support generalizations','Logical flow of the overall introduction, coherence of discussion, and effectiveness of conclusion'],ans:2},
+{q:'When checking for "overall organization" in the revision process, the handout focuses on which elements?',opts:['Font size, line spacing, margin width, and the consistent formatting of headings throughout the document','Sentence-level grammar, vocabulary choice, punctuation accuracy, and correct spelling of all terms','Logical flow of introduction, coherence and depth of discussion, and effectiveness of conclusion','Bibliography format, citation consistency, footnote accuracy, and the completeness of the works cited list'],ans:2},
+{q:'Finding answers to research questions requires that answers be based on what, according to the handout?',opts:['Assumptions and reasonable predictions grounded in the researcher\'s professional experience and background','Evidence from the collected data — not on guesses, speculation, or personal opinions of the researcher','Consensus among cited literature sources that the majority of researchers agree on a particular conclusion','Statistical significance at the p<0.05 threshold as verified by the chosen statistical treatment tool'],ans:1},
+{q:'When analyzing quantitative data, the handout recommends computing which of the following?',opts:['Narrative themes, coded categories, recurring patterns, and emerging conceptual frameworks from responses','Totals, percentages, averages, or rankings from the numerical data collected from research respondents','Biographical profiles of respondents, thematic clusters of qualitative answers, and case study summaries','Historical trends, bibliometric analysis, and citation counts from the reviewed related literature'],ans:1},
+{q:'When analyzing qualitative data, the handout recommends grouping answers into what?',opts:['Statistical tables with numerical frequencies, percentages, and cross-tabulation of all variables measured','Themes — common ideas or repeated responses that emerge naturally from the data collected','Chronological timelines showing when each respondent provided their answers during the data collection','Alphabetical indexes listing all key terms mentioned by respondents in interviews or open-ended surveys'],ans:1},
+{q:'After analyzing data, the handout advises researchers to "interpret what the results mean." Which of the following correctly describes this step?',opts:['Re-reading all the raw data from the beginning without any pre-existing expectations or analytical frameworks','Explaining patterns in simple terms, connecting results to the research problem, and comparing with related studies','Transcribing all interview recordings word-for-word and then rearranging them into thematic categories','Calculating additional statistical measures not included in the original methodology to confirm existing findings'],ans:1},
+{q:'The handout advises checking the quality of research answers against three standards. Which option correctly lists all three?',opts:['Are they statistically significant, peer-reviewed, and published in an indexed academic journal?','Are they original, creative, and written in a formal academic register appropriate for scholarly publication?','Are the answers complete and specific; are they supported by evidence; do they match the research questions exactly?','Are they long enough to meet minimum word count requirements, properly formatted, and free from typographical errors?'],ans:2},
+{q:'When reporting findings, the handout says to "include only relevant information; avoid opinions here." What type of data may include short quotations as evidence?',opts:['Statistical data from quantitative surveys when the numbers alone do not fully convey the significance','Bibliographic data taken from previously published sources that directly support the research conclusions','Qualitative data collected through interviews, open-ended questions, or observational field notes','Secondary source data obtained from reviewing existing literature during the initial research phase'],ans:2},
+{q:'According to the handout, conclusions must connect to the research questions and, if applicable, to related studies. Specifically, conclusions should indicate what about the relationship with related studies?',opts:['Whether the related studies are more recent, more credible, or more widely cited than the current study','Whether the study\'s results agree with, contradict, or are exceptions to the findings of related studies','Whether the related studies used the same statistical tools and data collection methods as the current study','Whether the related studies were published in peer-reviewed journals indexed by international databases'],ans:1},
+{q:'Recommendations in a research paper must identify for whom the recommendation is directed. Which list from the handout correctly identifies possible audiences for recommendations?',opts:['Publishers, book reviewers, grant funding agencies, and international research conference organizers','Data analysts, statisticians, laboratory technicians, and research instrument validation specialists','Students, teachers, school administrators, the broader community, or future researchers','Government regulators, corporate executives, media outlets, and technology platform developers'],ans:2},
+{q:'According to the handout, when writing related literature, what bibliographical information should be recorded for internet sources specifically?',opts:['Only the website name and the article title are required since URLs change frequently over time','Author, title, place of publication, publisher, date of publication, page numbers, URLs, creation or modification dates on web pages, and the date of access','The domain extension, IP address, server location, and web hosting provider name are most important','Just the URL and the date it was first discovered, since other details are automatically captured by citation tools'],ans:1},
+{q:'The handout provides a good title example: "The Relationship of Luteinizing Hormone to Obesity in the Zucker Rat." Why is this considered a good title?',opts:['It is short and vague enough to attract a wide range of readers from different academic disciplines','It clearly describes the contents and the specific focus of the research, enabling readers to decide to read it','It avoids using any scientific terminology so that general audiences can immediately understand the topic','It uses "cute" language and a colloquial tone that makes the research more accessible and engaging'],ans:1},
+{q:'The handout gives poor title examples including "Fat Rats: Are Their Hormones Different?" Why is this considered a poor title?',opts:['It is too long and contains unnecessary information that exceeds the recommended title word limit','It uses "cute" language that is unprofessional and does not clearly describe the precise focus of the study','It contains too many scientific terms that would prevent non-specialist readers from understanding the topic','It is formatted incorrectly because it uses a question mark instead of a declarative statement format'],ans:1},
+{q:'In the context of finding information online for research, the handout cautions about what regarding government websites with .gov extensions?',opts:['Government websites are entirely reliable and should always be prioritized over educational resources','Government websites are regularly outdated because agencies rarely update their published online content','Government websites tend to be more reliable but should be watched for possible political bias in some cases','Government websites are restricted to public servants and cannot be legally accessed for academic research'],ans:2},
+{q:'According to the handout, how should a researcher handle information that is not understood during the note-taking process?',opts:['Include it anyway since all information contributes to a comprehensive and thorough research paper','Translate it into simpler language using a dictionary before including it in the notes and draft','Do not include any information that is not relevant to the topic or that the researcher does not understand','Flag it with a symbol for later review and ask a librarian or supervisor to explain it during consultation'],ans:2},
+{q:'According to the handout, the Summary section in Chapter 5 should present the summary of findings how?',opts:['As a single comprehensive paragraph combining all findings from every statement of the problem together','For each statement of the problem individually, presenting the key results obtained for that specific question','In reverse chronological order, starting with the final finding and working backward to the first question','Only for the most significant three findings, omitting minor results that did not support the hypothesis'],ans:1},
+{q:'The handout advises against "speculation that cannot be tested in the foreseeable future" in Chapter 5. What kind of content does this warning prohibit?',opts:['Suggesting practical applications of findings to real-world situations that could be implemented immediately','Recommendations directed at students, teachers, or schools based on the evidence collected in the study','Making claims or predictions about outcomes that go beyond what the data can support and cannot be verified','Drawing conclusions that connect the findings of the current study to those of previously related literature'],ans:2},
+{q:'The Recommendations section should suggest what in relation to theoretical implications, according to the handout?',opts:['Recommend that future researchers completely abandon the theoretical framework used in the current study','Suggest the theoretical implications of the results — how the findings affect or extend existing theoretical knowledge','Argue that the theoretical framework used was incorrect and propose an entirely new theoretical model instead','Summarize all theoretical frameworks from Chapter 2 and rank them by their relevance to the current findings'],ans:1},
+{q:'According to the handout, if the argument or point of a paper is complex, what should the writer do at the conclusion?',opts:['Shorten the conclusion to a single sentence to avoid redundancy with the summary section of the paper','Summarize the argument for the reader so they can fully understand the significance of the complex findings','Remove the complex argument entirely and replace it with a simpler finding that is easier to communicate','Refer the reader to the appendix where the full complexity of the argument is explained in technical detail'],ans:1}
 ];
 
-let quizQs=[], curQ=0, correct=0, ictSc=0, resSc=0, answered=false;
+// ─── ICT ESSAYS: 10 PROMPTS ───────────────────────────────────
+const ictEssays=[
+'Explain the evolution from Web 1.0 to Web 3.0. Discuss the key characteristics of each generation and give concrete examples of how each shift changed the daily online behavior of ordinary users — from simply reading information to creating content to participating in decentralized systems.',
+'Compare and contrast synchronous and asynchronous online collaboration. For each type, provide at least two real-world examples of tools or situations, and explain in detail which type would be more appropriate for a high school group project with members in different time zones.',
+'Discuss the importance of online safety and online security as separate but related concerns for students. Choose three specific safety measures and two specific security measures from the handout and explain the potential consequences a student could face by neglecting each one.',
+'Explain the five primary principles of graphic design: Unity, Variety, Hierarchy, Proportion, and Balance. For each principle, describe in your own words what it means and give a practical example of how it would be visibly applied when designing a poster for a school event.',
+'Describe the concept of content curation and explain why it is different from simply sharing random posts online. Using all four content curation strategies from the handout (choosing correct content, personalized thoughts, socializing, and publishing at the right time), discuss how a student could build a credible academic social media account.',
+'Discuss the role of productivity tools in education. Compare the word processor, spreadsheet, and presentation program in terms of their specific features and appropriate uses. Provide a distinct scenario where each one would be the most effective tool to use over the other two.',
+'Discuss the concept of visual messaging and visual literacy. Explain the three factors to assess when creating a visual message (audience, purpose and intention, and context), and describe how ignoring any one of these factors could cause a visual message to completely fail in its communication goal.',
+'Explain the concept of assistive technology and its significance in creating an inclusive digital society. Describe at least three specific examples from the handout and explain how each one addresses a particular type of disability or challenge experienced by users.',
+'Discuss the nature and purposes of online platforms as described in the handout. Explain how each of the three purposes — facilitating faster interaction, diverse business models, and social empowerment — has changed how people in the Philippines engage with society, the economy, and each other.',
+'Explain the key principles of online etiquette as described in the handout. For each of the five etiquette points, describe a realistic scenario where a student violates that principle and explain what the real-world consequences of that violation could be in an academic or professional context.',
+];
+
+// ─── RESEARCH ESSAYS: 10 PROMPTS ─────────────────────────────
+const resEssays=[
+'Explain why choosing the right research topic is described as one of the most critical steps in the research process. Discuss all four guidelines from the handout (interest and challenge, manageability, avoiding overly technical topics, and avoiding topics with limited sources) and for each one, explain what happens to the research paper when that guideline is ignored.',
+'A research paper is described in the handout as being distinctly different from a book report, an opinion essay, or an expository summary. Explain in detail what makes research a unique genre of academic writing, and describe what qualities a piece of writing must have to truly qualify as research according to the handout.',
+'Explain the purpose and content of each chapter in the structure of a research paper from Chapter 1 through Chapter 5. For each chapter, describe its specific purpose, list the key sections it contains, and explain how that chapter connects to and supports the chapters that come before and after it.',
+'Explain the difference between reporting findings, drawing conclusions, and making recommendations. Describe what each section must contain, what it must avoid, and provide an example of how a careless researcher could easily confuse one for another — and what the academic consequences of that confusion would be.',
+'Discuss the Methodology chapter as the "core of the research paper." Explain the four key roles it plays as stated in the handout, describe what a well-written methodology must include to allow other researchers to verify the study, and explain what happens to the credibility of a study when the methodology is poorly written or incomplete.',
+'The handout outlines a multi-step process for finding, organizing, and writing a literature review. Describe the full process from finding information online (including the guidelines for evaluating websites by domain extension) through organizing notes and writing the first draft, explaining the rationale behind each major step.',
+'Explain the concept of plagiarism as addressed in the handout and discuss why it is described as "definitely out of the question" in academic research. Describe the correct alternatives to plagiarism — summarizing, paraphrasing, and quoting — and explain the specific conditions under which each technique should be used.',
+'Discuss the complete process of finding answers to research questions as outlined in the handout. Cover all five steps (organizing data, analyzing data, interpreting results, answering each question directly, and checking quality), and for each step explain both how to do it correctly and what a common mistake looks like.',
+'Discuss the role of conclusions and recommendations in Chapter 5 of a research paper. Explain the difference between a finding and a conclusion, describe what makes a recommendation realistic and useful versus vague and unhelpful, and explain why the handout warns against overgeneralization and untestable speculation.',
+'The handout describes several revision strategies for improving a research paper draft. Explain the three levels of revision concerns (overall organization, paragraph level, and sentence level), describe what a researcher should check at each level, and explain why revising in this specific order — from broad to narrow — is more effective than the reverse.',
+];
+
+// ─── STATE & QUIZ LOGIC ───────────────────────────────────────
+let quizMode=null, quizQs=[], curQ=0, correctCt=0, answered=false;
+let essayMode=null;
 
 function shuffle(a){let b=[...a];for(let i=b.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b;}
 
 function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  const pageMap=['home','ict-terms','res-terms','quiz-hub','essays-hub'];
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    ['home','ict','research','quiz','essays'].forEach((pg,pi)=>{b.classList.toggle('active',pg===id&&i===pi)});
+    b.classList.toggle('active',pageMap[i]===id||(i===3&&(id==='quiz-hub'||id==='quiz-active'||id==='quiz-results'))||(i===4&&(id==='essays-hub'||id==='essays-active')));
   });
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-function renderTerms(arr,elId){
-  document.getElementById(elId).innerHTML=arr.map(t=>`
-    <div class="term-card">
-      <div class="term-name">${t.name}</div>
-      <div class="term-desc">${t.desc}</div>
-    </div>`).join('');
-}
-
-function filterICT(cat,el){
-  document.querySelectorAll('#ict .filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderTerms(cat==='all'?ictTerms:ictTerms.filter(t=>t.cat===cat),'ict-grid');
-}
-function filterRes(cat,el){
-  document.querySelectorAll('#research .filter-btn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');
-  renderTerms(cat==='all'?resTerms:resTerms.filter(t=>t.cat===cat),'res-grid');
-}
-
-function startQuiz(){
-  const ictQ=shuffle(pool.filter(q=>q.sub==='ICT')).slice(0,15);
-  const resQ=shuffle(pool.filter(q=>q.sub==='Research')).slice(0,15);
-  quizQs=[...ictQ,...resQ];
-  curQ=0;correct=0;ictSc=0;resSc=0;answered=false;
-  document.getElementById('quiz-start-screen').style.display='none';
-  document.getElementById('quiz-active-screen').style.display='block';
-  document.getElementById('quiz-results-screen').style.display='none';
+function initQuiz(mode){
+  quizMode=mode;
+  const pool=mode==='ict'?ictPool:resPool;
+  quizQs=shuffle(pool).slice(0,30);
+  curQ=0;correctCt=0;answered=false;
+  showPage('quiz-active');
+  const pf=document.getElementById('q-progress');
+  pf.className='progress-fill '+(mode==='ict'?'pf-ict':'pf-res');
   renderQ();
 }
 
 function renderQ(){
   const q=quizQs[curQ];
-  document.getElementById('q-num-display').textContent=`Question ${curQ+1} of 30`;
-  document.getElementById('q-live-score').textContent=`Score: ${correct}`;
+  document.getElementById('q-num-lbl').textContent=`Question ${curQ+1} of 30`;
+  document.getElementById('q-score-lbl').textContent=`Score: ${correctCt}`;
   document.getElementById('q-progress').style.width=((curQ/30)*100)+'%';
-  const sa=document.getElementById('section-announce');
-  if(curQ===0) sa.innerHTML='<span class="section-announce announce-ict">ICT Section — Questions 1–15</span>';
-  else if(curQ===15) sa.innerHTML='<span class="section-announce announce-res">Research Section — Questions 16–30</span>';
-  else sa.innerHTML='';
+  const ba=document.getElementById('q-badge-area');
+  ba.innerHTML=`<span class="badge ${quizMode==='ict'?'badge-ict':'badge-res'}">${quizMode==='ict'?'ICT Quiz':'Research Quiz'} · Q${curQ+1}</span>`;
   document.getElementById('q-text').textContent=q.q;
   document.getElementById('q-opts').innerHTML=q.opts.map((o,i)=>
-    `<button class="opt" onclick="pickOpt(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
+    `<button class="opt" onclick="pick(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('');
   const fb=document.getElementById('q-feedback');
   fb.style.display='none';fb.className='feedback-box';
   document.getElementById('q-next-btn').style.display='none';
   answered=false;
 }
 
-function pickOpt(i){
+function pick(i){
   if(answered)return;
   answered=true;
   const q=quizQs[curQ];
@@ -658,12 +616,14 @@ function pickOpt(i){
   fb.style.display='block';
   if(i===q.ans){
     btns[i].classList.add('correct');
-    fb.className='feedback-box correct';fb.textContent='✓ Correct!';
-    correct++;q.sub==='ICT'?ictSc++:resSc++;
+    fb.className='feedback-box correct';
+    fb.textContent='✓ Correct!';
+    correctCt++;
   } else {
-    btns[i].classList.add('wrong');btns[q.ans].classList.add('correct');
+    btns[i].classList.add('wrong');
+    btns[q.ans].classList.add('correct');
     fb.className='feedback-box wrong';
-    fb.textContent=`✗ Incorrect. Correct answer: ${String.fromCharCode(65+q.ans)}. ${q.opts[q.ans]}`;
+    fb.textContent=`✗ Incorrect. The correct answer is: ${String.fromCharCode(65+q.ans)}. ${q.opts[q.ans]}`;
   }
   document.getElementById('q-next-btn').style.display='inline-flex';
 }
@@ -675,45 +635,59 @@ function nextQ(){
 }
 
 function showResults(){
-  document.getElementById('quiz-active-screen').style.display='none';
-  document.getElementById('quiz-results-screen').style.display='block';
-  document.getElementById('r-score').textContent=correct;
-  document.getElementById('r-ict').textContent=ictSc;
-  document.getElementById('r-res').textContent=resSc;
-  const pct=Math.round((correct/30)*100);
-  let grade='';
-  if(pct>=90)grade='🏆 Excellent! Outstanding performance — '+pct+'%';
-  else if(pct>=75)grade='✦ Good job! Solid understanding — '+pct+'%';
-  else if(pct>=60)grade='⚠ Passing. Review missed terms — '+pct+'%';
-  else grade='✗ Needs improvement. Revisit both handouts — '+pct+'%';
-  document.getElementById('r-grade').textContent=grade;
+  showPage('quiz-results');
+  document.getElementById('q-progress').style.width='100%';
+  document.getElementById('r-num').textContent=correctCt;
+  const c=document.getElementById('r-circle');
+  c.className='results-circle '+(quizMode==='ict'?'ict-circle':'res-circle');
+  const pct=Math.round((correctCt/30)*100);
+  let g='';
+  if(pct>=90)g='🏆 Excellent — '+pct+'% · Outstanding performance!';
+  else if(pct>=75)g='✦ Good job — '+pct+'% · Solid understanding.';
+  else if(pct>=60)g='⚠ Passing — '+pct+'% · Review the terms you missed.';
+  else g='✗ Needs improvement — '+pct+'% · Revisit the handout.';
+  document.getElementById('r-grade').textContent=g;
+  document.getElementById('r-retake-btn').onclick=()=>initQuiz(quizMode);
 }
 
-function retakeQuiz(){
-  document.getElementById('quiz-start-screen').style.display='block';
-  document.getElementById('quiz-results-screen').style.display='none';
-}
-
-function loadEssays(){
-  const ictE=shuffle(essayPool.filter(e=>e.sub==='ICT')).slice(0,3);
-  const resE=shuffle(essayPool.filter(e=>e.sub==='Research')).slice(0,2);
-  const chosen=shuffle([...ictE,...resE]);
+function loadEssays(mode){
+  essayMode=mode;
+  const pool=mode==='ict'?ictEssays:resEssays;
+  const chosen=shuffle(pool).slice(0,5);
+  document.getElementById('essay-set-badge').innerHTML=
+    `<span class="badge ${mode==='ict'?'badge-ict':'badge-res'}">${mode==='ict'?'ICT Essays':'Research Essays'} · 5 of 10</span>`;
   document.getElementById('essay-list').innerHTML=chosen.map((e,i)=>`
     <div class="essay-card">
       <div class="essay-top">
-        <div class="essay-num-badge">${i+1}</div>
-        <span class="badge ${e.sub==='ICT'?'badge-ict':'badge-res'}">${e.sub}</span>
+        <div class="essay-num-b">${i+1}</div>
+        <span class="badge ${mode==='ict'?'badge-ict':'badge-res'}">${mode==='ict'?'ICT':'Research'}</span>
       </div>
-      <div class="essay-prompt">${e.prompt}</div>
+      <div class="essay-prompt">${e}</div>
       <textarea class="essay-area" placeholder="Write your answer here..."></textarea>
-      <div class="essay-guide">Aim for 2–4 well-developed paragraphs. Use specific terms and examples from the course handouts.</div>
+      <div class="essay-guide">Aim for 3–5 well-developed paragraphs. Use specific terms and examples from the course handouts.</div>
     </div>`).join('');
+  document.getElementById('essay-reload-btn').onclick=()=>loadEssays(mode);
+  showPage('essays-active');
 }
 
-// Init
-renderTerms(ictTerms,'ict-grid');
-renderTerms(resTerms,'res-grid');
-loadEssays();
+// ─── TERMS RENDERING ─────────────────────────────────────────
+function renderGrid(arr,id){
+  document.getElementById(id).innerHTML=arr.map(t=>
+    `<div class="term-card"><div class="term-name">${t.name}</div><div class="term-desc">${t.desc}</div></div>`).join('');
+}
+function filterICT(cat,el){
+  document.querySelectorAll('#ict-terms .filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid(cat==='all'?ictTerms:ictTerms.filter(t=>t.cat===cat),'ict-grid');
+}
+function filterRes(cat,el){
+  document.querySelectorAll('#res-terms .filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid(cat==='all'?resTerms:resTerms.filter(t=>t.cat===cat),'res-grid');
+}
+
+renderGrid(ictTerms,'ict-grid');
+renderGrid(resTerms,'res-grid');
 </script>
 </body>
 </html>
