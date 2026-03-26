@@ -1,143 +1,868 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>VoxelAR 2026 - Gesture Builder</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <style>
-        body {
-            margin: 0;
-            background-color: #000;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
-        #info {
-            position: absolute;
-            top: 20px;
-            width: 100%;
-            text-align: center;
-            color: white;
-            z-index: 10;
-            pointer-events: none;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
-        }
-        .controls-hint {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px 20px;
-            border-radius: 20px;
-            display: inline-block;
-        }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>✦ AR Hand Voxel Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --accent:   #00d4ff;
+    --blue-4:   #1e90ff;
+    --blue-3:   #0057d8;
+    --blue-2:   #003580;
+    --gold:     #ffd700;
+    --red:      #ff4444;
+    --green:    #00ff88;
+    --font-h:   'Orbitron', monospace;
+    --font-m:   'Share Tech Mono', monospace;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: var(--font-m); }
+
+  /* ── LAYER STACK ─────────────────────────── */
+  /* 1. Video fills screen */
+  #cam-bg {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);   /* mirror */
+    z-index: 0;
+  }
+
+  /* 2. Composite canvas (camera copy + voxels + hand fx) */
+  #ar-canvas {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* 3. HUD overlays */
+  #hud {
+    position: fixed; inset: 0;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  /* Corner brackets */
+  .corner {
+    position: absolute;
+    width: 36px; height: 36px;
+    border-color: var(--accent);
+    border-style: solid;
+    opacity: 0.7;
+  }
+  .corner.tl { top: 14px; left: 14px; border-width: 2px 0 0 2px; }
+  .corner.tr { top: 14px; right: 14px; border-width: 2px 2px 0 0; }
+  .corner.bl { bottom: 14px; left: 14px; border-width: 0 0 2px 2px; }
+  .corner.br { bottom: 14px; right: 14px; border-width: 0 2px 2px 0; }
+
+  /* Top bar */
+  #topbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 52px;
+    background: linear-gradient(180deg, rgba(0,8,20,0.88) 0%, transparent 100%);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 20px;
+  }
+  #topbar h1 {
+    font-family: var(--font-h);
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-shadow: 0 0 14px var(--accent);
+    white-space: nowrap;
+  }
+  .top-sep { flex: 1; height: 1px; background: linear-gradient(90deg, var(--blue-3), transparent); }
+  .top-stat { display: flex; flex-direction: column; align-items: flex-end; }
+  .top-stat-label { font-size: 0.45rem; letter-spacing: 0.2em; color: var(--blue-4); text-transform: uppercase; }
+  .top-stat-val   { font-family: var(--font-h); font-size: 0.75rem; color: var(--accent); text-shadow: 0 0 8px var(--accent); }
+
+  /* Bottom bar */
+  #bottombar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 58px;
+    background: linear-gradient(0deg, rgba(0,8,20,0.9) 0%, transparent 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 0 20px;
+  }
+  .g-chip {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(0,20,50,0.6);
+    border: 1px solid rgba(30,144,255,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    transition: border-color 0.2s, background 0.2s;
+    backdrop-filter: blur(4px);
+  }
+  .g-chip.active {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.12);
+    box-shadow: 0 0 12px rgba(0,212,255,0.3);
+  }
+  .g-chip.active.erase-chip {
+    border-color: var(--red);
+    background: rgba(255,68,68,0.12);
+    box-shadow: 0 0 12px rgba(255,68,68,0.3);
+  }
+  .g-icon { font-size: 0.9rem; }
+  .g-text { font-size: 0.55rem; letter-spacing: 0.1em; color: #8bb; text-transform: uppercase; }
+  .g-text b { color: var(--accent); font-weight: normal; }
+  .g-chip.active .g-text b { color: #fff; }
+
+  /* Left panel */
+  #leftpanel {
+    position: absolute;
+    left: 14px; top: 70px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .lp-card {
+    background: rgba(0,8,20,0.72);
+    border: 1px solid rgba(30,144,255,0.25);
+    border-radius: 6px;
+    padding: 8px 12px;
+    backdrop-filter: blur(8px);
+    min-width: 110px;
+  }
+  .lp-label { font-size: 0.48rem; letter-spacing: 0.18em; color: #556; text-transform: uppercase; margin-bottom: 2px; }
+  .lp-val   { font-family: var(--font-h); font-size: 0.85rem; color: var(--accent); text-shadow: 0 0 8px var(--accent); }
+  #mode-card .lp-val { transition: color 0.3s; }
+  #mode-card.erase .lp-val { color: var(--red); text-shadow: 0 0 8px var(--red); }
+
+  /* Hold ring */
+  #hold-ring {
+    position: absolute;
+    left: 14px; top: 70px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  #hold-ring.visible { opacity: 1; }
+  #hold-ring svg { filter: drop-shadow(0 0 8px var(--accent)); }
+  #hold-ring-label { font-size: 0.5rem; letter-spacing: 0.12em; color: var(--accent); text-transform: uppercase; }
+
+  /* Gesture name badge */
+  #gesture-badge {
+    position: absolute;
+    right: 14px; top: 70px;
+    background: rgba(0,8,20,0.75);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-family: var(--font-h);
+    font-size: 0.8rem;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-shadow: 0 0 10px var(--accent);
+    backdrop-filter: blur(8px);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  #gesture-badge.fist  { border-color: var(--red); color: var(--red); text-shadow: 0 0 10px var(--red); }
+  #gesture-badge.place { border-color: var(--gold); color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+  #gesture-badge.erase-mode { border-color: var(--red); color: var(--red); }
+
+  /* Clear button */
+  #clear-btn {
+    position: absolute;
+    right: 14px; bottom: 68px;
+    background: rgba(0,8,20,0.75);
+    border: 1px solid rgba(255,80,80,0.4);
+    border-radius: 6px;
+    padding: 6px 16px;
+    color: #ff8888;
+    font-family: var(--font-m);
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    cursor: pointer;
+    pointer-events: all;
+    text-transform: uppercase;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  #clear-btn:hover { background: rgba(255,60,60,0.18); border-color: var(--red); }
+
+  /* Splash */
+  #splash {
+    position: fixed; inset: 0;
+    background: rgba(0,4,12,0.97);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px; z-index: 100;
+    transition: opacity 0.6s;
+  }
+  #splash.hidden { opacity: 0; pointer-events: none; }
+  #splash h2 { font-family: var(--font-h); font-size: 2rem; color: var(--accent); text-shadow: 0 0 30px var(--accent); letter-spacing: 0.2em; }
+  #splash .sub { font-size: 0.75rem; color: #4af; max-width: 360px; text-align: center; line-height: 1.8; }
+  #splash .badge { font-size: 0.65rem; color: #556; letter-spacing: 0.1em; margin-top: 6px; }
+  #start-btn {
+    margin-top: 10px; padding: 12px 40px;
+    background: transparent; border: 2px solid var(--accent);
+    color: var(--accent); font-family: var(--font-h); font-size: 0.85rem;
+    letter-spacing: 0.2em; cursor: pointer; border-radius: 4px;
+    text-shadow: 0 0 8px var(--accent);
+    box-shadow: 0 0 20px rgba(0,212,255,0.15);
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+  #start-btn:hover { background: rgba(0,212,255,0.1); box-shadow: 0 0 32px rgba(0,212,255,0.35); }
+
+  /* scan line overlay */
+  #scanlines {
+    position: fixed; inset: 0; z-index: 4; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px);
+  }
+  /* vignette */
+  #vignette {
+    position: fixed; inset: 0; z-index: 3; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,4,18,0.75) 100%);
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .rec-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--red); margin-right: 5px; animation: blink 1.2s ease-in-out infinite; }
+</style>
 </head>
 <body>
-    <div id="info">
-        <div class="controls-hint">
-            <b>Pinch Index Finger</b> to Place Voxel
-        </div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <h2>◈ AR VOXEL</h2>
+  <div class="sub">Full augmented-reality hand voxel builder.<br/>
+    Your camera becomes the canvas.<br/>
+    Hand skeleton is rendered live over your feed.</div>
+  <div class="badge">Requires webcam · Best in Chrome / Edge</div>
+  <button id="start-btn">▶ LAUNCH AR</button>
+</div>
+
+<!-- CAMERA BG (hidden — we draw it ourselves onto ar-canvas for compositing) -->
+<video id="cam-bg" autoplay playsinline muted></video>
+
+<!-- AR CANVAS — camera + voxels + hand FX all composited here -->
+<canvas id="ar-canvas"></canvas>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <!-- Top bar -->
+  <div id="topbar">
+    <h1>◈ AR VOXEL</h1>
+    <div class="top-sep"></div>
+    <div class="top-stat">
+      <div class="top-stat-label">Blocks</div>
+      <div class="top-stat-val" id="st-blocks">0</div>
     </div>
+    <div class="top-stat">
+      <div class="top-stat-label">FPS</div>
+      <div class="top-stat-val" id="st-fps">—</div>
+    </div>
+    <div class="top-stat" style="margin-left:8px">
+      <div class="top-stat-label">Status</div>
+      <div class="top-stat-val" style="font-size:0.6rem"><span class="rec-dot"></span>LIVE</div>
+    </div>
+  </div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-            }
-        }
-    </script>
+  <!-- Left panel -->
+  <div id="leftpanel">
+    <div class="lp-card" id="mode-card">
+      <div class="lp-label">Mode</div>
+      <div class="lp-val" id="st-mode">BUILD</div>
+    </div>
+  </div>
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { ARButton } from 'three/addons/webxr/ARButton.js';
-        import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
-        import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
+  <!-- Hold ring (repositioned to center dynamically by JS) -->
+  <div id="hold-ring">
+    <svg width="68" height="68" viewBox="0 0 68 68">
+      <circle cx="34" cy="34" r="28" fill="rgba(0,8,20,0.5)" stroke="#001f3f" stroke-width="4"/>
+      <circle id="ring-arc" cx="34" cy="34" r="28" fill="none"
+              stroke="#00d4ff" stroke-width="4"
+              stroke-dasharray="175.9" stroke-dashoffset="175.9"
+              stroke-linecap="round"
+              transform="rotate(-90 34 34)"/>
+      <text x="34" y="39" text-anchor="middle" font-size="11"
+            fill="#00d4ff" font-family="'Share Tech Mono',monospace" id="ring-pct">0%</text>
+    </svg>
+    <div id="hold-ring-label">HOLD TO PLACE</div>
+  </div>
 
-        let container;
-        let camera, scene, renderer;
-        let hand1, hand2;
-        let controllerModelFactory, handModelFactory;
+  <!-- Gesture badge -->
+  <div id="gesture-badge">NONE</div>
 
-        const voxelSize = 0.05; // 5cm grid
-        const voxels = [];
+  <!-- Clear btn -->
+  <button id="clear-btn" onclick="voxels.clear()">✕ CLEAR ALL</button>
 
-        init();
-        animate();
+  <!-- Bottom gesture chips -->
+  <div id="bottombar">
+    <div class="g-chip" id="g-point">
+      <span class="g-icon">☞</span>
+      <span class="g-text"><b>POINT</b> move</span>
+    </div>
+    <div class="g-chip" id="g-pinch">
+      <span class="g-icon">○</span>
+      <span class="g-text"><b>PINCH</b> place</span>
+    </div>
+    <div class="g-chip" id="g-fist">
+      <span class="g-icon">✊</span>
+      <span class="g-text"><b>FIST</b> delete</span>
+    </div>
+    <div class="g-chip" id="g-peace">
+      <span class="g-icon">✌</span>
+      <span class="g-text"><b>PEACE</b> erase mode</span>
+    </div>
+    <div class="g-chip" id="g-open">
+      <span class="g-icon">✋</span>
+      <span class="g-text"><b>OPEN</b> build mode</span>
+    </div>
+  </div>
+</div>
 
-        function init() {
-            container = document.createElement('div');
-            document.body.appendChild(container);
+<div id="vignette"></div>
+<div id="scanlines"></div>
 
-            scene = new THREE.Scene();
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const GRID_COLS  = 16;
+const GRID_ROWS  = 10;
+const CELL       = 56;
+const ISO_ANG    = Math.PI / 6;
+const COS_A      = Math.cos(ISO_ANG);
+const SIN_A      = Math.sin(ISO_ANG);
+const DEPTH_H    = Math.floor(CELL * 0.36);
+const PINCH_D    = 0.07;
+const HOLD_MS    = 380;
+const SMOOTH_N   = 8;
 
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+// MediaPipe landmark indices
+const CONNECTIONS = [
+  [0,1],[1,2],[2,3],[3,4],       // thumb
+  [0,5],[5,6],[6,7],[7,8],       // index
+  [5,9],[9,10],[10,11],[11,12],  // middle
+  [9,13],[13,14],[14,15],[15,16],// ring
+  [13,17],[0,17],[17,18],[18,19],[19,20] // pinky
+];
 
-            // Lighting for depth
-            const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 3);
-            light.position.set(0.5, 1, 0.25);
-            scene.add(light);
+// ─── CANVAS ───────────────────────────────────────────────────────────────────
+const canvas = document.getElementById('ar-canvas');
+const ctx    = canvas.getContext('2d');
+const video  = document.getElementById('cam-bg');
 
-            // Renderer Setup
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.xr.enabled = true;
-            container.appendChild(renderer.domElement);
+let W = 0, H = 0;
+let origin = { x: 0, y: 0 };
 
-            // AR Button with Hand Tracking feature request
-            document.body.appendChild(ARButton.createButton(renderer, { 
-                optionalFeatures: ['hand-tracking', 'layers'] 
-            }));
+function resize() {
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  origin.x = W * 0.5;
+  origin.y = H * 0.38;
+}
+window.addEventListener('resize', resize);
+resize();
 
-            // Controllers & Hand Models
-            controllerModelFactory = new XRControllerModelFactory();
-            handModelFactory = new XRHandModelFactory();
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const voxels  = new Set();
+let curCol = Math.floor(GRID_COLS / 2);
+let curRow = Math.floor(GRID_ROWS / 2);
+let gesture   = 'NONE';
+let mode      = 'BUILD';
+let holdStart = null;
+let holdType  = null;
+let holdProg  = 0;
+const sxBuf   = [], syBuf = [];
+let lastT     = performance.now();
+const fpsBuf  = [];
+let pulseTick = 0;
 
-            // Setup Right Hand (Hand 1)
-            hand1 = renderer.xr.getHand(1);
-            hand1.add(handModelFactory.createHandModel(hand1, "mesh"));
-            scene.add(hand1);
+// Hand landmarks from MediaPipe (normalized 0-1)
+let handLandmarks = null;
+let handedness    = 'Right';
 
-            // Pinch Event Listener
-            hand1.addEventListener('pinchend', () => {
-                // Get the index finger tip joint
-                const indexTip = hand1.joints['index-finger-tip'];
-                if (indexTip) {
-                    spawnVoxel(indexTip.position);
-                }
-            });
+// ─── ISO MATH ─────────────────────────────────────────────────────────────────
+function iso(col, row) {
+  return {
+    x: origin.x + (col - row) * CELL * COS_A,
+    y: origin.y + (col + row) * CELL * SIN_A
+  };
+}
+function s2g(sx, sy) {
+  const dx = (sx - origin.x) / CELL;
+  const dy = (sy - origin.y) / CELL;
+  return {
+    col: Math.round((dx / COS_A + dy / SIN_A) / 2),
+    row: Math.round((dy / SIN_A - dx / COS_A) / 2)
+  };
+}
 
-            window.addEventListener('resize', onWindowResize);
-        }
+// ─── VOXEL DRAWING ────────────────────────────────────────────────────────────
+function voxelFaces(col, row) {
+  const { x: cx, y: cy } = iso(col, row);
+  const h = DEPTH_H;
+  const top = [
+    { x: cx,              y: cy - h },
+    { x: cx + CELL*COS_A, y: cy - h + CELL*SIN_A },
+    { x: cx,              y: cy - h + 2*CELL*SIN_A },
+    { x: cx - CELL*COS_A, y: cy - h + CELL*SIN_A },
+  ];
+  const left = [
+    top[3], top[2],
+    { x: cx,              y: cy + 2*CELL*SIN_A },
+    { x: cx - CELL*COS_A, y: cy + CELL*SIN_A },
+  ];
+  const right = [
+    top[2], top[1],
+    { x: cx + CELL*COS_A, y: cy + CELL*SIN_A },
+    { x: cx,              y: cy + 2*CELL*SIN_A },
+  ];
+  return { top, left, right, cx, cy };
+}
 
-        function spawnVoxel(position) {
-            const geometry = new THREE.BoxGeometry(voxelSize, voxelSize, voxelSize);
-            const material = new THREE.MeshStandardMaterial({ 
-                color: Math.random() * 0xffffff,
-                roughness: 0.7 
-            });
-            const voxel = new THREE.Mesh(geometry, material);
+function poly(pts) {
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+  ctx.closePath();
+}
 
-            // Grid Snapping Logic
-            voxel.position.x = Math.round(position.x / voxelSize) * voxelSize;
-            voxel.position.y = Math.round(position.y / voxelSize) * voxelSize;
-            voxel.position.z = Math.round(position.z / voxelSize) * voxelSize;
+function drawVoxel(col, row, ghost = false) {
+  const { top, left, right, cx, cy } = voxelFaces(col, row);
 
-            scene.add(voxel);
-            voxels.push(voxel);
-        }
+  if (ghost) {
+    ctx.save();
+    ctx.globalAlpha = 0.22;
+    poly(top);  ctx.fillStyle = '#1e90ff'; ctx.fill();
+    poly(left); ctx.fillStyle = '#0057d8'; ctx.fill();
+    poly(right);ctx.fillStyle = '#003a9e'; ctx.fill();
+    ctx.globalAlpha = 0.6;
+    [top, left, right].forEach(f => {
+      poly(f); ctx.strokeStyle = '#00d4ff'; ctx.lineWidth = 1; ctx.stroke();
+    });
+    ctx.restore();
+    return;
+  }
 
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+  // Gradient fills
+  const gTop = ctx.createLinearGradient(cx - CELL*COS_A, cy - DEPTH_H, cx + CELL*COS_A, cy);
+  gTop.addColorStop(0, '#60b8ff');
+  gTop.addColorStop(1, '#1e90ff');
+  poly(top); ctx.fillStyle = gTop; ctx.fill();
 
-        function animate() {
-            renderer.setAnimationLoop(render);
-        }
+  const gLeft = ctx.createLinearGradient(cx - CELL*COS_A, cy, cx, cy + 2*CELL*SIN_A);
+  gLeft.addColorStop(0, '#0057d8');
+  gLeft.addColorStop(1, '#001030');
+  poly(left); ctx.fillStyle = gLeft; ctx.fill();
 
-        function render() {
-            renderer.render(scene, camera);
-        }
-    </script>
+  const gRight = ctx.createLinearGradient(cx, cy, cx + CELL*COS_A, cy + 2*CELL*SIN_A);
+  gRight.addColorStop(0, '#003a9e');
+  gRight.addColorStop(1, '#000820');
+  poly(right); ctx.fillStyle = gRight; ctx.fill();
+
+  // Edges
+  ctx.strokeStyle = 'rgba(160,220,255,0.45)';
+  ctx.lineWidth = 0.8;
+  [top, left, right].forEach(f => { poly(f); ctx.stroke(); });
+
+  // Shimmer
+  ctx.save();
+  poly(top); ctx.clip();
+  const sh = ctx.createRadialGradient(cx - CELL*COS_A*0.3, top[0].y, 0, cx, cy - DEPTH_H + CELL*SIN_A, CELL*0.7);
+  sh.addColorStop(0, 'rgba(200,240,255,0.25)');
+  sh.addColorStop(1, 'transparent');
+  ctx.fillStyle = sh; ctx.fill();
+  ctx.restore();
+}
+
+function drawCursor(col, row) {
+  const { cx, cy } = voxelFaces(col, row);
+  const r = CELL * COS_A * 0.42 + Math.sin(pulseTick * 4) * 3;
+  const color = gesture === 'PINCH' ? '#ffd700' : '#00d4ff';
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur  = 18;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - r);
+  ctx.lineTo(cx + r, cy);
+  ctx.lineTo(cx, cy + r);
+  ctx.lineTo(cx - r, cy);
+  ctx.closePath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+  ctx.beginPath();
+  ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#fff';
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawGrid() {
+  ctx.save();
+  ctx.globalAlpha = 0.13;
+  for (let c = 0; c <= GRID_COLS; c++) {
+    for (let r = 0; r <= GRID_ROWS; r++) {
+      const { x, y } = iso(c, r);
+      const oy = y + DEPTH_H * 2;
+      if (c < GRID_COLS) {
+        const { x: nx, y: ny } = iso(c + 1, r);
+        ctx.beginPath(); ctx.moveTo(x, oy); ctx.lineTo(nx, ny + DEPTH_H * 2);
+        ctx.strokeStyle = '#1e90ff'; ctx.lineWidth = 0.7; ctx.stroke();
+      }
+      if (r < GRID_ROWS) {
+        const { x: nx, y: ny } = iso(c, r + 1);
+        ctx.beginPath(); ctx.moveTo(x, oy); ctx.lineTo(nx, ny + DEPTH_H * 2);
+        ctx.strokeStyle = '#1e90ff'; ctx.lineWidth = 0.7; ctx.stroke();
+      }
+    }
+  }
+  ctx.restore();
+}
+
+// ─── HAND SKELETON DRAW ───────────────────────────────────────────────────────
+function drawHandSkeleton(lm) {
+  if (!lm || lm.length === 0) return;
+
+  // Convert normalized → screen (mirrored X since video is flipped)
+  const pts = lm.map(p => ({
+    x: (1 - p.x) * W,
+    y:       p.y  * H,
+    z:       p.z
+  }));
+
+  const now = Date.now();
+
+  // ── Connections (glowing lines) ──
+  CONNECTIONS.forEach(([a, b]) => {
+    const pa = pts[a], pb = pts[b];
+    const grad = ctx.createLinearGradient(pa.x, pa.y, pb.x, pb.y);
+    grad.addColorStop(0, 'rgba(0,212,255,0.85)');
+    grad.addColorStop(1, 'rgba(30,144,255,0.55)');
+
+    ctx.save();
+    ctx.shadowColor = '#00d4ff';
+    ctx.shadowBlur  = 8;
+    ctx.beginPath();
+    ctx.moveTo(pa.x, pa.y);
+    ctx.lineTo(pb.x, pb.y);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth   = 2.5;
+    ctx.lineCap     = 'round';
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  // ── Scan sweep effect (animated line across hand bbox) ──
+  const minX = Math.min(...pts.map(p => p.x));
+  const maxX = Math.max(...pts.map(p => p.x));
+  const minY = Math.min(...pts.map(p => p.y));
+  const maxY = Math.max(...pts.map(p => p.y));
+  const scanProgress = ((now * 0.0015) % 1);
+  const scanY = minY + (maxY - minY) * scanProgress;
+
+  ctx.save();
+  ctx.globalAlpha = 0.45;
+  const scanGrad = ctx.createLinearGradient(minX, scanY - 12, minX, scanY + 12);
+  scanGrad.addColorStop(0,   'transparent');
+  scanGrad.addColorStop(0.5, '#00d4ff');
+  scanGrad.addColorStop(1,   'transparent');
+  ctx.fillStyle = scanGrad;
+  ctx.fillRect(minX - 10, scanY - 12, maxX - minX + 20, 24);
+  ctx.restore();
+
+  // ── Landmark dots ──
+  pts.forEach((p, i) => {
+    const isTip = [4, 8, 12, 16, 20].includes(i);
+    const isWrist = i === 0;
+    const pulse = 0.6 + 0.4 * Math.sin(now * 0.004 + i * 0.5);
+
+    // Outer glow ring
+    ctx.save();
+    ctx.shadowColor = isTip ? '#ffd700' : '#00d4ff';
+    ctx.shadowBlur  = isTip ? 18 : 10;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, isTip ? 7 : (isWrist ? 6 : 4.5), 0, Math.PI * 2);
+    ctx.strokeStyle = isTip ? `rgba(255,215,0,${pulse})` : `rgba(0,212,255,${pulse})`;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+
+    // Core dot
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, isTip ? 4 : (isWrist ? 4 : 2.5), 0, Math.PI * 2);
+    ctx.fillStyle = isTip ? '#ffd700' : '#00d4ff';
+    ctx.fill();
+
+    // Fingertip label
+    if (isTip) {
+      const labels = { 4:'THUMB', 8:'INDEX', 12:'MID', 16:'RING', 20:'PINKY' };
+      ctx.font = '9px Share Tech Mono, monospace';
+      ctx.fillStyle = 'rgba(0,212,255,0.75)';
+      ctx.fillText(labels[i], p.x + 6, p.y - 6);
+    }
+  });
+
+  // ── Bounding box (AR scan frame) ──
+  const pad = 18;
+  const bx = minX - pad, by = minY - pad;
+  const bw = maxX - minX + pad * 2, bh = maxY - minY + pad * 2;
+  const cs = 14; // corner size
+
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,212,255,0.6)';
+  ctx.lineWidth = 1.5;
+  // TL
+  ctx.beginPath(); ctx.moveTo(bx + cs, by); ctx.lineTo(bx, by); ctx.lineTo(bx, by + cs); ctx.stroke();
+  // TR
+  ctx.beginPath(); ctx.moveTo(bx + bw - cs, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + cs); ctx.stroke();
+  // BL
+  ctx.beginPath(); ctx.moveTo(bx, by + bh - cs); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + cs, by + bh); ctx.stroke();
+  // BR
+  ctx.beginPath(); ctx.moveTo(bx + bw - cs, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - cs); ctx.stroke();
+
+  // Label
+  ctx.font = '9px Orbitron, monospace';
+  ctx.fillStyle = 'rgba(0,212,255,0.7)';
+  ctx.fillText('HAND DETECTED', bx + 4, by - 5);
+  ctx.restore();
+
+  // ── Pinch distance indicator ──
+  const thumbTip = pts[4], indexTip = pts[8];
+  const pd = Math.hypot(thumbTip.x - indexTip.x, thumbTip.y - indexTip.y);
+  const normPd = Math.hypot(lm[4].x - lm[8].x, lm[4].y - lm[8].y);
+  const isPinching = normPd < PINCH_D;
+
+  ctx.save();
+  ctx.setLineDash([3, 4]);
+  ctx.strokeStyle = isPinching ? 'rgba(255,215,0,0.9)' : 'rgba(0,212,255,0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.shadowColor = isPinching ? '#ffd700' : '#00d4ff';
+  ctx.shadowBlur  = isPinching ? 12 : 4;
+  ctx.beginPath();
+  ctx.moveTo(thumbTip.x, thumbTip.y);
+  ctx.lineTo(indexTip.x, indexTip.y);
+  ctx.stroke();
+  ctx.restore();
+
+  if (isPinching) {
+    const mx = (thumbTip.x + indexTip.x) / 2;
+    const my = (thumbTip.y + indexTip.y) / 2;
+    ctx.save();
+    ctx.font = 'bold 10px Orbitron, monospace';
+    ctx.fillStyle = '#ffd700';
+    ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 10;
+    ctx.fillText('PINCH', mx - 18, my - 8);
+    ctx.restore();
+  }
+}
+
+// ─── GESTURE DETECTION ────────────────────────────────────────────────────────
+function fingerUp(lm, tip, pip) { return lm[tip].y < lm[pip].y; }
+function lmDist(lm, a, b) { return Math.hypot(lm[a].x - lm[b].x, lm[a].y - lm[b].y); }
+
+function detectGesture(lm, hand) {
+  const thumbUp  = hand === 'Right' ? lm[4].x < lm[3].x : lm[4].x > lm[3].x;
+  const iUp  = fingerUp(lm, 8, 6);
+  const mUp  = fingerUp(lm, 12, 10);
+  const rUp  = fingerUp(lm, 16, 14);
+  const pUp  = fingerUp(lm, 20, 18);
+  const cnt  = [iUp, mUp, rUp, pUp].filter(Boolean).length;
+  const pd   = lmDist(lm, 4, 8);
+
+  if (pd < PINCH_D) return 'PINCH';
+  if (cnt === 0 && !thumbUp) return 'FIST';
+  if (cnt >= 4) return 'OPEN';
+  if (iUp && !mUp && !rUp && !pUp) return 'POINT';
+  if (iUp && mUp && !rUp && !pUp) return 'PEACE';
+  return 'OTHER';
+}
+
+// ─── MAIN RENDER ─────────────────────────────────────────────────────────────
+function render() {
+  const now = performance.now();
+  const dt  = now - lastT; lastT = now;
+  fpsBuf.push(1000 / dt);
+  if (fpsBuf.length > 30) fpsBuf.shift();
+  pulseTick += dt * 0.001;
+
+  // 1. Draw camera frame (full screen, mirrored)
+  if (video.readyState >= 2) {
+    ctx.save();
+    ctx.translate(W, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0, W, H);
+    ctx.restore();
+  }
+
+  // 2. Subtle AR tint overlay (blue shift)
+  ctx.save();
+  ctx.globalAlpha = 0.08;
+  ctx.fillStyle = '#001428';
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+
+  // 3. Grid
+  drawGrid();
+
+  // 4. Voxels (back → front)
+  const sorted = [...voxels].map(k => {
+    const [c, r] = k.split(',').map(Number);
+    return { c, r, z: c + r };
+  }).sort((a, b) => a.z - b.z);
+  sorted.forEach(({ c, r }) => drawVoxel(c, r));
+
+  // Ghost voxel at cursor
+  if (!voxels.has(`${curCol},${curRow}`)) drawVoxel(curCol, curRow, true);
+  drawCursor(curCol, curRow);
+
+  // 5. Hand skeleton on top of everything
+  if (handLandmarks) drawHandSkeleton(handLandmarks);
+
+  // ── HUD updates ──
+  document.getElementById('st-blocks').textContent = voxels.size;
+  document.getElementById('st-fps').textContent    = Math.round(fpsBuf.reduce((a,b)=>a+b,0)/fpsBuf.length);
+
+  // Mode
+  const modeCard = document.getElementById('mode-card');
+  const modeVal  = document.getElementById('st-mode');
+  modeVal.textContent = mode;
+  modeCard.className = mode === 'ERASE' ? 'lp-card erase' : 'lp-card';
+
+  // Gesture badge
+  const badge = document.getElementById('gesture-badge');
+  badge.textContent = gesture;
+  badge.className = '';
+  if (gesture === 'FIST' || mode === 'ERASE') badge.classList.add('fist');
+  if (gesture === 'PINCH' && mode === 'BUILD') badge.classList.add('place');
+
+  // Chips
+  ['point','pinch','fist','peace','open'].forEach(g => {
+    const el = document.getElementById(`g-${g}`);
+    el.classList.remove('active', 'erase-chip');
+  });
+  const gMap = { POINT:'point', PINCH:'pinch', FIST:'fist', PEACE:'peace', OPEN:'open' };
+  if (gMap[gesture]) {
+    const el = document.getElementById(`g-${gMap[gesture]}`);
+    el.classList.add('active');
+    if (mode === 'ERASE') el.classList.add('erase-chip');
+  }
+
+  // Hold ring
+  const ringWrap = document.getElementById('hold-ring');
+  const arc      = document.getElementById('ring-arc');
+  const pctEl    = document.getElementById('ring-pct');
+  const actEl    = document.getElementById('hold-ring-label');
+  const circ     = 2 * Math.PI * 28;
+  if (holdProg > 0) {
+    ringWrap.classList.add('visible');
+    arc.style.strokeDashoffset = circ * (1 - holdProg);
+    arc.style.stroke = holdType === 'delete' ? '#ff4444' : '#00d4ff';
+    pctEl.style.fill = holdType === 'delete' ? '#ff4444' : '#00d4ff';
+    pctEl.textContent = Math.round(holdProg * 100) + '%';
+    actEl.textContent = holdType === 'delete' ? 'HOLD TO DELETE' : 'HOLD TO PLACE';
+
+    // Position ring near cursor
+    const { cx, cy } = voxelFaces(curCol, curRow);
+    ringWrap.style.left = (cx - 34) + 'px';
+    ringWrap.style.top  = (cy - 90) + 'px';
+  } else {
+    ringWrap.classList.remove('visible');
+    arc.style.strokeDashoffset = circ;
+  }
+
+  requestAnimationFrame(render);
+}
+
+// ─── MEDIAPIPE ───────────────────────────────────────────────────────────────
+const hands = new Hands({ locateFile: f =>
+  `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`
+});
+hands.setOptions({
+  maxNumHands: 1,
+  modelComplexity: 1,
+  minDetectionConfidence: 0.72,
+  minTrackingConfidence: 0.65
+});
+
+hands.onResults(results => {
+  if (!results.multiHandLandmarks || !results.multiHandLandmarks.length) {
+    handLandmarks = null;
+    gesture       = 'NONE';
+    holdProg      = 0;
+    holdStart     = null;
+    holdType      = null;
+    return;
+  }
+
+  handLandmarks = results.multiHandLandmarks[0];
+  handedness    = results.multiHandedness[0].label;
+  gesture       = detectGesture(handLandmarks, handedness);
+
+  // Cursor position from index fingertip
+  const tip = handLandmarks[8];
+  const sx  = (1 - tip.x) * W;
+  const sy  =      tip.y  * H;
+  sxBuf.push(sx); if (sxBuf.length > SMOOTH_N) sxBuf.shift();
+  syBuf.push(sy); if (syBuf.length > SMOOTH_N) syBuf.shift();
+  const smx = sxBuf.reduce((a,b)=>a+b,0) / sxBuf.length;
+  const smy = syBuf.reduce((a,b)=>a+b,0) / syBuf.length;
+  const { col, row } = s2g(smx, smy - DEPTH_H);
+  curCol = Math.max(0, Math.min(GRID_COLS - 1, col));
+  curRow = Math.max(0, Math.min(GRID_ROWS - 1, row));
+
+  // Mode switching
+  if (gesture === 'PEACE') mode = 'ERASE';
+  else if (gesture === 'OPEN') mode = 'BUILD';
+
+  // Hold-to-act
+  const now = performance.now();
+  const placing = gesture === 'PINCH' && mode === 'BUILD';
+  const deleting = (gesture === 'FIST' || (gesture === 'PINCH' && mode === 'ERASE'));
+
+  if (placing) {
+    if (holdType !== 'place') { holdStart = now; holdType = 'place'; }
+    holdProg = Math.min((now - holdStart) / HOLD_MS, 1);
+    if (holdProg >= 1) { voxels.add(`${curCol},${curRow}`); holdStart = now; }
+  } else if (deleting) {
+    if (holdType !== 'delete') { holdStart = now; holdType = 'delete'; }
+    holdProg = Math.min((now - holdStart) / HOLD_MS, 1);
+    if (holdProg >= 1) { voxels.delete(`${curCol},${curRow}`); holdStart = now; }
+  } else {
+    holdStart = null; holdType = null; holdProg = 0;
+  }
+});
+
+// ─── LAUNCH ───────────────────────────────────────────────────────────────────
+document.getElementById('start-btn').addEventListener('click', async () => {
+  document.getElementById('splash').classList.add('hidden');
+
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }
+  });
+  video.srcObject = stream;
+  await video.play();
+
+  const camera = new Camera(video, {
+    onFrame: async () => { await hands.send({ image: video }); },
+    width: 1280, height: 720
+  });
+  camera.start();
+
+  requestAnimationFrame(render);
+});
+
+window.addEventListener('keydown', e => {
+  if (e.key === 'c' || e.key === 'C') voxels.clear();
+});
+</script>
 </body>
 </html>
