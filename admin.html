@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geo GenSan — Reports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f7fa; --surface: #ffffff; --border: #e5e7eb;
+      --primary: #2563eb; --danger: #ef4444; --danger-light: #fee2e2;
+      --success: #10b981; --text: #111827; --muted: #6b7280;
+      --font: 'DM Sans', -apple-system, sans-serif;
+      --mono: 'Space Mono', monospace;
+      --radius: 12px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+    }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── LOGIN ── */
+    #login-screen {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #1e3a8a 0%, #4c1d95 100%); padding: 24px;
+    }
+    .login-card {
+      background: white; border-radius: 20px; padding: 40px 36px;
+      width: 100%; max-width: 380px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3); text-align: center;
+    }
+    .login-logo { font-size: 32px; font-weight: 900; color: #2563eb; letter-spacing: -1px; margin-bottom: 8px; }
+    .login-title { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+    .login-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
+    .login-label { display: block; text-align: left; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px; }
+    .login-input {
+      width: 100%; padding: 13px 16px; border: 2px solid var(--border); border-radius: 10px;
+      font-family: var(--mono); font-size: 20px; letter-spacing: 6px; text-align: center;
+      color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s; margin-bottom: 6px;
+    }
+    .login-input:focus { border-color: var(--primary); background: white; }
+    .login-error { font-size: 13px; color: var(--danger); margin-bottom: 14px; min-height: 18px; }
+    .login-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      color: white; border: none; border-radius: 10px;
+      font-family: var(--font); font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+    }
+    .login-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+
+    /* ── ADMIN SCREEN ── */
+    #admin-screen { display: none; }
+    .topbar {
+      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      color: white; padding: 0 24px; height: 60px;
+      display: flex; align-items: center; justify-content: flex-end;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(37,99,235,0.3);
+    }
+    .logout-btn {
+      background: rgba(255,255,255,0.18); border: none; color: white;
+      font-family: var(--font); font-size: 13px; font-weight: 600;
+      padding: 7px 14px; border-radius: 8px; cursor: pointer; transition: background 0.15s;
+    }
+    .logout-btn:hover { background: rgba(255,255,255,0.28); }
+
+    .container { max-width: 1200px; margin: 0 auto; padding: 28px 24px 48px; }
+
+    /* ── STATS SECTION ── */
+    .stats-section { margin-bottom: 20px; }
+    .stats-header { margin-bottom: 12px; }
+    .stats-top-row {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .stats-total-card {
+      background: var(--surface); border-radius: var(--radius); padding: 14px 20px;
+      box-shadow: var(--shadow); border: 1px solid var(--border);
+      flex-shrink: 0; min-width: 140px;
+    }
+    .stats-total-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+    .stats-total-val { font-family: var(--mono); font-size: 22px; font-weight: 700; color: var(--text); line-height: 1.2; }
+    .stats-recent   { font-size: 13px !important; color: var(--muted) !important; font-family: var(--font) !important; font-weight: 600 !important; }
+    .stats-top-type { font-size: 13px !important; color: var(--primary) !important; font-family: var(--font) !important; font-weight: 700 !important; }
+    .toggle-breakdown-btn {
+      background: var(--surface); border: 1.5px solid var(--border);
+      color: var(--muted); font-family: var(--font); font-size: 12px; font-weight: 700;
+      padding: 6px 12px; border-radius: 8px; cursor: pointer;
+      transition: all 0.15s; white-space: nowrap; letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .toggle-breakdown-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .toggle-breakdown-btn.active { background: #eff6ff; border-color: var(--primary); color: var(--primary); }
+
+    /* Type breakdown cards — collapsible */
+    .breakdown-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.3s ease, opacity 0.25s ease, margin-top 0.25s ease;
+      margin-top: 0;
+    }
+    .breakdown-row.open {
+      max-height: 200px;
+      opacity: 1;
+      margin-top: 4px;
+    }
+    .stat-card {
+      background: var(--surface); border-radius: var(--radius); padding: 14px 16px;
+      box-shadow: var(--shadow); border: 1px solid var(--border);
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+    .stat-card.active-filter { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.18); }
+    .stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 7px; }
+    .stat-value { font-family: var(--mono); font-size: 26px; font-weight: 700; line-height: 1; }
+    .stat-overcharging .stat-value { color: #c2410c; }
+    .stat-reckless     .stat-value { color: #b91c1c; }
+    .stat-refusal      .stat-value { color: #7c3aed; }
+    .stat-verbal       .stat-value { color: #be123c; }
+    .stat-unsafe       .stat-value { color: #a16207; }
+    .stat-other        .stat-value { color: #15803d; }
+
+    /* ── TABLE CARD ── */
+    .table-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden; }
+    .table-toolbar { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 11px; }
+    .toolbar-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .toolbar-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .toolbar-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* Search */
+    .search-wrap { position: relative; }
+    .search-prefix {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      font-size: 11px; font-weight: 700; color: var(--muted); pointer-events: none;
+      text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .search-input {
+      padding: 7px 10px 7px 58px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: var(--mono); font-size: 13px; color: var(--text);
+      background: var(--bg); outline: none; width: 200px; transition: border-color 0.15s, width 0.2s;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .search-input:focus { border-color: var(--primary); width: 240px; background: white; }
+    .search-input::placeholder { font-family: var(--font); text-transform: none; letter-spacing: 0; font-size: 13px; }
+
+    /* Date filter */
+    .date-filter-group { display: flex; align-items: center; gap: 6px; }
+    .date-filter-group label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+
+    /* Selects & inputs */
+    .filter-select, .date-input {
+      padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: var(--font); font-size: 13px; color: var(--text);
+      background: var(--bg); outline: none; cursor: pointer;
+    }
+    .filter-select:focus, .date-input:focus { border-color: var(--primary); background: white; }
+    .date-input { cursor: text; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 8px; font-family: var(--font);
+      font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid transparent;
+      transition: all 0.15s; white-space: nowrap; letter-spacing: 0.01em;
+    }
+    .btn-excel  { background: #16a34a; color: white; border-color: #16a34a; }
+    .btn-excel:hover { background: #15803d; }
+    .btn-pdf    { background: #1e40af; color: white; border-color: #1e40af; }
+    .btn-pdf:hover { background: #1e3a8a; }
+    .btn-print  { background: var(--surface); color: var(--text); border-color: var(--border); }
+    .btn-print:hover { border-color: #9ca3af; background: #f9fafb; }
+    .btn-clear-date {
+      background: none; border: none; color: var(--muted); font-size: 13px;
+      cursor: pointer; padding: 4px 6px; border-radius: 5px; font-family: var(--font);
+      font-weight: 600;
+    }
+    .btn-clear-date:hover { color: var(--danger); background: var(--danger-light); }
+
+    /* Selection banner */
+    .sel-banner {
+      display: none; align-items: center; gap: 10px;
+      background: #eff6ff; border-bottom: 1px solid #bfdbfe;
+      padding: 9px 18px; font-size: 13px; font-weight: 600; color: #1d4ed8;
+    }
+    .sel-banner.show { display: flex; }
+    .sel-banner-count { flex: 1; }
+    .sel-banner-desel {
+      background: white; border: 1.5px solid #bfdbfe; color: #1d4ed8;
+      padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+    }
+    .sel-banner-del {
+      background: var(--danger); color: white; border: none;
+      padding: 6px 13px; border-radius: 7px; font-size: 12px; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+    }
+    .sel-banner-desel:hover { background: #dbeafe; }
+    .sel-banner-del:hover { background: #dc2626; }
+
+    /* ── TABLE ── */
+    .table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: #f9fafb; color: var(--muted); font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.07em;
+      padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { color: #374151; }
+    th .sort-icon { margin-left: 3px; font-size: 9px; opacity: 0.3; }
+    th.sort-asc  .sort-icon::after { content: '\25B2'; opacity: 1; color: var(--primary); }
+    th.sort-desc .sort-icon::after { content: '\25BC'; opacity: 1; color: var(--primary); }
+    th.sort-asc, th.sort-desc { color: var(--primary); }
+
+    tbody td { padding: 12px 14px; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: var(--text); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #f9fafb; }
+    tbody tr.sel-row td { background: #eff6ff !important; }
+    @keyframes hl { 0% { background: #dbeafe; } 100% { background: transparent; } }
+    tbody tr.new-row td { animation: hl 2s ease-out; }
+
+    .col-chk  { width: 38px; text-align: center; }
+    .col-num  { font-family: var(--mono); font-size: 12px; color: var(--muted); width: 36px; }
+    .col-img  { width: 64px; }
+    .col-plate { font-family: var(--mono); font-weight: 700; font-size: 13px; white-space: nowrap; }
+    .col-date { font-size: 12px; color: var(--muted); white-space: nowrap; }
+    .col-desc { max-width: 200px; word-break: break-word; font-size: 13px; color: #374151; line-height: 1.5; }
+    .col-act  { width: 180px; text-align: right; padding-right: 18px !important; }
+
+    .type-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .type-badge.overcharging { background: #fff7ed; color: #c2410c; }
+    .type-badge.reckless     { background: #fef2f2; color: #b91c1c; }
+    .type-badge.refusal      { background: #f5f3ff; color: #7c3aed; }
+    .type-badge.verbal       { background: #fff1f2; color: #be123c; }
+    .type-badge.unsafe       { background: #fefce8; color: #a16207; }
+    .type-badge.other        { background: #f0fdf4; color: #15803d; }
+    .type-badge.default      { background: #f1f5f9; color: #475569; }
+
+    .report-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 7px; border: 1.5px solid var(--border); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; display: block; }
+    .report-thumb:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .no-img { font-size: 11px; color: var(--muted); font-style: italic; }
+
+    /* Row action buttons — text buttons, no emojis */
+    .row-acts { display: flex; align-items: center; gap: 5px; justify-content: flex-end; }
+    .act-btn {
+      background: none; border: 1.5px solid var(--border); cursor: pointer;
+      padding: 4px 10px; border-radius: 6px; font-family: var(--font);
+      font-size: 11px; font-weight: 700; color: var(--muted);
+      transition: all 0.15s; white-space: nowrap; letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+    .act-btn.save-pdf:hover  { border-color: #1e40af; color: #1e40af; background: #eff6ff; }
+    .act-btn.print-r:hover   { border-color: #374151; color: #374151; background: #f9fafb; }
+    .act-btn.del-r:hover     { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
+
+    input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--primary); cursor: pointer; }
+
+    /* ── LIGHTBOX ── */
+    .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; align-items: center; justify-content: center; padding: 20px; }
+    .lightbox.show { display: flex; }
+    .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+    .lb-close { position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,0.15); border: none; color: white; font-size: 22px; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+    .lb-close:hover { background: rgba(255,255,255,0.28); }
+
+    /* ── CONFIRM MODAL ── */
+    .confirm-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 8888; align-items: center; justify-content: center; padding: 20px; }
+    .confirm-ov.show { display: flex; }
+    .confirm-box { background: white; border-radius: 16px; padding: 28px; max-width: 360px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center; }
+    .confirm-ttl { font-size: 17px; font-weight: 800; margin-bottom: 8px; }
+    .confirm-msg { font-size: 14px; color: var(--muted); margin-bottom: 22px; line-height: 1.5; }
+    .confirm-btns { display: flex; gap: 10px; }
+    .confirm-btns button { flex: 1; padding: 11px; border-radius: 10px; font-family: var(--font); font-size: 14px; font-weight: 700; cursor: pointer; border: 1.5px solid transparent; transition: opacity 0.15s; }
+    .c-cancel { background: var(--bg); color: var(--text); border-color: var(--border) !important; }
+    .c-ok     { background: var(--danger); color: white; }
+    .c-cancel:hover, .c-ok:hover { opacity: 0.85; }
+
+    /* ── MISC ── */
+    .empty-state { text-align: center; padding: 52px 24px; color: var(--muted); }
+    .empty-state .ei { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; opacity: 0.4; }
+    .empty-state p { font-size: 15px; }
+    .loading-state { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; }
+    .spinner-sm { width: 24px; height: 24px; border: 3px solid #e5e7eb; border-top-color: var(--primary); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1f2937; color: white; padding: 10px 22px; border-radius: 99px; font-size: 13px; font-weight: 600; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s; opacity: 0; pointer-events: none; z-index: 9999; white-space: nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    @media (max-width: 700px) {
+      .container { padding: 16px 12px 48px; }
+      .topbar { padding: 0 14px; }
+      .search-input { width: 140px; }
+      .search-input:focus { width: 170px; }
+    }
+
+    /* ── PRINT ── */
+    #print-area { display: none; }
+    @media print {
+      body > *:not(#print-area) { display: none !important; }
+      #print-area { display: block !important; }
+    }
+
+    /* ── FARE EDITOR ── */
+    .fare-editor-card {
+      background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
+      border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px;
+    }
+    .fare-editor-header {
+      background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.08));
+      border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .fare-editor-title { font-size: 15px; font-weight: 700; color: var(--text); }
+    .fare-editor-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .fare-editor-body { padding: 20px; }
+    .fare-fields-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px;
+      margin-bottom: 16px;
+    }
+    .fare-field label {
+      display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px;
+    }
+    .fare-field input[type=number] {
+      width: 100%; padding: 10px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-family: var(--mono); font-size: 16px; font-weight: 700;
+      color: var(--text); background: var(--bg); outline: none; transition: border-color 0.15s;
+    }
+    .fare-field input[type=number]:focus { border-color: var(--primary); background: white; }
+    .fare-field-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .fare-preview-box {
+      background: #f0fdf4; border: 1px solid #86efac; border-radius: 10px;
+      padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #166534;
+    }
+    .fare-preview-label { font-weight: 700; margin-bottom: 4px; }
+    .fare-preview-formula { font-family: var(--mono); font-size: 14px; }
+    .fare-save-btn {
+      padding: 11px 24px; background: linear-gradient(135deg, #2563eb, #7c3aed);
+      color: white; border: none; border-radius: 10px; font-family: var(--font);
+      font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
+    }
+    .fare-save-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .fare-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .fare-save-status { font-size: 13px; color: var(--success); font-weight: 600; margin-left: 12px; opacity: 0; transition: opacity 0.3s; }
+    .fare-save-status.visible { opacity: 1; }
+    .fare-history-list { margin-top: 16px; }
+    .fare-history-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--muted);
+    }
+    .fare-history-item:last-child { border-bottom: none; }
+    .fare-history-formula { font-family: var(--mono); font-weight: 700; color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">Geo Gensan</div>
+    <div class="login-title">Admin</div>
+    <div class="login-subtitle">Tricycle Reports Dashboard</div>
+    <label class="login-label" for="login-input">Password</label>
+    <input type="password" class="login-input" id="login-input" placeholder="••••••••" maxlength="20" autocomplete="off">
+    <div class="login-error" id="login-error"></div>
+    <button class="login-btn" id="login-btn">Login</button>
+  </div>
+</div>
+
+<!-- ── ADMIN SCREEN ── -->
+<div id="admin-screen">
+  <div class="topbar">
+    <button class="logout-btn" id="logout-btn">Logout</button>
+  </div>
+
+  <div class="container">
+
+    <!-- FARE LOGIC EDITOR -->
+    <div class="fare-editor-card" id="fare-editor-card">
+      <div class="fare-editor-header">
+        <div>
+          <div class="fare-editor-title">⚙️ Trike Fare Logic Editor</div>
+          <div class="fare-editor-sub">Changes apply immediately to the live app — loaded from Firebase</div>
+        </div>
+        <button class="toggle-breakdown-btn" id="toggle-fare-editor">Edit Fare</button>
+      </div>
+      <div id="fare-editor-body-wrap" style="display:none;">
+        <div class="fare-editor-body">
+          <div class="fare-fields-grid">
+            <div class="fare-field">
+              <label>Base Fare (₱)</label>
+              <input type="number" id="fe-base-fare" value="15" min="1" max="999" step="1">
+              <div class="fare-field-hint">Minimum fare charged</div>
+            </div>
+            <div class="fare-field">
+              <label>Base Distance (km)</label>
+              <input type="number" id="fe-base-km" value="4" min="1" max="20" step="0.5">
+              <div class="fare-field-hint">Km covered by base fare</div>
+            </div>
+            <div class="fare-field">
+              <label>Rate per Extra km (₱)</label>
+              <input type="number" id="fe-per-km" value="1" min="0.5" max="20" step="0.5">
+              <div class="fare-field-hint">Added per km after base</div>
+            </div>
+            <div class="fare-field">
+              <label>Special Discount (%)</label>
+              <input type="number" id="fe-discount" value="20" min="0" max="50" step="1">
+              <div class="fare-field-hint">PWD / Senior / Student</div>
+            </div>
+            <div class="fare-field">
+              <label>Bus Min. Fare (₱)</label>
+              <input type="number" id="fe-bus-fare" value="30" min="1" max="999" step="1">
+              <div class="fare-field-hint">Minimum bus/jeep fare</div>
+            </div>
+          </div>
+
+          <div class="fare-preview-box" id="fare-preview-box">
+            <div class="fare-preview-label">📋 Current Formula Preview:</div>
+            <div class="fare-preview-formula" id="fare-preview-formula">₱15 for first 4 km, then ₱1/km. Special passengers get 20% off.</div>
+          </div>
+
+          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;">
+            <button class="fare-save-btn" id="fare-save-btn">💾 Save Fare Config</button>
+            <span class="fare-save-status" id="fare-save-status">✅ Saved successfully!</span>
+            <button class="toggle-breakdown-btn" id="fare-reset-btn" style="margin-left:auto;">Reset to Default</button>
+          </div>
+
+          <div class="fare-history-list" id="fare-history-list">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);margin-top:20px;margin-bottom:8px;">Change History (last 5)</div>
+            <div id="fare-history-items"><div class="fare-history-item" style="color:var(--muted);font-style:italic;">No history yet</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS SECTION -->
+    <div class="stats-section">
+      <div class="stats-header">
+        <div class="stats-top-row">
+          <div class="stats-total-card">
+            <div class="stats-total-label">Total Reports</div>
+            <div class="stats-total-val" id="stat-total">—</div>
+          </div>
+          <div class="stats-total-card">
+            <div class="stats-total-label">Most Recent</div>
+            <div class="stats-total-val stats-recent" id="stat-recent">—</div>
+          </div>
+          <div class="stats-total-card">
+            <div class="stats-total-label">Top Violation</div>
+            <div class="stats-total-val stats-top-type" id="stat-top-type">—</div>
+          </div>
+          <button class="toggle-breakdown-btn" id="toggle-breakdown-btn">More</button>
+        </div>
+      </div>
+      <!-- Collapsible type breakdown -->
+      <div class="breakdown-row" id="breakdown-row">
+        <!-- injected by JS -->
+      </div>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="table-card">
+
+      <!-- Toolbar -->
+      <div class="table-toolbar">
+
+        <!-- Row 1: title + export buttons -->
+        <div class="toolbar-row">
+          <span class="toolbar-title">Tricycle Reports</span>
+          <div class="toolbar-controls">
+            <button class="btn btn-excel"  id="btn-excel">Export Excel</button>
+          </div>
+        </div>
+
+        <!-- Row 2: search + type filter + date filter -->
+        <div class="toolbar-row">
+          <div class="toolbar-controls">
+            <!-- Plate search -->
+            <div class="search-wrap">
+              <span class="search-prefix">Plate</span>
+              <input type="text" class="search-input" id="search-plate" placeholder="e.g. AB-1234" autocomplete="off" spellcheck="false">
+            </div>
+
+            <!-- Type filter -->
+            <select class="filter-select" id="filter-type">
+              <option value="">All Types</option>
+              <option value="Overcharging">Overcharging</option>
+              <option value="Reckless Driving">Reckless Driving</option>
+              <option value="Refusal of Service">Refusal of Service</option>
+              <option value="Verbal Abuse">Verbal Abuse</option>
+              <option value="Unsafe Vehicle">Unsafe Vehicle</option>
+              <option value="Other">Other</option>
+            </select>
+
+            <!-- Calendar date filter -->
+            <div class="date-filter-group">
+              <label for="date-granularity">View by</label>
+              <select class="filter-select" id="date-granularity">
+                <option value="">All Time</option>
+                <option value="year">Year</option>
+                <option value="month">Month</option>
+                <option value="week">Week</option>
+                <option value="day">Day</option>
+              </select>
+              <!-- Dynamic date picker rendered by JS -->
+              <div id="date-picker-wrap"></div>
+              <button class="btn-clear-date" id="btn-clear-date" style="display:none;">Clear</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Selection banner -->
+      <div class="sel-banner" id="sel-banner">
+        <span class="sel-banner-count" id="sel-banner-count">0 selected</span>
+        <button class="sel-banner-desel" id="btn-deselect-all">Deselect All</button>
+        <button class="sel-banner-del"   id="btn-mass-delete">Delete Selected</button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-chk"><input type="checkbox" id="check-all" title="Select / deselect all visible"></th>
+              <th class="col-num">#</th>
+              <th class="col-img">Photo</th>
+              <th class="sortable" data-col="plate">Plate No.<span class="sort-icon"></span></th>
+              <th class="sortable sort-desc" data-col="date">Date &amp; Time<span class="sort-icon"></span></th>
+              <th>Type</th>
+              <th>Description</th>
+              <th class="col-act">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reports-tbody">
+            <tr><td colspan="8"><div class="loading-state"><div class="spinner-sm"></div>Loading reports…</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lb-close">&#x2715;</button>
+  <img id="lb-img" src="" alt="Report photo">
+</div>
+
+<!-- Confirm dialog -->
+<div class="confirm-ov" id="confirm-ov">
+  <div class="confirm-box">
+    <div class="confirm-ttl" id="confirm-ttl">Delete?</div>
+    <div class="confirm-msg" id="confirm-msg">This cannot be undone.</div>
+    <div class="confirm-btns">
+      <button class="c-cancel" id="c-cancel">Cancel</button>
+      <button class="c-ok"     id="c-ok">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Print/PDF area -->
+<div id="print-area"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================================================================
+   CONFIG
+================================================================ */
+const FIREBASE_DB_URL = 'https://gentrike-75c7c-default-rtdb.asia-southeast1.firebasedatabase.app';
+const ADMIN_PASSWORD  = '00000000';
+
+/* ── helpers ──────────────────────────────────────────────────── */
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg, ms = 2600) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}
+
+/* ── Firebase ─────────────────────────────────────────────────── */
+async function fbGetAll() {
+  // Fetch all reports (sorted client-side)
+  const url = `${FIREBASE_DB_URL}/reports.json`;
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error('read failed');
+  const data = await res.json();
+  if (!data) return [];
+  return Object.entries(data).map(([k, v]) => ({ _key: k, ...v }));
+}
+async function fbDelete(key) {
+  const res = await fetch(`${FIREBASE_DB_URL}/reports/${key}.json`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('delete failed');
+}
+
+/* ── Type maps ────────────────────────────────────────────────── */
+const TYPE_CLS = {
+  'Overcharging':'overcharging','Reckless Driving':'reckless',
+  'Refusal of Service':'refusal','Verbal Abuse':'verbal',
+  'Unsafe Vehicle':'unsafe','Other':'other'
+};
+const TYPE_STAT_CLS = {
+  'Overcharging':'stat-overcharging','Reckless Driving':'stat-reckless',
+  'Refusal of Service':'stat-refusal','Verbal Abuse':'stat-verbal',
+  'Unsafe Vehicle':'stat-unsafe','Other':'stat-other'
+};
+
+/* ================================================================
+   STATE
+================================================================ */
+let allReports   = [];
+let selectedKeys = new Set();
+let sortCol      = 'date';
+let sortDir      = 'desc';
+let pollInterval = null;
+let isFirstLoad  = true;
+let breakdownOpen = false;
+
+/* ── active date filter ── */
+let dateFilter = { granularity: '', year: null, month: null, week: null, day: null };
+
+/* ================================================================
+   CONFIRM DIALOG
+================================================================ */
+let _confirmResolve = null;
+function showConfirm(title, msg) {
+  return new Promise(res => {
+    _confirmResolve = res;
+    document.getElementById('confirm-ttl').textContent = title;
+    document.getElementById('confirm-msg').textContent = msg;
+    document.getElementById('confirm-ov').classList.add('show');
+  });
+}
+document.getElementById('c-cancel').onclick = () => {
+  document.getElementById('confirm-ov').classList.remove('show');
+  _confirmResolve && _confirmResolve(false);
+};
+document.getElementById('c-ok').onclick = () => {
+  document.getElementById('confirm-ov').classList.remove('show');
+  _confirmResolve && _confirmResolve(true);
+};
+
+/* ================================================================
+   BREAKDOWN TOGGLE
+================================================================ */
+const toggleBtn   = document.getElementById('toggle-breakdown-btn');
+const breakdownEl = document.getElementById('breakdown-row');
+
+toggleBtn.addEventListener('click', () => {
+  breakdownOpen = !breakdownOpen;
+  breakdownEl.classList.toggle('open', breakdownOpen);
+  toggleBtn.textContent = breakdownOpen ? 'Hide' : 'More';
+  toggleBtn.classList.toggle('active', breakdownOpen);
+});
+
+/* ================================================================
+   STATS
+================================================================ */
+function updateStats() {
+  document.getElementById('stat-total').textContent = allReports.length;
+
+  // Most recent report date
+  const sorted = [...allReports].sort((a,b) => (b.timestamp||0)-(a.timestamp||0));
+  if (sorted.length > 0) {
+    const latest = sorted[0];
+    const d = latest.timestamp ? new Date(latest.timestamp) : new Date(latest.date);
+    const dateStr = isNaN(d) ? (latest.date||'—') :
+      d.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+    document.getElementById('stat-recent').textContent = dateStr;
+  } else {
+    document.getElementById('stat-recent').textContent = '—';
+  }
+
+  // Most reported type
+  const counts = {};
+  allReports.forEach(r => { counts[r.type] = (counts[r.type] || 0) + 1; });
+  const topType = Object.entries(counts).sort((a,b) => b[1]-a[1])[0];
+  document.getElementById('stat-top-type').textContent = topType
+    ? `${topType[0]} (${topType[1]})`
+    : '—';
+
+  // Breakdown cards
+  breakdownEl.innerHTML = '';
+  const currentFilter = document.getElementById('filter-type').value;
+  Object.entries(counts).sort((a,b) => b[1]-a[1]).forEach(([type, count]) => {
+    const cls  = TYPE_STAT_CLS[type] || '';
+    const card = document.createElement('div');
+    card.className = `stat-card ${cls}${currentFilter === type ? ' active-filter' : ''}`;
+    card.title = `Click to filter by: ${type}`;
+    card.innerHTML = `<div class="stat-label">${esc(type)}</div><div class="stat-value">${count}</div>`;
+    card.addEventListener('click', () => {
+      const ft = document.getElementById('filter-type');
+      ft.value = (ft.value === type) ? '' : type;
+      updateStats();
+      applyAndRender();
+    });
+    breakdownEl.appendChild(card);
+  });
+}
+
+/* ================================================================
+   DATE PICKER
+================================================================ */
+function renderDatePicker() {
+  const g    = document.getElementById('date-granularity').value;
+  const wrap = document.getElementById('date-picker-wrap');
+  const clearBtn = document.getElementById('btn-clear-date');
+  wrap.innerHTML = '';
+  dateFilter.granularity = g;
+
+  if (!g) { clearBtn.style.display = 'none'; return; }
+  clearBtn.style.display = '';
+
+  const now = new Date();
+
+  if (g === 'year') {
+    const sel = document.createElement('select');
+    sel.className = 'filter-select';
+    const startYear = 2023;
+    const endYear   = now.getFullYear();
+    for (let y = endYear; y >= startYear; y--) {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y;
+      if (dateFilter.year === y) o.selected = true;
+      sel.appendChild(o);
+    }
+    if (!dateFilter.year) { dateFilter.year = endYear; sel.value = endYear; }
+    sel.addEventListener('change', () => { dateFilter.year = parseInt(sel.value); applyAndRender(); });
+    wrap.appendChild(sel);
+  }
+
+  else if (g === 'month') {
+    // Year select
+    const ySel = document.createElement('select');
+    ySel.className = 'filter-select';
+    for (let y = now.getFullYear(); y >= 2023; y--) {
+      const o = document.createElement('option');
+      o.value = y; o.textContent = y;
+      if (dateFilter.year === y) o.selected = true;
+      ySel.appendChild(o);
+    }
+    if (!dateFilter.year) { dateFilter.year = now.getFullYear(); }
+
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const mSel = document.createElement('select');
+    mSel.className = 'filter-select';
+    months.forEach((m, i) => {
+      const o = document.createElement('option');
+      o.value = i; o.textContent = m;
+      if (dateFilter.month === i) o.selected = true;
+      mSel.appendChild(o);
+    });
+    if (dateFilter.month === null) { dateFilter.month = now.getMonth(); mSel.value = now.getMonth(); }
+
+    ySel.addEventListener('change', () => { dateFilter.year = parseInt(ySel.value); applyAndRender(); });
+    mSel.addEventListener('change', () => { dateFilter.month = parseInt(mSel.value); applyAndRender(); });
+    wrap.appendChild(ySel);
+    wrap.appendChild(mSel);
+  }
+
+  else if (g === 'week') {
+    // A date input — we derive the ISO week from it
+    const inp = document.createElement('input');
+    inp.type = 'week';
+    inp.className = 'date-input filter-select';
+    // Default to current week
+    const isoWeek = toISOWeek(now);
+    inp.value = dateFilter.week || isoWeek;
+    if (!dateFilter.week) dateFilter.week = isoWeek;
+    inp.addEventListener('change', () => { dateFilter.week = inp.value; applyAndRender(); });
+    wrap.appendChild(inp);
+  }
+
+  else if (g === 'day') {
+    const inp = document.createElement('input');
+    inp.type = 'date';
+    inp.className = 'date-input filter-select';
+    const todayStr = now.toISOString().slice(0,10);
+    inp.value = dateFilter.day || todayStr;
+    if (!dateFilter.day) dateFilter.day = todayStr;
+    inp.addEventListener('change', () => { dateFilter.day = inp.value; applyAndRender(); });
+    wrap.appendChild(inp);
+  }
+
+  applyAndRender();
+}
+
+function toISOWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(week).padStart(2,'0')}`;
+}
+
+function getWeekRange(isoWeek) {
+  // e.g. "2024-W12" → {start: Date, end: Date}
+  const [yearStr, wStr] = isoWeek.split('-W');
+  const year = parseInt(yearStr), week = parseInt(wStr);
+  const simple = new Date(year, 0, 1 + (week - 1) * 7);
+  const dow = simple.getDay();
+  const monday = new Date(simple);
+  monday.setDate(simple.getDate() - (dow <= 4 ? dow - 1 : dow - 8));
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return { start: monday, end: sunday };
+}
+
+function matchesDateFilter(r) {
+  const g = dateFilter.granularity;
+  if (!g) return true;
+  if (!r.timestamp && !r.date) return false;
+
+  const ts = r.timestamp ? new Date(r.timestamp) : new Date(r.date);
+  if (isNaN(ts)) return false;
+
+  if (g === 'year')  return ts.getFullYear() === dateFilter.year;
+  if (g === 'month') return ts.getFullYear() === dateFilter.year && ts.getMonth() === dateFilter.month;
+  if (g === 'week') {
+    if (!dateFilter.week) return true;
+    const { start, end } = getWeekRange(dateFilter.week);
+    return ts >= start && ts <= new Date(end.getTime() + 86399999);
+  }
+  if (g === 'day') {
+    if (!dateFilter.day) return true;
+    return ts.toISOString().slice(0,10) === dateFilter.day;
+  }
+  return true;
+}
+
+document.getElementById('date-granularity').addEventListener('change', () => {
+  // Reset sub-fields when granularity changes
+  dateFilter = { granularity: '', year: null, month: null, week: null, day: null };
+  renderDatePicker();
+});
+
+document.getElementById('btn-clear-date').addEventListener('click', () => {
+  dateFilter = { granularity: '', year: null, month: null, week: null, day: null };
+  document.getElementById('date-granularity').value = '';
+  document.getElementById('date-picker-wrap').innerHTML = '';
+  document.getElementById('btn-clear-date').style.display = 'none';
+  applyAndRender();
+});
+
+/* ================================================================
+   FILTER + SORT PIPELINE
+================================================================ */
+function getFiltered() {
+  const ft     = document.getElementById('filter-type').value;
+  const search = document.getElementById('search-plate').value.trim().toLowerCase();
+
+  let list = [...allReports];
+  if (ft)     list = list.filter(r => r.type === ft);
+  if (search) list = list.filter(r => (r.plate||'').toLowerCase().includes(search));
+  list = list.filter(r => matchesDateFilter(r));
+
+  list.sort((a, b) => {
+    if (sortCol === 'plate') {
+      const diff = (a.plate||'').toLowerCase().localeCompare((b.plate||'').toLowerCase());
+      return sortDir === 'asc' ? diff : -diff;
+    }
+    const ta = a.timestamp || 0, tb = b.timestamp || 0;
+    return sortDir === 'asc' ? ta - tb : tb - ta;
+  });
+
+  return list;
+}
+
+function applyAndRender() { renderTable(getFiltered()); }
+
+/* ================================================================
+   RENDER TABLE
+================================================================ */
+function renderTable(filtered) {
+  const tbody = document.getElementById('reports-tbody');
+
+  if (filtered.length === 0) {
+    const hasFilter = document.getElementById('filter-type').value
+      || document.getElementById('search-plate').value
+      || dateFilter.granularity;
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="ei">No Results</div><p>${hasFilter ? 'No reports match the current filters.' : 'No reports yet.'}</p></div></td></tr>`;
+    syncCheckAll(filtered);
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((r, i) => {
+    const cls     = TYPE_CLS[r.type] || 'default';
+    const imgCell = r.imageUrl
+      ? `<img class="report-thumb" src="${esc(r.imageUrl)}" alt="photo" data-src="${esc(r.imageUrl)}">`
+      : `<span class="no-img">No photo</span>`;
+    const chk = selectedKeys.has(r._key) ? 'checked' : '';
+    const rc  = selectedKeys.has(r._key) ? 'sel-row' : '';
+    return `<tr class="${rc}" data-key="${esc(r._key)}">
+      <td class="col-chk"><input type="checkbox" class="row-chk" data-key="${esc(r._key)}" ${chk}></td>
+      <td class="col-num">${i+1}</td>
+      <td class="col-img">${imgCell}</td>
+      <td class="col-plate">${esc(r.plate||'—')}</td>
+      <td class="col-date">${esc(r.date||'—')}</td>
+      <td><span class="type-badge ${cls}">${esc(r.type)}</span></td>
+      <td class="col-desc">${esc(r.description||'')}</td>
+      <td class="col-act">
+        <div class="row-acts">
+          <button class="act-btn save-pdf" data-key="${esc(r._key)}">Save PDF</button>
+          <button class="act-btn print-r"  data-key="${esc(r._key)}">Print</button>
+          <button class="act-btn del-r"    data-key="${esc(r._key)}">Delete</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Thumbnails
+  tbody.querySelectorAll('.report-thumb').forEach(img =>
+    img.addEventListener('click', () => openLightbox(img.dataset.src)));
+
+  // Delete
+  tbody.querySelectorAll('.act-btn.del-r').forEach(btn =>
+    btn.addEventListener('click', () => deleteSingle(btn.dataset.key)));
+
+  // Save PDF
+  tbody.querySelectorAll('.act-btn.save-pdf').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const r = allReports.find(x => x._key === btn.dataset.key);
+      if (r) downloadPDF(r);
+    }));
+
+  // Print
+  tbody.querySelectorAll('.act-btn.print-r').forEach(btn =>
+    btn.addEventListener('click', () => {
+      const r = allReports.find(x => x._key === btn.dataset.key);
+      if (r) printReport(r);
+    }));
+
+  // Checkboxes
+  tbody.querySelectorAll('.row-chk').forEach(cb =>
+    cb.addEventListener('change', () => {
+      cb.checked ? selectedKeys.add(cb.dataset.key) : selectedKeys.delete(cb.dataset.key);
+      cb.closest('tr').classList.toggle('sel-row', cb.checked);
+      updateSelUI();
+    }));
+
+  syncCheckAll(filtered);
+  updateSelUI();
+}
+
+function syncCheckAll(filtered) {
+  const ca = document.getElementById('check-all');
+  ca.checked       = filtered.length > 0 && filtered.every(r => selectedKeys.has(r._key));
+  ca.indeterminate = !ca.checked && filtered.some(r => selectedKeys.has(r._key));
+}
+
+function updateSelUI() {
+  const n = selectedKeys.size;
+  document.getElementById('sel-banner').classList.toggle('show', n > 0);
+  document.getElementById('sel-banner-count').textContent = `${n} report${n!==1?'s':''} selected`;
+}
+
+/* ================================================================
+   CHECK-ALL + BANNER
+================================================================ */
+document.getElementById('check-all').addEventListener('change', function() {
+  const filtered = getFiltered();
+  if (this.checked) filtered.forEach(r => selectedKeys.add(r._key));
+  else              filtered.forEach(r => selectedKeys.delete(r._key));
+  applyAndRender();
+});
+document.getElementById('btn-deselect-all').addEventListener('click', () => { selectedKeys.clear(); applyAndRender(); });
+document.getElementById('btn-mass-delete').addEventListener('click', deleteMass);
+
+/* ================================================================
+   SORT HEADERS
+================================================================ */
+document.querySelectorAll('th.sortable').forEach(th => {
+  th.addEventListener('click', () => {
+    const col = th.dataset.col;
+    if (sortCol === col) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+    else { sortCol = col; sortDir = 'asc'; }
+    document.querySelectorAll('th.sortable').forEach(t => t.classList.remove('sort-asc','sort-desc'));
+    th.classList.add(sortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+    applyAndRender();
+  });
+});
+
+/* ================================================================
+   FILTER LISTENERS
+================================================================ */
+document.getElementById('filter-type').addEventListener('change', () => { updateStats(); applyAndRender(); });
+document.getElementById('search-plate').addEventListener('input', applyAndRender);
+
+/* ================================================================
+   DELETE
+================================================================ */
+async function deleteSingle(key) {
+  const r  = allReports.find(x => x._key === key);
+  const ok = await showConfirm('Delete Report?', `Remove the report for plate "${r?.plate||key}"? This cannot be undone.`);
+  if (!ok) return;
+  try {
+    await fbDelete(key);
+    allReports = allReports.filter(x => x._key !== key);
+    selectedKeys.delete(key);
+    updateStats(); applyAndRender();
+    showToast('Report deleted');
+  } catch { showToast('Delete failed'); }
+}
+
+async function deleteMass() {
+  if (!selectedKeys.size) return;
+  const n  = selectedKeys.size;
+  const ok = await showConfirm(`Delete ${n} Report${n!==1?'s':''}?`, `Permanently remove ${n} selected report${n!==1?'s':''}? This cannot be undone.`);
+  if (!ok) return;
+  try {
+    const toDelete = new Set(selectedKeys);
+    await Promise.all([...toDelete].map(k => fbDelete(k)));
+    allReports = allReports.filter(r => !toDelete.has(r._key));
+    selectedKeys.clear();
+    updateStats(); applyAndRender();
+    showToast(`${n} report${n!==1?'s':''} deleted`);
+  } catch { showToast('Some deletions failed'); }
+}
+
+/* ================================================================
+   PDF DOWNLOAD  (jsPDF)
+================================================================ */
+async function downloadPDF(r) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const pageW = 210, margin = 18, contentW = pageW - margin * 2;
+  let y = 0;
+  const blue=[37,99,235],dark=[17,24,39],muted=[107,114,128],light=[249,250,251],border=[229,231,235];
+
+  // Header bar
+  doc.setFillColor(...blue); doc.rect(0,0,pageW,18,'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(13); doc.setTextColor(255,255,255);
+  doc.text('Geo GenSan', margin, 11.5);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8);
+  doc.text('Tricycle Report System  ·  General Santos City', margin, 15.5);
+  const printedDate = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
+  doc.setFontSize(7.5); doc.setTextColor(220,230,255);
+  doc.text('Report ID: '+r._key, pageW-margin, 11, {align:'right'});
+  doc.text('Date: '+printedDate, pageW-margin, 15.5, {align:'right'});
+  y = 26;
+
+  // Title
+  doc.setFont('helvetica','bold'); doc.setFontSize(16); doc.setTextColor(...dark);
+  doc.text('Tricycle Incident Report', margin, y); y+=5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...muted);
+  doc.text('Official report filed through the Geo GenSan public reporting system.', margin, y); y+=8;
+
+  // Divider
+  doc.setDrawColor(...border); doc.setLineWidth(0.4); doc.line(margin,y,pageW-margin,y); y+=7;
+
+  // Field helper
+  function drawField(label, value, x, fy, w) {
+    doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...muted);
+    doc.text(label.toUpperCase(), x, fy);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(...dark);
+    const lines = doc.splitTextToSize(value, w);
+    doc.text(lines, x, fy+4.5);
+    return fy+4.5+lines.length*5;
+  }
+  const col1x=margin, col2x=margin+contentW/2+4, colW=contentW/2-6;
+  drawField('Plate Number', r.plate||'—', col1x, y, colW);
+  drawField('Date & Time Filed', r.date||'—', col2x, y, colW);
+  y+=14;
+  drawField('Violation Type', r.type||'—', col1x, y, colW);
+  y+=14;
+  doc.setDrawColor(...border); doc.line(margin,y,pageW-margin,y); y+=7;
+
+  // Description box
+  doc.setFillColor(...light);
+  const desc = r.description||'No description provided.';
+  const descLines = doc.splitTextToSize(desc, contentW-12);
+  const descBoxH = descLines.length*5.5+12;
+  doc.roundedRect(margin, y, contentW, descBoxH, 2, 2, 'F');
+  doc.setFillColor(...blue); doc.rect(margin, y, 3, descBoxH, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...muted);
+  doc.text('INCIDENT DESCRIPTION', margin+7, y+5.5);
+  doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(...dark);
+  doc.text(descLines, margin+7, y+11);
+  y+=descBoxH+8;
+
+  // Photo
+  if (r.imageUrl) {
+    try {
+      const imgData = await loadImageAsDataURL(r.imageUrl);
+      doc.setFont('helvetica','bold'); doc.setFontSize(7.5); doc.setTextColor(...muted);
+      doc.text('ATTACHED PHOTO  (Plate / Vehicle Evidence)', margin, y); y+=4;
+      const dims = await fitImageDims(imgData, 90, 60);
+      doc.addImage(imgData, 'JPEG', margin, y, dims.w, dims.h);
+      doc.setDrawColor(...border); doc.setLineWidth(0.3); doc.rect(margin,y,dims.w,dims.h);
+      y+=dims.h+8;
+    } catch(e) {}
+  }
+
+  // Disclaimer
+  doc.setFillColor(254,252,232); doc.setDrawColor(253,230,138); doc.setLineWidth(0.4);
+  const discText = doc.splitTextToSize('This is an official incident report filed by a member of the public through the Geo GenSan system. The information above is submitted as-is and is pending verification by the appropriate authority.', contentW-8);
+  const discH = discText.length*4.8+8;
+  doc.roundedRect(margin,y,contentW,discH,2,2,'FD');
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(146,64,14);
+  doc.text(discText, margin+4, y+5.5); y+=discH+10;
+
+  // Signature lines
+  const sigW=(contentW-14)/2;
+  doc.setDrawColor(...border); doc.setLineWidth(0.5);
+  doc.line(margin,y+12,margin+sigW,y+12);
+  doc.line(margin+sigW+14,y+12,margin+contentW,y+12);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...muted);
+  doc.text('Received by / Verified by', margin, y+16);
+  doc.text('Authorized Signature & Date', margin+sigW+14, y+16);
+
+  // Footer
+  doc.setDrawColor(...border); doc.line(margin,284,pageW-margin,284);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...muted);
+  doc.text('Geo GenSan — General Santos City Tricycle Monitoring System', margin, 288);
+  doc.text('CONFIDENTIAL · For official use only', pageW-margin, 288, {align:'right'});
+
+  const safePlate = (r.plate||'report').replace(/[^a-zA-Z0-9-]/g,'_');
+  doc.save('GeoGenSan_Report_'+safePlate+'.pdf');
+}
+
+function loadImageAsDataURL(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image(); img.crossOrigin='anonymous';
+    img.onload = () => {
+      const c=document.createElement('canvas');
+      c.width=img.naturalWidth; c.height=img.naturalHeight;
+      c.getContext('2d').drawImage(img,0,0);
+      resolve(c.toDataURL('image/jpeg',0.85));
+    };
+    img.onerror=reject; img.src=url;
+  });
+}
+function fitImageDims(dataUrl, maxW, maxH) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const w = img.naturalWidth  || maxW;
+      const h = img.naturalHeight || maxH;
+      const r = Math.min(maxW / w, maxH / h);
+      resolve({ w: w * r, h: h * r });
+    };
+    img.onerror = () => resolve({ w: maxW, h: maxH });
+    img.src = dataUrl;
+  });
+}
+
+/* ================================================================
+   PRINT  (browser print dialog)
+================================================================ */
+function printReport(r) {
+  const pa=document.getElementById('print-area');
+  pa.innerHTML=buildPrintHTML(r);
+  pa.style.display='block';
+  setTimeout(()=>{ window.print(); setTimeout(()=>{pa.style.display='none';},900); },280);
+}
+
+function buildPrintHTML(r) {
+  return `
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700;900&display=swap');
+      *{box-sizing:border-box;margin:0;padding:0;}
+      body{font-family:'DM Sans',Arial,sans-serif;color:#111827;background:white;}
+      .wrap{max-width:680px;margin:0 auto;padding:36px 40px;}
+      .hdr{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:14px;border-bottom:3px solid #2563eb;margin-bottom:26px;}
+      .hdr-logo{font-size:22px;font-weight:900;color:#2563eb;letter-spacing:-0.5px;}
+      .hdr-sub{font-size:11px;color:#6b7280;margin-top:3px;}
+      .hdr-ref{text-align:right;font-size:11px;color:#6b7280;line-height:1.8;}
+      .hdr-ref strong{color:#111827;}
+      .doc-title{font-size:19px;font-weight:900;margin-bottom:5px;}
+      .doc-sub{font-size:13px;color:#6b7280;margin-bottom:22px;}
+      .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px;margin-bottom:22px;}
+      .field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;display:block;margin-bottom:4px;}
+      .field span{font-size:14px;font-weight:600;color:#111827;}
+      .badge{display:inline-block;padding:3px 12px;border-radius:99px;font-size:12px;font-weight:700;background:#fff7ed;color:#c2410c;}
+      .desc-box{background:#f9fafb;border-left:4px solid #2563eb;border-radius:6px;padding:14px 16px;margin-bottom:22px;}
+      .desc-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin-bottom:7px;}
+      .desc-txt{font-size:14px;line-height:1.65;color:#374151;}
+      .img-box{margin-bottom:22px;}
+      .img-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin-bottom:8px;}
+      .report-img{max-width:340px;max-height:260px;object-fit:contain;border-radius:10px;border:1.5px solid #e5e7eb;display:block;}
+      .disc{background:#fefce8;border:1px solid #fde68a;border-radius:7px;padding:11px 14px;font-size:12px;color:#92400e;margin-bottom:22px;line-height:1.6;}
+      .sig{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:32px;}
+      .sig-box{border-top:1.5px solid #d1d5db;padding-top:8px;}
+      .sig-lbl{font-size:11px;color:#6b7280;}
+      .ftr{margin-top:28px;padding-top:12px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:10.5px;color:#9ca3af;}
+    </style>
+    <div class="wrap">
+      <div class="hdr">
+        <div><div class="hdr-logo">Geo GenSan</div><div class="hdr-sub">Tricycle Report System &middot; General Santos City</div></div>
+        <div class="hdr-ref">
+          <div>Report ID: <strong>${esc(r._key)}</strong></div>
+          <div>Date: <strong>${new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'})}</strong></div>
+        </div>
+      </div>
+      <div class="doc-title">Tricycle Incident Report</div>
+      <div class="doc-sub">Official report filed through the Geo GenSan public reporting system.</div>
+      <div class="grid">
+        <div class="field"><label>Plate Number</label><span>${esc(r.plate||'—')}</span></div>
+        <div class="field"><label>Date &amp; Time Filed</label><span>${esc(r.date||'—')}</span></div>
+        <div class="field"><label>Violation Type</label><span class="badge">${esc(r.type||'—')}</span></div>
+      </div>
+      <div class="desc-box">
+        <div class="desc-lbl">Incident Description</div>
+        <div class="desc-txt">${esc(r.description||'No description provided.')}</div>
+      </div>
+      ${r.imageUrl ? '<div class="img-box"><div class="img-lbl">Attached Photo (Plate / Vehicle Evidence)</div><img class="report-img" src="' + esc(r.imageUrl) + '" alt="Evidence photo"></div>' : ''}
+      <div class="disc">This is an official incident report filed by a member of the public through the Geo GenSan system. The information above is submitted as-is and is pending verification by the appropriate authority.</div>
+      <div class="sig">
+        <div class="sig-box"><div class="sig-lbl">Received by / Verified by</div></div>
+        <div class="sig-box"><div class="sig-lbl">Authorized Signature &amp; Date</div></div>
+      </div>
+      <div class="ftr">
+        <span>Geo GenSan &mdash; General Santos City Tricycle Monitoring System</span>
+        <span>CONFIDENTIAL &middot; For official use only</span>
+      </div>
+    </div>`;
+}
+
+
+
+/* ================================================================
+   EXCEL EXPORT
+================================================================ */
+document.getElementById('btn-excel').addEventListener('click', () => {
+  if (!allReports.length) { showToast('No reports to export'); return; }
+
+  const rows = allReports.map((r, i) => ({
+    '#':            i + 1,
+    'Plate No.':    r.plate       || '—',
+    'Date & Time':  r.date        || '—',
+    'Type':         r.type        || '—',
+    'Description':  r.description || '—',
+    'Photo URL':    r.imageUrl    || 'No photo'
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{ wch:4 },{ wch:14 },{ wch:26 },{ wch:22 },{ wch:54 },{ wch:60 }];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Reports');
+
+  const date = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `GeoGenSan_Reports_${date}.xlsx`);
+  showToast('Excel file exported');
+});
+
+/* ================================================================
+   POLLING
+================================================================ */
+async function loadReports() {
+  try {
+    const fresh = await fbGetAll();
+    if (!isFirstLoad && fresh.length > allReports.length) showToast('New report received');
+    isFirstLoad = false;
+    allReports  = fresh;
+    updateStats();
+    applyAndRender();
+  } catch (err) {
+    console.error(err);
+    if (isFirstLoad)
+      document.getElementById('reports-tbody').innerHTML =
+        `<tr><td colspan="8"><div class="empty-state"><div class="ei">Error</div><p>Failed to load. Check your connection.</p></div></td></tr>`;
+  }
+}
+function startPolling() { loadReports(); pollInterval = setInterval(loadReports, 10000); }
+function stopPolling()  { clearInterval(pollInterval); pollInterval = null; }
+
+/* ================================================================
+   LIGHTBOX
+================================================================ */
+const lightbox = document.getElementById('lightbox');
+const lbImg    = document.getElementById('lb-img');
+function openLightbox(src) { lbImg.src = src; lightbox.classList.add('show'); }
+document.getElementById('lb-close').onclick = () => lightbox.classList.remove('show');
+lightbox.addEventListener('click', e => { if (e.target === lightbox) lightbox.classList.remove('show'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.classList.remove('show'); });
+
+/* ================================================================
+   FARE LOGIC EDITOR
+================================================================ */
+const DEFAULT_FARE = { trike: { baseFare: 15, baseKm: 4, perKmRate: 1, discountRate: 0.20 }, bus: { minimumFare: 30 } };
+
+async function loadFareConfig() {
+  try {
+    const res = await fetch(`${FIREBASE_DB_URL}/fareConfig.json`);
+    if (res.ok) {
+      const d = await res.json();
+      if (d && d.trike) return d;
+    }
+  } catch(e) {}
+  return DEFAULT_FARE;
+}
+
+async function saveFareConfig(config) {
+  const res = await fetch(`${FIREBASE_DB_URL}/fareConfig.json`, {
+    method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config)
+  });
+  if (!res.ok) throw new Error('Save failed');
+  // Save to history
+  const histEntry = {
+    timestamp: Date.now(),
+    date: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' }),
+    formula: `₱${config.trike.baseFare} for ${config.trike.baseKm}km, then ₱${config.trike.perKmRate}/km. ${Math.round(config.trike.discountRate*100)}% discount. Bus ₱${config.bus.minimumFare}.`
+  };
+  const histRes = await fetch(`${FIREBASE_DB_URL}/fareHistory.json`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(histEntry) });
+  return res.json();
+}
+
+async function loadFareHistory() {
+  try {
+    const res = await fetch(`${FIREBASE_DB_URL}/fareHistory.json`);
+    if (!res.ok) return [];
+    const d = await res.json();
+    if (!d) return [];
+    return Object.values(d).sort((a, b) => b.timestamp - a.timestamp).slice(0, 5);
+  } catch(e) { return []; }
+}
+
+function updateFarePreview() {
+  const baseFare = parseFloat(document.getElementById('fe-base-fare').value) || 15;
+  const baseKm   = parseFloat(document.getElementById('fe-base-km').value) || 4;
+  const perKm    = parseFloat(document.getElementById('fe-per-km').value) || 1;
+  const disc     = parseFloat(document.getElementById('fe-discount').value) || 20;
+  const busFare  = parseFloat(document.getElementById('fe-bus-fare').value) || 30;
+  document.getElementById('fare-preview-formula').textContent =
+    `₱${baseFare} for first ${baseKm}km, then ₱${perKm}/km per additional km. Special passengers (PWD/Senior/Student) get ${disc}% off. Bus/Jeep minimum ₱${busFare}.`;
+}
+
+function renderFareHistory(history) {
+  const el = document.getElementById('fare-history-items');
+  if (!history.length) { el.innerHTML = '<div class="fare-history-item" style="color:var(--muted);font-style:italic;">No history yet</div>'; return; }
+  el.innerHTML = history.map(h => `
+    <div class="fare-history-item">
+      <span class="fare-history-formula">${h.formula}</span>
+      <span>${h.date}</span>
+    </div>
+  `).join('');
+}
+
+async function initFareEditor() {
+  const toggleBtn = document.getElementById('toggle-fare-editor');
+  const bodyWrap = document.getElementById('fare-editor-body-wrap');
+  toggleBtn.addEventListener('click', async () => {
+    const isOpen = bodyWrap.style.display !== 'none';
+    bodyWrap.style.display = isOpen ? 'none' : 'block';
+    toggleBtn.textContent = isOpen ? 'Edit Fare' : 'Close';
+    if (!isOpen) {
+      const config = await loadFareConfig();
+      document.getElementById('fe-base-fare').value = config.trike.baseFare;
+      document.getElementById('fe-base-km').value   = config.trike.baseKm;
+      document.getElementById('fe-per-km').value    = config.trike.perKmRate;
+      document.getElementById('fe-discount').value  = Math.round(config.trike.discountRate * 100);
+      document.getElementById('fe-bus-fare').value  = config.bus.minimumFare;
+      updateFarePreview();
+      const history = await loadFareHistory();
+      renderFareHistory(history);
+    }
+  });
+
+  ['fe-base-fare','fe-base-km','fe-per-km','fe-discount','fe-bus-fare'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateFarePreview);
+  });
+
+  document.getElementById('fare-save-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('fare-save-btn');
+    const status = document.getElementById('fare-save-status');
+    btn.disabled = true; btn.textContent = '⏳ Saving...';
+    try {
+      const config = {
+        trike: {
+          baseFare:     parseFloat(document.getElementById('fe-base-fare').value) || 15,
+          baseKm:       parseFloat(document.getElementById('fe-base-km').value) || 4,
+          perKmRate:    parseFloat(document.getElementById('fe-per-km').value) || 1,
+          discountRate: (parseFloat(document.getElementById('fe-discount').value) || 20) / 100,
+        },
+        bus: { minimumFare: parseFloat(document.getElementById('fe-bus-fare').value) || 30 }
+      };
+      await saveFareConfig(config);
+      status.textContent = '✅ Saved!'; status.classList.add('visible');
+      setTimeout(() => status.classList.remove('visible'), 3000);
+      showToast('Fare config saved to Firebase');
+      const history = await loadFareHistory();
+      renderFareHistory(history);
+    } catch(err) {
+      showToast('Failed to save fare config');
+      console.error(err);
+    } finally {
+      btn.disabled = false; btn.textContent = '💾 Save Fare Config';
+    }
+  });
+
+  document.getElementById('fare-reset-btn').addEventListener('click', async () => {
+    document.getElementById('fe-base-fare').value = 15;
+    document.getElementById('fe-base-km').value   = 4;
+    document.getElementById('fe-per-km').value    = 1;
+    document.getElementById('fe-discount').value  = 20;
+    document.getElementById('fe-bus-fare').value  = 30;
+    updateFarePreview();
+    showToast('Reset to default values (not saved yet)');
+  });
+}
+
+/* ================================================================
+   LOGIN / LOGOUT
+================================================================ */
+const loginScreen = document.getElementById('login-screen');
+const adminScreen = document.getElementById('admin-screen');
+const loginInput  = document.getElementById('login-input');
+const loginError  = document.getElementById('login-error');
+
+function doLogin() {
+  if (loginInput.value === ADMIN_PASSWORD) {
+    loginScreen.style.display = 'none';
+    adminScreen.style.display = 'block';
+    isFirstLoad = true;
+    startPolling();
+    initFareEditor();
+  } else {
+    loginError.textContent = 'Incorrect password. Try again.';
+    loginInput.value = ''; loginInput.focus();
+    setTimeout(() => { loginError.textContent = ''; }, 3000);
+  }
+}
+document.getElementById('login-btn').addEventListener('click', doLogin);
+loginInput.addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  stopPolling(); allReports = []; selectedKeys.clear(); isFirstLoad = true;
+  adminScreen.style.display = 'none';
+  loginScreen.style.display = 'flex';
+  loginInput.value = '';
+});
+</script>
+</body>
+</html>
