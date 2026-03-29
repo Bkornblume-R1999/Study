@@ -1,91 +1,618 @@
-/* api.js — GeoGensan Fare Engine */
-
-const FIREBASE_DB_URL = 'https://gentrike-75c7c-default-rtdb.asia-southeast1.firebasedatabase.app';
-
-// Default fare config (overridden by admin settings from Firebase)
-const DEFAULT_FARE_CONFIG = {
-  trike: {
-    baseFare: 15,
-    baseKm: 4,
-    perKmRate: 1,
-    discountRate: 0.20,
-  },
-  bus: {
-    minimumFare: 30
-  }
-};
-
-let _fareConfigCache = null;
-let _fareConfigExpiry = 0;
-
-export async function getFareConfig() {
-  if (_fareConfigCache && Date.now() < _fareConfigExpiry) {
-    return _fareConfigCache;
-  }
-  try {
-    const res = await fetch(`${FIREBASE_DB_URL}/fareConfig.json`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.trike) {
-        _fareConfigCache = data;
-        _fareConfigExpiry = Date.now() + 60000; // cache 1 min
-        return data;
-      }
-    }
-  } catch (e) {
-    console.warn('Could not load fare config from Firebase, using defaults.', e);
-  }
-  _fareConfigCache = DEFAULT_FARE_CONFIG;
-  _fareConfigExpiry = Date.now() + 30000;
-  return DEFAULT_FARE_CONFIG;
-}
-
-export function invalidateFareCache() {
-  _fareConfigCache = null;
-  _fareConfigExpiry = 0;
-}
-
-export const Api = {
-  async computeFare({ mode, distanceKm, discountType = 'none', regularPassengers = 1, discountedPassengers = 0 }) {
-    const config = await getFareConfig();
-    const rounded = Math.round(distanceKm * 1000) / 1000;
-
-    let baseFarePerPerson = 0;
-
-    if (mode === 'trike') {
-      const { baseFare, baseKm, perKmRate } = config.trike;
-      baseFarePerPerson = rounded <= baseKm
-        ? baseFare
-        : baseFare + Math.ceil(rounded - baseKm) * perKmRate;
-    } else if (mode === 'bus' || mode === 'jeep') {
-      baseFarePerPerson = config.bus ? config.bus.minimumFare : DEFAULT_FARE_CONFIG.bus.minimumFare;
-    } else {
-      throw new Error('Unsupported mode');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>GeoGensan</title>
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="png" href="geogensan.png"/>
+  <style>
+    /* ── Live pulse animation ── */
+    @keyframes live-pulse {
+      0%, 100% { box-shadow: 0 0 0 6px rgba(37,99,235,0.25); }
+      50% { box-shadow: 0 0 0 12px rgba(37,99,235,0.1); }
     }
 
-    const discountRate = config.trike ? config.trike.discountRate : DEFAULT_FARE_CONFIG.trike.discountRate;
-    const discountAmountPerPerson = Math.round(baseFarePerPerson * discountRate);
-    const discountedFarePerPerson = baseFarePerPerson - discountAmountPerPerson;
+    /* ── Live active state for My Location button ── */
+    .action-card.live-active {
+      background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(37,99,235,0.05));
+      border: 1.5px solid rgba(37,99,235,0.4);
+      color: var(--primary);
+    }
+    .action-card.live-active .action-icon::after {
+      content: '';
+      display: inline-block;
+      width: 7px; height: 7px;
+      background: var(--success);
+      border-radius: 50%;
+      margin-left: 4px;
+      animation: blink-dot 1.2s ease-in-out infinite;
+      vertical-align: middle;
+    }
+    @keyframes blink-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
 
-    const regularTotal = baseFarePerPerson * regularPassengers;
-    const discountedTotal = discountedFarePerPerson * discountedPassengers;
-    const totalFare = regularTotal + discountedTotal;
+    /* ── ETA display ── */
+    .eta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .eta-label { font-size: 12px; color: var(--gray-500); }
+    .eta-value {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      font-family: var(--font-mono);
+      background: linear-gradient(135deg, #10b981, #2563eb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 6px rgba(16,185,129,0.6));
+    }
+    body.dark-mode .eta-value {
+      filter: drop-shadow(0 0 8px rgba(52,211,153,0.8));
+    }
 
-    await new Promise(r => setTimeout(r, 80));
+    /* ── Passenger controls ── */
+    .passenger-section {
+      background: var(--gray-50);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
 
-    return {
-      mode,
-      distanceKm: rounded,
-      baseFarePerPerson,
-      discountRate,
-      discountAmountPerPerson,
-      discountedFarePerPerson,
-      regularPassengers,
-      discountedPassengers,
-      regularTotal,
-      discountedTotal,
-      totalFare,
-      config
-    };
-  }
-};
+    .passenger-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .passenger-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .passenger-row:last-child { margin-bottom: 0; }
+
+    .passenger-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .passenger-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pax-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gray-300);
+      background: var(--white);
+      color: var(--gray-700);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      line-height: 1;
+      padding: 0;
+    }
+    .pax-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(37,99,235,0.06); }
+
+    .pax-count {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--black);
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .total-pax-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      background: rgba(37,99,235,0.08);
+      color: var(--primary);
+      border-radius: 50px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 6px;
+    }
+
+    /* Dark mode for passenger section */
+    body.dark-mode .passenger-section {
+      background: var(--gray-200);
+      border-color: var(--gray-300);
+    }
+    body.dark-mode .passenger-label { color: var(--gray-900); }
+    body.dark-mode .pax-btn { background: var(--gray-100); border-color: var(--gray-400); color: var(--gray-900); }
+    body.dark-mode .pax-count { color: var(--gray-900); }
+
+    /* ── Alt routes info ── */
+    .alt-routes-hint {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(37,99,235,0.06);
+      border: 1px solid rgba(37,99,235,0.15);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .alt-routes-hint.visible { display: flex; }
+
+    /* ── Bus ETA box ── */
+    .bus-stats-box {
+      background: var(--gray-50);
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 20px;
+    }
+    .bus-stat { flex: 1; }
+    .bus-stat-label { font-size: 11px; color: var(--gray-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
+    .bus-stat-val { font-size: 16px; font-weight: 700; color: var(--black); font-family: var(--font-mono); }
+    body.dark-mode .bus-stats-box { background: var(--gray-200); border-color: var(--gray-300); }
+    body.dark-mode .bus-stat-label { color: var(--gray-600); }
+    body.dark-mode .bus-stat-val { color: var(--gray-900); }
+  </style>
+</head>
+<body>
+  <!-- Full-screen map container -->
+  <div id="map" role="application" aria-label="Interactive transport map"></div>
+
+  <!-- Floating header -->
+  <header class="floating-header">
+    <div class="logo">
+      <img src="geogensan.png" alt="GeoGensan" class="logo-img">
+      <div class="logo-text">
+        <h1>Geo Gensan</h1>
+        <p>Don't get lost</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- COMPLAINT MODAL -->
+  <div id="complaint-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>🚨 Report a Tricycle</h2>
+        <button class="modal-close" id="close-complaint">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="complaint-cooldown-notice" class="cooldown-notice" style="display:none;">
+          <span>⏳</span>
+          <p id="cooldown-text">You may submit another report in <strong id="cooldown-timer"></strong>.</p>
+        </div>
+        <div id="complaint-form-body">
+          <div class="form-group">
+            <label>Plate Number <span class="required">*</span></label>
+            <input type="text" id="complaint-plate" placeholder="e.g. AB-1234 (or attach photo below)" maxlength="20" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>Plate Photo <span class="optional">(optional)</span></label>
+            <div class="image-drop-zone" id="image-drop-zone">
+              <input type="file" id="complaint-image-input" accept="image/*" style="display:none;">
+              <div class="drop-zone-idle" id="drop-zone-idle">
+                <span class="drop-icon">📷</span>
+                <span class="drop-text">Tap to take photo or browse files</span>
+                <span class="drop-sub">JPG, PNG, HEIC — max 5MB</span>
+              </div>
+              <div class="drop-zone-preview" id="drop-zone-preview" style="display:none;">
+                <img id="complaint-img-preview" src="" alt="preview">
+                <button class="drop-remove-btn" id="drop-remove-img" type="button">✕</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Report Type <span class="required">*</span></label>
+            <select id="complaint-type">
+              <option value="">— Select type —</option>
+              <option value="Overcharging">Overcharging</option>
+              <option value="Reckless Driving">Reckless Driving</option>
+              <option value="Refusal of Service">Refusal of Service</option>
+              <option value="Verbal Abuse">Verbal Abuse</option>
+              <option value="Unsafe Vehicle">Unsafe Vehicle</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Description <span class="required">*</span></label>
+            <textarea id="complaint-desc" placeholder="Describe what happened..." rows="4" maxlength="500"></textarea>
+            <span class="char-count"><span id="desc-count">0</span>/500</span>
+          </div>
+          <button class="btn-primary" id="submit-complaint">Submit Report</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mode switcher -->
+  <nav class="mode-switcher" role="tablist">
+    <button class="mode-btn active" data-mode="trike" role="tab" aria-selected="true">
+      <span class="mode-icon"><img src="trike.png" alt="Trike" class="mode-img"></span>
+      <span class="mode-label">Trike</span>
+    </button>
+    <button class="mode-btn" data-mode="busjeep" role="tab" aria-selected="false">
+      <span class="mode-icon"><img src="bus.png" alt="Bus" class="mode-img"></span>
+      <span class="mode-label">Bus/Jeep</span>
+    </button>
+    <button class="mode-btn" data-mode="info" role="tab" aria-selected="false">
+      <span class="mode-icon"><img src="info.png" alt="Info" class="mode-img"></span>
+      <span class="mode-label">Info</span>
+    </button>
+  </nav>
+
+  <!-- Bottom sheet / Sidebar -->
+  <aside class="control-panel" id="control-panel">
+    <div class="panel-handle"><div class="handle-bar"></div></div>
+
+    <!-- TRIKE MODE -->
+    <div class="panel-view active" data-view="trike">
+      <div class="panel-header">
+        <h2 class="panel-title">Trike Fare Calculator</h2>
+      </div>
+      <div class="panel-content">
+        <!-- Quick actions -->
+        <div class="quick-actions">
+          <button class="action-card" id="use-location">
+            <span class="action-icon">📍</span>
+            <span class="action-text">Live Location</span>
+          </button>
+          <button class="action-card" id="reset-trike">
+            <span class="action-icon">🔄</span>
+            <span class="action-text">Reset</span>
+          </button>
+        </div>
+
+        <!-- Discount selector -->
+        <div class="discount-selector">
+          <label class="discount-label">Passenger Type</label>
+          <div class="discount-options">
+            <button class="discount-btn active" data-discount="none">
+              <span class="discount-icon">👤</span>
+              <span class="discount-name">Regular</span>
+            </button>
+            <button class="discount-btn" data-discount="special">
+              <span class="discount-icon">💳</span>
+              <span class="discount-name">PWD / Senior / Student</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Passenger count section -->
+        <div class="passenger-section">
+          <div class="passenger-section-title">Passengers</div>
+          <div class="passenger-row">
+            <span class="passenger-label">👤 Regular</span>
+            <div class="passenger-controls">
+              <button class="pax-btn" id="regular-minus">−</button>
+              <span class="pax-count" id="regular-count">1</span>
+              <button class="pax-btn" id="regular-plus">+</button>
+            </div>
+          </div>
+          <div class="passenger-row" id="discounted-pax-row" style="display:none;">
+            <span class="passenger-label">💳 Special</span>
+            <div class="passenger-controls">
+              <button class="pax-btn" id="discounted-minus">−</button>
+              <span class="pax-count" id="discounted-count">0</span>
+              <button class="pax-btn" id="discounted-plus">+</button>
+            </div>
+          </div>
+          <div class="total-pax-badge" id="total-pax-display">1 passenger</div>
+        </div>
+
+        <!-- Location inputs -->
+        <div class="location-input-group">
+          <div class="input-wrapper">
+            <div class="input-icon start-icon">A</div>
+            <div class="input-content">
+              <input type="text" id="search-start" class="location-input" placeholder="Starting point..." autocomplete="off">
+              <span class="input-label" id="start-display">Tap map or search</span>
+            </div>
+          </div>
+          <div class="connection-line"></div>
+          <div class="input-wrapper">
+            <div class="input-icon end-icon">B</div>
+            <div class="input-content">
+              <input type="text" id="search-end" class="location-input" placeholder="Destination..." autocomplete="off">
+              <span class="input-label" id="end-display">Tap map or search</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alt routes hint -->
+        <div class="alt-routes-hint" id="alt-routes-hint">
+          🛣️ Tap a dashed route on the map to switch
+        </div>
+
+        <!-- Trip summary -->
+        <div class="trip-summary" id="trip-summary">
+          <div class="summary-row">
+            <span class="summary-label">Distance</span>
+            <span class="summary-value" id="distance-display">—</span>
+          </div>
+          <div class="eta-row">
+            <span class="eta-label">Est. Travel Time</span>
+            <span class="eta-value" id="eta-display">—</span>
+          </div>
+          <div class="summary-divider"></div>
+          <div class="fare-display-main">
+            <div class="fare-top">
+              <span class="fare-label">Total Fare</span>
+              <span class="fare-amount" id="fare-display">₱—</span>
+            </div>
+            <div class="fare-breakdown" id="fare-breakdown" style="display:none;"></div>
+          </div>
+          <div class="fare-formula" id="fare-formula">₱15 base (4km) + ₱1/km</div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instruction-card">
+          <p>💡 Tap any two points on the map — 3 route options will appear</p>
+        </div>
+
+        <!-- Report a Tricycle -->
+        <button class="report-trike-btn" id="open-complaint">
+          <span class="report-trike-icon">🚨</span>
+          <div class="report-trike-text">
+            <strong>Report a Tricycle</strong>
+            <span>Overcharging, reckless driving, etc.</span>
+          </div>
+          <span class="report-trike-arrow">›</span>
+        </button>
+
+        <div class="warning-box">
+          <p><strong>⚠️ Route Advisory:</strong> Actual routes may differ due to traffic or driver preference. Always confirm with your driver before paying.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- BUS/JEEP MODE -->
+    <div class="panel-view" data-view="busjeep">
+      <div class="panel-header">
+        <h2 class="panel-title">Bus & Jeep Routes</h2>
+      </div>
+      <div class="panel-content">
+        <!-- Bus ETA box -->
+        <div class="bus-stats-box">
+          <div class="bus-stat">
+            <div class="bus-stat-label">Route Length</div>
+            <div class="bus-stat-val" id="bus-dist-display">—</div>
+          </div>
+          <div class="bus-stat">
+            <div class="bus-stat-label">Est. Time</div>
+            <div class="bus-stat-val" id="bus-eta-display">—</div>
+          </div>
+          <div class="bus-stat">
+            <div class="bus-stat-label">Total Stops</div>
+            <div class="bus-stat-val" id="bus-stops-count-display">—</div>
+          </div>
+          <div class="bus-stat">
+            <div class="bus-stat-label">Min. Fare</div>
+            <div class="bus-stat-val" id="bus-min-fare-display">₱30</div>
+          </div>
+        </div>
+
+        <div class="route-grid">
+          <button class="route-card" data-route="uhaw">
+            <div class="route-badge green">🟢</div>
+            <div class="route-info">
+              <h3 class="route-name">Uhaw Route</h3>
+              <p class="route-stops">12 stops • Airport to Robinsons</p>
+            </div>
+            <div class="route-fare">₱30</div>
+          </button>
+          <button class="route-card" data-route="calumpang">
+            <div class="route-badge yellow">🟡</div>
+            <div class="route-info">
+              <h3 class="route-name">Calumpang Route</h3>
+              <p class="route-stops">8 stops • Lado to Lagao Market</p>
+            </div>
+            <div class="route-fare">₱30</div>
+          </button>
+          <button class="route-card" data-route="mabuhay">
+            <div class="route-badge white">⚪</div>
+            <div class="route-info">
+              <h3 class="route-name">Mabuhay Route</h3>
+              <p class="route-stops">10 stops • Market to Mabuhay</p>
+            </div>
+            <div class="route-fare">₱30</div>
+          </button>
+        </div>
+
+        <div class="route-detail" id="route-detail" style="display:none;">
+          <div class="route-detail-header">
+            <h3 id="route-detail-name"></h3>
+            <button class="btn-text" id="clear-route">Clear</button>
+          </div>
+          <div class="stops-list" id="stops-list"></div>
+        </div>
+
+        <div class="info-box">
+          <strong>Minimum Fare: ₱30</strong> — Bus & jeep fares start at ₱30. Confirm fare with driver.
+        </div>
+
+        <div class="warning-box">
+          <strong>Route Advisory:</strong> Drivers may take alternative routes due to traffic. Always confirm fare before paying.
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO MODE -->
+    <div class="panel-view" data-view="info">
+      <div class="panel-header">
+        <h2 class="panel-title">About</h2>
+        <button class="dark-mode-toggle" id="dark-mode-toggle" aria-label="Toggle dark mode">
+          <span class="toggle-icon" id="dark-mode-label">Dark</span>
+        </button>
+      </div>
+      <div class="panel-content">
+        <div class="info-section">
+          <h3>What is this?</h3>
+          <p>GeoGensan helps you plan trips and calculate transportation costs in General Santos City with real-time route mapping based on City Ordinance No. 08, Series of 2023.</p>
+        </div>
+        <div class="info-section">
+          <h3>Features</h3>
+          <div class="feature-grid">
+            <div class="feature-item"><div><strong>Trike Fares</strong><p>Distance-based pricing with discounts & multi-passenger support</p></div></div>
+            <div class="feature-item"><div><strong>3 Route Options</strong><p>Shortest route + 2 alternatives shown on the map</p></div></div>
+            <div class="feature-item"><div><strong>Live Location</strong><p>GPS follows you in real-time as you move</p></div></div>
+            <div class="feature-item"><div><strong>ETA Display</strong><p>Estimated travel time for trike and bus</p></div></div>
+            <div class="feature-item"><div><strong>Bus Routes</strong><p>View popular jeepney routes with stop details</p></div></div>
+            <div class="feature-item"><div><strong>Report System</strong><p>Report overcharging or reckless driving</p></div></div>
+          </div>
+        </div>
+        <div class="info-section">
+          <h3>Special Discounts (20% off)</h3>
+          <div class="discount-info-box">
+            <ul>
+              <li><strong>PWD:</strong> Persons with Disability (with valid ID)</li>
+              <li><strong>Senior Citizens:</strong> 60 years old and above (with valid ID)</li>
+              <li><strong>Students:</strong> With valid school ID</li>
+            </ul>
+          </div>
+        </div>
+        <div class="info-section">
+          <h3>Official Fare Matrix</h3>
+          <p class="matrix-intro">Official tricycle fare matrices for General Santos City per Ordinance No. 08, Series of 2023:</p>
+          <div class="matrix-tabs">
+            <button class="matrix-tab active" data-cluster="white">White</button>
+            <button class="matrix-tab" data-cluster="apple">Apple-Green</button>
+            <button class="matrix-tab" data-cluster="red">Red</button>
+          </div>
+          <div class="matrix-container">
+            <!-- WHITE CLUSTER -->
+            <div class="matrix-view active" data-cluster="white">
+              <div class="matrix-header">White Cluster Routes</div>
+              <div class="matrix-note">Base fare: ₱15 (first 4km) + ₱1.00 per additional km</div>
+              <div class="matrix-table-wrapper">
+                <table class="matrix-table">
+                  <thead><tr><th class="route-col">Route</th><th class="dist-col">Dist.</th><th class="fare-col">Regular</th><th class="fare-col">Special*</th></tr></thead>
+                  <tbody>
+                    <tr><td>CBD to Purok Mabuhay Satellite Market</td><td>4 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>CBD to Brgy. Labangal - San Isidro</td><td>4 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>KCC/Robinson Via Glifos St. to Leonandria</td><td>4 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>CBD to Habitat Phase III</td><td>8 km</td><td>₱19</td><td>₱15</td></tr>
+                    <tr><td>CBD to VSM Heights</td><td>8 km</td><td>₱19</td><td>₱15</td></tr>
+                    <tr><td>CBD to Habitat Phase A</td><td>9 km</td><td>₱20</td><td>₱16</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Katangawan</td><td>9 km</td><td>₱20</td><td>₱16</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Kalabchay</td><td>13 km</td><td>₱24</td><td>₱19</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Conel</td><td>15 km</td><td>₱26</td><td>₱21</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Olympog</td><td>16 km</td><td>₱27</td><td>₱22</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Upper Labay</td><td>25 km</td><td>₱36</td><td>₱29</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- APPLE-GREEN CLUSTER -->
+            <div class="matrix-view" data-cluster="apple">
+              <div class="matrix-header">Apple-Green Cluster Routes</div>
+              <div class="matrix-note">Base fare: ₱15 (first 4km) + ₱1.00 per additional km</div>
+              <div class="matrix-table-wrapper">
+                <table class="matrix-table">
+                  <thead><tr><th class="route-col">Route</th><th class="dist-col">Dist.</th><th class="fare-col">Regular</th><th class="fare-col">Special*</th></tr></thead>
+                  <tbody>
+                    <tr><td>SM to Bulaong Terminal</td><td>2.5 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>KCC/Caloocan/SM to Bulaong Terminal</td><td>3.14 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>KCC/Robinson/SM to Liceo NDSL Junction</td><td>3.42 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>Plaza Heneral Santos to Lagao Gym</td><td>3.45 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>SM via Aparente St. to Mindanao Medical Center</td><td>3.68 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>SM to SM Store More</td><td>3.7 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>KCC/Robinson to Greenfield Residence</td><td>3.83 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>KCC/Robinson to Legaspi National High School</td><td>3.91 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>CBD to Pioneer/Aparente Junction</td><td>3.93 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>CBD to Salvasal St.</td><td>3.97 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>KCC/Robinson to Liceo City Heights</td><td>4 km</td><td>₱15</td><td>₱12</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!-- RED CLUSTER -->
+            <div class="matrix-view" data-cluster="red">
+              <div class="matrix-header">Red Cluster Routes</div>
+              <div class="matrix-note">Base fare: ₱15 (first 4km) + ₱1.00 per additional km</div>
+              <div class="matrix-table-wrapper">
+                <table class="matrix-table">
+                  <thead><tr><th class="route-col">Route</th><th class="dist-col">Dist.</th><th class="fare-col">Regular</th><th class="fare-col">Special*</th></tr></thead>
+                  <tbody>
+                    <tr><td>KCC via Public Market to Petronas Gas Station</td><td>3.8 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>Plaza Heneral Santos to King Solomon Institute</td><td>3.95 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>SM to Labangal Road Ceresita Fine Hotel</td><td>3.96 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>CBD to Bloomfields Subdivision</td><td>3.98 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>CBD to King Solomon Institute</td><td>3.99 km</td><td>₱15</td><td>₱12</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Calumpang</td><td>6 km</td><td>₱17</td><td>₱14</td></tr>
+                    <tr><td>CBD to Barrio Blaan</td><td>8 km</td><td>₱19</td><td>₱15</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Aponguol</td><td>8 km</td><td>₱19</td><td>₱15</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Tambler</td><td>10 km</td><td>₱21</td><td>₱17</td></tr>
+                    <tr><td>CBD to Lanton</td><td>11 km</td><td>₱22</td><td>₱18</td></tr>
+                    <tr><td>CBD to Ellesport Complex</td><td>11 km</td><td>₱22</td><td>₱18</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Fatima</td><td>12 km</td><td>₱23</td><td>₱18</td></tr>
+                    <tr><td>CBD to Brgy. Ilud - Sinawal</td><td>13 km</td><td>₱24</td><td>₱19</td></tr>
+                    <tr><td>CBD to Batomlong/Siguel</td><td>18 km</td><td>₱29</td><td>₱23</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="matrix-footer">
+            <p><strong>*Special fare rates (20% discount) apply to:</strong></p>
+            <ul>
+              <li>PWD (Persons with Disability) with valid ID</li>
+              <li>Senior Citizens (60 years and above) with valid ID</li>
+              <li>Students with valid school ID</li>
+            </ul>
+            <p class="matrix-legal"><strong>Legal Notice:</strong> Republic Act No. 10909 prohibits short charging. Drivers who refuse passengers due to short distance routes are subject to penalties under the law.</p>
+          </div>
+        </div>
+
+        <div class="disclaimer">
+          <strong>Disclaimer:</strong> Fares are based on GenSan City Ordinance No. 08, Series of 2023. This calculator provides estimates only.
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Loading -->
+  <div id="loading" class="loading-overlay" style="display:none;">
+    <div class="spinner"></div>
+    <p>Calculating route...</p>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
