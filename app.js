@@ -216,7 +216,7 @@ const GENSAN_PLACES = [
   { name: 'Cathedral Parish of Our Lady of Peace & Good Voyage', lat: 6.11280, lng: 125.17440, tags: ['church','cathedral','parish','catholic'] },
   { name: 'San Jose Parish, Lagao', lat: 6.13500, lng: 125.18500, tags: ['church','parish','catholic','lagao'] },
   { name: 'Bula Parish Church', lat: 6.10900, lng: 125.16100, tags: ['church','parish','bula','catholic'] },
-  { name: 'Kingdom Hall of Jehovah's Witnesses', lat: 6.11600, lng: 125.17300, tags: ['church','jehovah'] },
+  { name: 'Kingdom Hall of Jehovahs Witnesses', lat: 6.11600, lng: 125.17300, tags: ['church','jehovah'] },
   { name: 'Iglesia ni Cristo, Gensan', lat: 6.11700, lng: 125.16600, tags: ['church','inc','iglesia ni cristo'] },
   // ── Barangays / Areas ──
   { name: 'Barangay Lagao', lat: 6.13000, lng: 125.18000, tags: ['barangay','lagao','area'] },
