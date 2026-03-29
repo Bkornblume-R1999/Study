@@ -61,62 +61,213 @@ const ROUTES = {
 
 // ─── PLACES DATABASE ──────────────────────────────────────────────────────────
 const GENSAN_PLACES = [
-  { name: 'SM Mall of GenSan', lat: 6.11615, lng: 125.18107, tags: ['mall', 'shopping', 'arcade', 'restaurants'] },
-  { name: 'KCC Mall of GenSan', lat: 6.11605, lng: 125.18691, tags: ['mall', 'shopping', 'arcade', 'restaurants'] },
-  { name: 'Robinsons Mall of GenSan', lat: 6.12099, lng: 125.19069, tags: ['mall', 'shopping', 'arcade', 'restaurants'] },
-  { name: 'Gaisano Mall of GenSan', lat: 6.11727, lng: 125.18437, tags: ['mall', 'shopping', 'restaurants'] },
-  { name: 'Fit Mart Mall of GenSan', lat: 6.11237, lng: 125.16923, tags: ['mall', 'shopping'] },
-  { name: 'Veranza Mall', lat: 6.11600, lng: 125.18852, tags: ['mall', 'arcade', 'restaurants'] },
-  { name: 'St.Elizabeth Hospital', lat: 6.11821, lng: 125.17995, tags: ['hospital', 'clinic'] },
-  { name: 'GenSan Doctors Hospital', lat: 6.12011, lng: 125.17839, tags: ['hospital', 'clinic'] },
-  { name: 'Mindanao Medical Center', lat: 6.12801, lng: 125.15985, tags: ['hospital', 'clinic'] },
-  { name: 'Dadiangas Medical Center', lat: 6.12465, lng: 125.17772, tags: ['hospital', 'clinic'] },
-  { name: 'Dr. Jorge P. Royeca Hospital', lat: 6.12568, lng: 125.18583, tags: ['hospital', 'clinic'] },
-  { name: 'Socsargen County Hospital', lat: 6.11827, lng: 125.18984, tags: ['hospital', 'clinic'] },
-  { name: 'Gensan Medical Center', lat: 6.08247, lng: 125.14768, tags: ['hospital', 'clinic'] },
-  { name: 'Notre Dame of Dadiangas University', lat: 6.11748, lng: 125.17165, tags: ['nddu', 'university', 'school'] },
-  { name: 'Mindanao State University - General Santos', lat: 6.11652, lng: 125.17171, tags: ['msu', 'university', 'school'] },
-  { name: 'STI College, GenSan', lat: 6.11471, lng: 125.18297, tags: ['school', 'college'] },
-  { name: 'Holy Trinity College', lat: 6.11334, lng: 125.16877, tags: ['school', 'college'] },
-  { name: 'Goldenstate College, Acharon Boulevard', lat: 6.10716, lng: 125.17251, tags: ['glc', 'school', 'college'] },
-  { name: 'New Era University', lat: 6.13672, lng: 125.17091, tags: ['school', 'university'] },
-  { name: 'Lagao National High School', lat: 6.13483, lng: 125.17133, tags: ['school'] },
-  { name: 'Bulaong Terminal', lat: 6.11335, lng: 125.16237, tags: ['bus', 'van', 'terminal'] },
-  { name: 'Husky Terminal', lat: 6.11326, lng: 125.16428, tags: ['bus', 'transport', 'terminal'] },
-  { name: 'Yellow Bus Terminal, Gensan', lat: 6.11950, lng: 125.17742, tags: ['bus', 'terminal'] },
-  { name: 'Lagao Public Terminal', lat: 6.12740, lng: 125.19633, tags: ['van', 'bus', 'jeep', 'terminal'] },
-  { name: 'International Airport, GenSan', lat: 6.05762, lng: 125.10083, tags: ['airport', 'plane'] },
-  { name: 'Port of General Santos', lat: 6.09277, lng: 125.15536, tags: ['port', 'boat', 'ferry'] },
-  { name: 'City Hall of GenSan', lat: 6.11302, lng: 125.17173, tags: ['government', 'city hall'] },
-  { name: 'GenSan Public Market', lat: 6.10790, lng: 125.17848, tags: ['market', 'public market'] },
-  { name: 'Lagao Public Market', lat: 6.12732, lng: 125.19660, tags: ['market', 'lagao'] },
-  { name: 'Carlos P. Garcia Freedom Park', lat: 6.11538, lng: 125.17177, tags: ['park', 'plaza'] },
-  { name: 'Plaza Heneral Santos', lat: 6.11214, lng: 125.17179, tags: ['park', 'plaza'] },
-  { name: 'Queen Tuna Park', lat: 6.10678, lng: 125.17574, tags: ['park', 'beach'] },
-  { name: 'Pacman Mansion 2', lat: 6.12767, lng: 125.16759, tags: ['landmark'] },
-  { name: 'Pacman Mansion', lat: 6.13345, lng: 125.18503, tags: ['landmark'] },
-  { name: 'Green Leaf Hotel', lat: 6.11470, lng: 125.18220, tags: ['hotel', 'pool', 'restaurant'] },
-  { name: 'Grand Imperial Hotel', lat: 6.11970, lng: 125.18958, tags: ['hotel', 'pool', 'casino'] },
-  { name: 'T Boli Hotel', lat: 6.11903, lng: 125.17770, tags: ['hotel'] },
-  { name: 'Sun City Suites', lat: 6.11906, lng: 125.18320, tags: ['hotel', 'suites'] },
-  { name: 'McDonalds, Digos-Makar Road', lat: 6.11912, lng: 125.17981, tags: ['restaurant', 'fastfood', 'mcdo'] },
-  { name: 'Jollibee, Digos-Makar Road', lat: 6.11854, lng: 125.17887, tags: ['restaurant', 'fastfood', 'jollibee'] },
-  { name: 'Starbucks - GenSan Highway', lat: 6.11924, lng: 125.18453, tags: ['restaurant', 'cafe', 'coffee', 'starbucks'] },
-  { name: 'Burger King, Digos-Makar Road', lat: 6.11906, lng: 125.18049, tags: ['restaurant', 'fastfood'] },
-  { name: 'Jollibee, Pendatun Avenue', lat: 6.11265, lng: 125.17032, tags: ['restaurant', 'fastfood', 'jollibee'] },
-  { name: 'SM Savemore Market, Nuñez', lat: 6.13831, lng: 125.17002, tags: ['market', 'savemore', 'grocery'] },
-  { name: 'SM Savemore Market, Calumpang', lat: 6.07740, lng: 125.14651, tags: ['market', 'savemore', 'grocery'] },
-  { name: 'Philippine Statistics Authority, Gensan', lat: 6.11384, lng: 125.18006, tags: ['psa', 'government'] },
-  { name: 'Hall of Justice, Gensan', lat: 6.12657, lng: 125.19856, tags: ['government', 'justice'] },
-  { name: 'PacMan Wildcard Gym', lat: 6.11494, lng: 125.18192, tags: ['gym', 'fitness'] },
-  { name: 'Amandare Cove', lat: 6.12274, lng: 125.15678, tags: ['pool', 'resort'] },
-  { name: 'La Cassandra Subdivision', lat: 6.14048, lng: 125.12893, tags: [] },
-  { name: 'Camella Homes', lat: 6.14260, lng: 125.17993, tags: ['subdivision', 'homes'] },
-  { name: 'Bria Homes', lat: 6.15314, lng: 125.18770, tags: ['subdivision', 'homes'] },
-  { name: 'Lessandra Homes', lat: 6.14608, lng: 125.18869, tags: ['subdivision', 'homes'] },
+  // ── Malls & Commercial ──
+  { name: 'SM Mall of GenSan', lat: 6.11615, lng: 125.18107, tags: ['mall','shopping','sm','cinema'] },
+  { name: 'KCC Mall of GenSan', lat: 6.11605, lng: 125.18691, tags: ['mall','shopping','kcc','cinema'] },
+  { name: 'Robinsons Mall of GenSan', lat: 6.12099, lng: 125.19069, tags: ['mall','shopping','robinsons'] },
+  { name: 'Gaisano Mall of GenSan', lat: 6.11727, lng: 125.18437, tags: ['mall','shopping','gaisano'] },
+  { name: 'Fit Mart Mall of GenSan', lat: 6.11237, lng: 125.16923, tags: ['mall','shopping','fitmart'] },
+  { name: 'Veranza Mall', lat: 6.11600, lng: 125.18852, tags: ['mall','veranza'] },
+  { name: 'Magsaysay Park Commercial Complex', lat: 6.10780, lng: 125.17600, tags: ['commercial','market'] },
+  { name: 'Pioneer Avenue', lat: 6.10800, lng: 125.17200, tags: ['street','road','pioneer'] },
+  { name: 'Pendatun Avenue', lat: 6.11200, lng: 125.17100, tags: ['street','avenue'] },
+  { name: 'Acharon Boulevard', lat: 6.10800, lng: 125.17300, tags: ['street','boulevard'] },
+  { name: 'Digos-Makar Road', lat: 6.11900, lng: 125.18000, tags: ['road','street'] },
+  { name: 'Jose Catolico Sr. Avenue', lat: 6.12600, lng: 125.19400, tags: ['road','street','lagao'] },
+  // ── Hospitals & Clinics ──
+  { name: 'St. Elizabeth Hospital', lat: 6.11821, lng: 125.17995, tags: ['hospital','clinic','emergency'] },
+  { name: 'GenSan Doctors Hospital', lat: 6.12011, lng: 125.17839, tags: ['hospital','clinic','doctor'] },
+  { name: 'Mindanao Medical Center', lat: 6.12801, lng: 125.15985, tags: ['hospital','clinic','mmc'] },
+  { name: 'Dadiangas Medical Center', lat: 6.12465, lng: 125.17772, tags: ['hospital','clinic'] },
+  { name: 'Dr. Jorge P. Royeca Hospital', lat: 6.12568, lng: 125.18583, tags: ['hospital','royeca'] },
+  { name: 'Socsargen County Hospital', lat: 6.11827, lng: 125.18984, tags: ['hospital','clinic'] },
+  { name: 'Gensan Medical Center', lat: 6.08247, lng: 125.14768, tags: ['hospital','clinic'] },
+  { name: 'Puericulture Hospital', lat: 6.11360, lng: 125.17121, tags: ['hospital','clinic','children'] },
+  { name: 'Auguis Clinic & Hospital', lat: 6.11299, lng: 125.16777, tags: ['hospital','clinic'] },
+  { name: 'R. O. Diagan Community Hospital', lat: 6.11447, lng: 125.16717, tags: ['hospital','clinic'] },
+  { name: 'Yap Clinic', lat: 6.11536, lng: 125.17336, tags: ['clinic','doctor'] },
+  { name: 'Mercury Drugstore, Irineo Santiago Blvd', lat: 6.11779, lng: 125.17973, tags: ['pharmacy','drugstore','mercury'] },
+  { name: 'Mercury Drugstore, Pioneer', lat: 6.10889, lng: 125.17153, tags: ['pharmacy','drugstore','mercury'] },
+  { name: 'Rose Pharmacy, Digos-Makar Road', lat: 6.11913, lng: 125.17960, tags: ['pharmacy','drugstore','rose'] },
+  { name: 'Rojon Pharmacy, Cagampang Street', lat: 6.10844, lng: 125.17971, tags: ['pharmacy','drugstore'] },
+  { name: 'Decolongon Pharmacy', lat: 6.11821, lng: 125.17912, tags: ['pharmacy','drugstore'] },
+  { name: 'Navis Pharmacy', lat: 6.11289, lng: 125.16905, tags: ['pharmacy','drugstore'] },
+  // ── Schools / Universities ──
+  { name: 'Notre Dame of Dadiangas University', lat: 6.11748, lng: 125.17165, tags: ['nddu','university','college','school'] },
+  { name: 'Mindanao State University - General Santos', lat: 6.11652, lng: 125.17171, tags: ['msu','university','college','school'] },
+  { name: 'STI College, GenSan', lat: 6.11471, lng: 125.18297, tags: ['sti','school','college'] },
+  { name: 'Holy Trinity College', lat: 6.11334, lng: 125.16877, tags: ['htc','school','college'] },
+  { name: 'Goldenstate College, Acharon Boulevard', lat: 6.10716, lng: 125.17251, tags: ['glc','goldenstate','school','college'] },
+  { name: 'Goldenstate Little College, Malakas', lat: 6.13820, lng: 125.16848, tags: ['glc','goldenstate','school'] },
+  { name: 'New Era University', lat: 6.13672, lng: 125.17091, tags: ['neu','university','school'] },
+  { name: 'Lagao National High School', lat: 6.13483, lng: 125.17133, tags: ['lnhs','school','high school'] },
+  { name: 'Lagao National High School Annex', lat: 6.14475, lng: 125.18569, tags: ['lnhs','school','high school'] },
+  { name: 'Notre Dame Dadiangas University, Lagao', lat: 6.12437, lng: 125.19643, tags: ['nddu','university','lagao'] },
+  { name: 'Stratford International School', lat: 6.11359, lng: 125.18419, tags: ['stratford','school','international'] },
+  { name: 'RMMC School', lat: 6.11175, lng: 125.17388, tags: ['ramon magsaysay','school'] },
+  { name: 'Dadiangas North Elementary School', lat: 6.11583, lng: 125.16735, tags: ['school','elementary'] },
+  { name: 'Dadiangas East Elementary School', lat: 6.11625, lng: 125.17703, tags: ['school','elementary'] },
+  { name: 'Dadiangas South Central Elementary School', lat: 6.11035, lng: 125.17582, tags: ['school','elementary'] },
+  { name: 'Dadiangas West Central Elementary School', lat: 6.10963, lng: 125.16911, tags: ['school','elementary'] },
+  { name: 'Labangal Elementary School', lat: 6.10163, lng: 125.15779, tags: ['school','elementary','labangal'] },
+  { name: 'Montessori School of General Santos City', lat: 6.13605, lng: 125.16522, tags: ['montessori','school'] },
+  { name: 'Quantum Academy Inc.', lat: 6.13914, lng: 125.17980, tags: ['school','academy'] },
+  { name: 'GSC SPED Integrated School, Lagao', lat: 6.14550, lng: 125.18554, tags: ['school','sped'] },
+  { name: 'GSC SPED Integrated School, Quezon', lat: 6.11041, lng: 125.16766, tags: ['school','sped'] },
+  { name: 'Saavedra Saway Central Elementary School', lat: 6.10276, lng: 125.15781, tags: ['school','elementary'] },
+  { name: 'King Solomon Institute', lat: 6.11150, lng: 125.17050, tags: ['school','institute'] },
+  { name: 'Legaspi National High School', lat: 6.10800, lng: 125.16900, tags: ['school','high school','legaspi'] },
+  // ── Transport Terminals ──
+  { name: 'Bulaong Terminal', lat: 6.11335, lng: 125.16237, tags: ['bus','van','terminal','bulaong'] },
+  { name: 'Husky Terminal', lat: 6.11326, lng: 125.16428, tags: ['bus','transport','terminal','husky'] },
+  { name: 'Yellow Bus Terminal, Gensan', lat: 6.11950, lng: 125.17742, tags: ['bus','terminal','yellow'] },
+  { name: 'KCC Van Terminal', lat: 6.11609, lng: 125.18948, tags: ['van','terminal','kcc'] },
+  { name: 'Lagao Public Terminal', lat: 6.12740, lng: 125.19633, tags: ['van','bus','jeep','terminal','lagao'] },
+  { name: 'International Airport, GenSan', lat: 6.05762, lng: 125.10083, tags: ['airport','plane','fly','sasa'] },
+  { name: 'Port of General Santos', lat: 6.09277, lng: 125.15536, tags: ['port','boat','ferry','ship'] },
+  { name: 'Kanto Uhaw Station', lat: 6.06688, lng: 125.14346, tags: ['terminal','station','uhaw','jeep'] },
+  // ── Government ──
+  { name: 'City Hall of GenSan', lat: 6.11302, lng: 125.17173, tags: ['government','city hall','LGU'] },
+  { name: 'Senior Citizens Office, GenSan', lat: 6.11440, lng: 125.17221, tags: ['government','senior'] },
+  { name: 'General Santos City Public Library', lat: 6.11456, lng: 125.17184, tags: ['government','library'] },
+  { name: 'Fire Station, GenSan', lat: 6.11457, lng: 125.17067, tags: ['government','fire station','emergency','BFP'] },
+  { name: 'Police Station 1, GenSan', lat: 6.11396, lng: 125.17063, tags: ['government','emergency','police','PNP'] },
+  { name: 'Legislative Building, Gensan', lat: 6.11322, lng: 125.17298, tags: ['government'] },
+  { name: 'Philippine Statistics Authority, Gensan', lat: 6.11384, lng: 125.18006, tags: ['psa','government','nso'] },
+  { name: 'National Bureau of Investigation, Gensan', lat: 6.12568, lng: 125.19250, tags: ['nbi','government'] },
+  { name: 'Hall of Justice, Gensan', lat: 6.12657, lng: 125.19856, tags: ['government','court','justice'] },
+  { name: 'Bureau of Internal Revenue, Gensan', lat: 6.11380, lng: 125.17400, tags: ['bir','government','tax'] },
+  { name: 'Social Security System, Gensan', lat: 6.11700, lng: 125.18200, tags: ['sss','government'] },
+  { name: 'PhilHealth, Gensan', lat: 6.11650, lng: 125.17900, tags: ['philhealth','government','insurance'] },
+  { name: 'Pag-IBIG Fund, Gensan', lat: 6.11600, lng: 125.17800, tags: ['pagibig','hdmf','government'] },
+  { name: 'DFA GenSan', lat: 6.11500, lng: 125.18000, tags: ['dfa','passport','government'] },
+  { name: 'Land Transportation Office, Gensan', lat: 6.11100, lng: 125.17600, tags: ['lto','government','driver license'] },
+  { name: 'COMELEC Gensan', lat: 6.11350, lng: 125.17200, tags: ['comelec','government','election'] },
+  { name: 'Gensan City PESO', lat: 6.11300, lng: 125.17250, tags: ['peso','employment','government'] },
+  // ── Markets ──
+  { name: 'GenSan Public Market', lat: 6.10790, lng: 125.17848, tags: ['market','palengke','public market'] },
+  { name: 'Bagsakan Market', lat: 6.11017, lng: 125.18225, tags: ['market','bagsakan'] },
+  { name: 'SM Savemore Market, Yumang', lat: 6.13274, lng: 125.16061, tags: ['market','savemore','grocery','sm'] },
+  { name: 'SM Savemore Market, Nuñez', lat: 6.13831, lng: 125.17002, tags: ['market','savemore','grocery','sm'] },
+  { name: 'Lagao Public Market', lat: 6.12732, lng: 125.19660, tags: ['market','palengke','lagao'] },
+  { name: 'SM Savemore Market, Calumpang', lat: 6.07740, lng: 125.14651, tags: ['market','savemore','grocery','calumpang'] },
+  { name: 'Gaisano Supermarket, Digos-Makar', lat: 6.11765, lng: 125.18393, tags: ['market','supermarket','gaisano','grocery'] },
+  // ── Parks, Sports & Landmarks ──
+  { name: 'Carlos P. Garcia Freedom Park', lat: 6.11538, lng: 125.17177, tags: ['park','plaza','garcia'] },
+  { name: 'Plaza Heneral Santos', lat: 6.11214, lng: 125.17179, tags: ['park','plaza','heneral'] },
+  { name: 'Queen Tuna Park', lat: 6.10678, lng: 125.17574, tags: ['park','beach','tuna','waterfront'] },
+  { name: 'Pacman Mansion', lat: 6.13345, lng: 125.18503, tags: ['landmark','pacman','manny pacquiao'] },
+  { name: 'Pacman Mansion 2', lat: 6.12767, lng: 125.16759, tags: ['landmark','pacman','manny pacquiao'] },
+  { name: 'Japanese WWII Bunker', lat: 6.14836, lng: 125.15902, tags: ['landmark','historical','wwii','bunker'] },
+  { name: 'Lagao Gym', lat: 6.13178, lng: 125.18373, tags: ['gymnasium','gym','sports','lagao'] },
+  { name: 'Oval Plaza Gym', lat: 6.11468, lng: 125.17117, tags: ['basketball','gymnasium','sports'] },
+  { name: 'PacMan Wildcard Gym', lat: 6.11494, lng: 125.18192, tags: ['gym','fitness','boxing'] },
+  { name: 'Tuna Smashers Badminton', lat: 6.13337, lng: 125.17130, tags: ['badminton','sports'] },
+  { name: 'Matchpoint Sports Complex', lat: 6.13451, lng: 125.16324, tags: ['badminton','volleyball','sports'] },
+  { name: 'Amandare Cove', lat: 6.12274, lng: 125.15678, tags: ['pool','resort','swim'] },
+  { name: 'Brigada Golf Range', lat: 6.15434, lng: 125.14782, tags: ['golf','sports','range'] },
+  { name: 'GenSan Tunaville Baywalk', lat: 6.10400, lng: 125.17500, tags: ['baywalk','park','beach','waterfront'] },
+  { name: 'Venue 88', lat: 6.13397, lng: 125.16035, tags: ['pool','resort','venue','events'] },
+  { name: 'Emjake Aquawave Resort', lat: 6.14353, lng: 125.19596, tags: ['pool','resort','aquawave'] },
+  // ── Hotels ──
+  { name: 'Green Leaf Hotel', lat: 6.11470, lng: 125.18220, tags: ['hotel','pool','restaurant','venue'] },
+  { name: 'Grand Imperial Hotel', lat: 6.11970, lng: 125.18958, tags: ['hotel','pool','casino','venue'] },
+  { name: 'T Boli Hotel', lat: 6.11903, lng: 125.17770, tags: ['hotel','tboli'] },
+  { name: 'Tierra Montana Hotel', lat: 6.11894, lng: 125.17629, tags: ['hotel','tierra montana'] },
+  { name: 'Florotel', lat: 6.11601, lng: 125.17001, tags: ['hotel','florotel'] },
+  { name: 'Pearl Suites', lat: 6.12875, lng: 125.18166, tags: ['hotel','suites','pearl'] },
+  { name: 'Phela Grande Hotel', lat: 6.10943, lng: 125.17037, tags: ['hotel','phela'] },
+  { name: 'Sydney Hotel', lat: 6.11129, lng: 125.17133, tags: ['hotel','sydney'] },
+  { name: 'Hotel Dolores', lat: 6.10896, lng: 125.17936, tags: ['hotel','dolores'] },
+  { name: 'Sun City Suites', lat: 6.11906, lng: 125.18320, tags: ['hotel','suites','sun city'] },
+  { name: 'Microtel Inn & Suites', lat: 6.12005, lng: 125.17986, tags: ['hotel','inn','suites','microtel'] },
+  { name: 'Zanrock Hotel', lat: 6.12683, lng: 125.19278, tags: ['hotel','zanrock','lagao'] },
+  { name: 'Agents Lodging House', lat: 6.12581, lng: 125.19303, tags: ['hotel','lodging'] },
+  { name: 'Alonzo Pensionne', lat: 6.11829, lng: 125.19305, tags: ['hotel','pensionne','guesthouse'] },
+  { name: 'Have Pension Hauz', lat: 6.11474, lng: 125.17492, tags: ['hotel','guesthouse','pension'] },
+  { name: 'Casa Rafael Business Inn', lat: 6.11267, lng: 125.17709, tags: ['hotel','inn'] },
+  { name: 'Soler Hotel', lat: 6.11394, lng: 125.17923, tags: ['hotel','soler'] },
+  { name: 'Hotel Filipino', lat: 6.11430, lng: 125.17924, tags: ['hotel','filipino'] },
+  { name: 'Jovinaj Travellers Inn', lat: 6.11132, lng: 125.18577, tags: ['hotel','inn','travellers'] },
+  { name: 'Matutum Hotel & Restaurant', lat: 6.10709, lng: 125.17347, tags: ['hotel','restaurant','matutum'] },
+  { name: 'Roadhaus Hotel', lat: 6.12249, lng: 125.17192, tags: ['hotel','roadhaus'] },
+  // ── Restaurants & Cafes ──
+  { name: 'McDonalds, Digos-Makar Road', lat: 6.11912, lng: 125.17981, tags: ['mcdo','restaurant','fastfood','mcdonalds'] },
+  { name: 'McDonalds, Jose Catolico Sr. Ave', lat: 6.12625, lng: 125.19532, tags: ['mcdo','restaurant','fastfood','mcdonalds'] },
+  { name: 'Jollibee, Digos-Makar Road', lat: 6.11854, lng: 125.17887, tags: ['jollibee','restaurant','fastfood'] },
+  { name: 'Jollibee, Pendatun Avenue', lat: 6.11265, lng: 125.17032, tags: ['jollibee','restaurant','fastfood'] },
+  { name: 'Jollibee, Jose Catolico Sr. Ave', lat: 6.12703, lng: 125.19527, tags: ['jollibee','restaurant','fastfood'] },
+  { name: 'Jollibee, Hadano Avenue', lat: 6.11877, lng: 125.14512, tags: ['jollibee','restaurant','fastfood'] },
+  { name: 'Chowking, Digos-Makar Road', lat: 6.11909, lng: 125.17925, tags: ['chowking','restaurant','fastfood','chinese'] },
+  { name: 'Mang Inasal, Digos-Makar Road', lat: 6.11911, lng: 125.17880, tags: ['mang inasal','restaurant','chicken'] },
+  { name: 'Starbucks, GenSan Highway', lat: 6.11924, lng: 125.18453, tags: ['starbucks','coffee','cafe','restaurant'] },
+  { name: 'Burger King, Digos-Makar Road', lat: 6.11906, lng: 125.18049, tags: ['burger king','restaurant','fastfood','burger'] },
+  { name: 'PBA Restaurant, Digos-Makar Road', lat: 6.11907, lng: 125.17258, tags: ['pba','restaurant'] },
+  { name: 'Dunkin Donuts, Digos-Makar Road', lat: 6.11901, lng: 125.17276, tags: ['dunkin','donuts','cafe','coffee'] },
+  { name: 'Ponti Cafe, Digos-Makar Road', lat: 6.11910, lng: 125.18422, tags: ['ponti','cafe','restaurant'] },
+  { name: 'The Coffee Bar', lat: 6.11874, lng: 125.18451, tags: ['coffee','cafe','restaurant'] },
+  { name: 'J8th Hobby Shop & Cafe', lat: 6.11487, lng: 125.18099, tags: ['anime','figurines','cards','cafe','hobby'] },
+  { name: 'Shakeys Pizza, Gensan', lat: 6.11800, lng: 125.18100, tags: ['shakeys','pizza','restaurant'] },
+  { name: 'Pizza Hut, Gensan', lat: 6.11750, lng: 125.18300, tags: ['pizza hut','pizza','restaurant'] },
+  { name: 'KFC, Gensan', lat: 6.11600, lng: 125.18400, tags: ['kfc','chicken','fastfood','restaurant'] },
+  { name: 'Greenwich Pizza, Gensan', lat: 6.11650, lng: 125.18500, tags: ['greenwich','pizza','restaurant'] },
+  { name: 'Andoks Litson, Gensan', lat: 6.11550, lng: 125.18200, tags: ['andoks','chicken','litson','restaurant'] },
+  // ── Churches ──
+  { name: 'Cathedral Parish of Our Lady of Peace & Good Voyage', lat: 6.11280, lng: 125.17440, tags: ['church','cathedral','parish','catholic'] },
+  { name: 'San Jose Parish, Lagao', lat: 6.13500, lng: 125.18500, tags: ['church','parish','catholic','lagao'] },
+  { name: 'Bula Parish Church', lat: 6.10900, lng: 125.16100, tags: ['church','parish','bula','catholic'] },
+  { name: 'Kingdom Hall of Jehovah's Witnesses', lat: 6.11600, lng: 125.17300, tags: ['church','jehovah'] },
+  { name: 'Iglesia ni Cristo, Gensan', lat: 6.11700, lng: 125.16600, tags: ['church','inc','iglesia ni cristo'] },
+  // ── Barangays / Areas ──
+  { name: 'Barangay Lagao', lat: 6.13000, lng: 125.18000, tags: ['barangay','lagao','area'] },
+  { name: 'Barangay Calumpang', lat: 6.08000, lng: 125.14000, tags: ['barangay','calumpang','area'] },
+  { name: 'Barangay Labangal', lat: 6.10200, lng: 125.15500, tags: ['barangay','labangal','area'] },
+  { name: 'Barangay Apopong', lat: 6.11500, lng: 125.16000, tags: ['barangay','apopong','area'] },
+  { name: 'Barangay Dadiangas North', lat: 6.11800, lng: 125.16800, tags: ['barangay','dadiangas north'] },
+  { name: 'Barangay Dadiangas South', lat: 6.11000, lng: 125.17200, tags: ['barangay','dadiangas south'] },
+  { name: 'Barangay Dadiangas East', lat: 6.11600, lng: 125.17700, tags: ['barangay','dadiangas east'] },
+  { name: 'Barangay Dadiangas West', lat: 6.11000, lng: 125.16800, tags: ['barangay','dadiangas west'] },
+  { name: 'Barangay Tambler', lat: 6.08000, lng: 125.10000, tags: ['barangay','tambler'] },
+  { name: 'Barangay Conel', lat: 6.05500, lng: 125.09000, tags: ['barangay','conel'] },
+  { name: 'Barangay Buayan', lat: 6.05800, lng: 125.10200, tags: ['barangay','buayan'] },
+  { name: 'Barangay Katangawan', lat: 6.08600, lng: 125.16500, tags: ['barangay','katangawan'] },
+  { name: 'Barangay Sinawal', lat: 6.04000, lng: 125.14000, tags: ['barangay','sinawal'] },
+  { name: 'Barangay Fatima', lat: 6.07200, lng: 125.11500, tags: ['barangay','fatima'] },
+  { name: 'Barangay Bula', lat: 6.10700, lng: 125.16000, tags: ['barangay','bula'] },
+  { name: 'Barangay Mabuhay', lat: 6.15400, lng: 125.16400, tags: ['barangay','mabuhay'] },
+  // ── Subdivisions ──
+  { name: 'Bloomfields Subdivision, Dadiangas North', lat: 6.11843, lng: 125.15354, tags: ['subdivision','bloomfields','homes'] },
+  { name: 'Las Villas, City Heights', lat: 6.12984, lng: 125.16021, tags: ['subdivision','las villas'] },
+  { name: 'Agan Grandville', lat: 6.12734, lng: 125.17880, tags: ['subdivision','agan'] },
+  { name: 'Countryside Homes', lat: 6.12523, lng: 125.18140, tags: ['subdivision','countryside'] },
+  { name: 'Camella Homes', lat: 6.14260, lng: 125.17993, tags: ['subdivision','camella'] },
+  { name: 'Camella Cerritos', lat: 6.14429, lng: 125.18933, tags: ['subdivision','camella','cerritos'] },
+  { name: 'Bria Homes', lat: 6.15314, lng: 125.18770, tags: ['subdivision','bria'] },
+  { name: 'Lessandra Homes', lat: 6.14608, lng: 125.18869, tags: ['subdivision','lessandra'] },
+  { name: 'Colinas Verdes', lat: 6.11490, lng: 125.19135, tags: ['subdivision','colinas verdes'] },
+  { name: 'Gensanville 1', lat: 6.10648, lng: 125.20386, tags: ['subdivision','gensanville'] },
+  { name: 'Fishermens Village', lat: 6.10633, lng: 125.18511, tags: ['subdivision','fishermens'] },
+  { name: 'Malesido Homes 3B', lat: 6.13913, lng: 125.15406, tags: ['subdivision','malesido'] },
+  { name: 'Malesido Homes 3A', lat: 6.14149, lng: 125.15403, tags: ['subdivision','malesido'] },
+  { name: 'Malesido Homes 1', lat: 6.14672, lng: 125.16512, tags: ['subdivision','malesido'] },
+  { name: 'Malesido Homes 2', lat: 6.14552, lng: 125.16484, tags: ['subdivision','malesido'] },
+  { name: 'VSM Heights Phase 1', lat: 6.15677, lng: 125.16511, tags: ['subdivision','vsm'] },
+  { name: 'VSM Heights 2', lat: 6.15312, lng: 125.16318, tags: ['subdivision','vsm'] },
+  { name: 'VSM Premier Estates', lat: 6.16258, lng: 125.19258, tags: ['subdivision','vsm'] },
+  { name: 'Agan Homes 1', lat: 6.13961, lng: 125.16193, tags: ['subdivision','agan'] },
+  { name: 'Agan Homes 2', lat: 6.14080, lng: 125.16211, tags: ['subdivision','agan'] },
+  { name: 'Agan Homes 3', lat: 6.14245, lng: 125.16190, tags: ['subdivision','agan'] },
+  { name: 'Agan North', lat: 6.15259, lng: 125.17421, tags: ['subdivision','agan north'] },
+  { name: 'Crest Shelter Subdivision', lat: 6.15295, lng: 125.16131, tags: ['subdivision','crest'] },
+  { name: 'Habitat Phase A', lat: 6.16245, lng: 125.16142, tags: ['subdivision','habitat'] },
+  { name: 'Habitat Phase B', lat: 6.16100, lng: 125.16000, tags: ['subdivision','habitat'] },
+  { name: 'La Cassandra Subdivision', lat: 6.14048, lng: 125.12893, tags: ['subdivision','la cassandra'] },
+  { name: 'Queenies Love Village', lat: 6.12049, lng: 125.17247, tags: ['subdivision','queenies'] },
+  { name: 'Isabella Homes', lat: 6.14059, lng: 125.15214, tags: ['subdivision','isabella'] },
+  { name: 'VS Homes', lat: 6.14174, lng: 125.16679, tags: ['subdivision','vs homes'] },
 ];
 
-// ─── SEARCH HISTORY ────────────────────────────────────────────────────────────
+// ─── SEARCH HISTORYRY ────────────────────────────────────────────────────────────
 const MAX_HISTORY = 4;
 function getSearchHistory() {
   try { return JSON.parse(localStorage.getItem('geoGensan_searchHistory') || '[]'); }
@@ -374,11 +525,15 @@ function startLiveLocation() {
   const btn = document.getElementById('use-location');
   if (btn) btn.classList.add('live-active');
 
+  // Grab initial position to lock point A — fare calculation uses THIS fixed point
+  let _liveOriginLocked = false;
+
   state.liveLocationWatchId = navigator.geolocation.watchPosition(
     (pos) => {
       const { latitude: lat, longitude: lng } = pos.coords;
       const latlng = L.latLng(lat, lng);
 
+      // Update the live dot
       if (!state.liveMarker) {
         state.liveMarker = L.marker(latlng, { icon: createLiveMarkerIcon(), zIndexOffset: 1000 }).addTo(state.map);
         state.liveMarker.bindTooltip('You are here', { permanent: false, direction: 'top' });
@@ -386,21 +541,34 @@ function startLiveLocation() {
         state.liveMarker.setLatLng(latlng);
       }
 
-      // If trike mode and start marker not manually set, update it
-      if (state.currentMode === 'trike' && !state.trike._startManuallySet) {
-        if (!state.trike.startMarker) {
-          state.trike.startMarker = L.marker(latlng, { draggable: true, icon: createMarkerIcon('A', '#10b981') }).addTo(state.map);
-          state.trike.startMarker.on('dragend', () => { state.trike._startManuallySet = true; updateTrikeRoute(); });
+      if (state.currentMode === 'trike') {
+        if (!_liveOriginLocked) {
+          // First fix: lock point A here and never move it again
+          _liveOriginLocked = true;
+          state.trike._liveStartLatLng = latlng;
+
+          if (!state.trike.startMarker) {
+            state.trike.startMarker = L.marker(latlng, { draggable: false, icon: createMarkerIcon('A', '#10b981') }).addTo(state.map);
+          } else {
+            state.trike.startMarker.setLatLng(latlng);
+          }
+          state.trike._startManuallySet = true;
+          // Only trigger route calculation if B already exists
+          if (state.trike.endMarker) updateTrikeRoute();
+          state.map.setView(latlng, 15);
         } else {
-          state.trike.startMarker.setLatLng(latlng);
+          // Subsequent GPS updates: just move the live dot, do NOT recalculate fare or move marker A
+          // The live dot shows current position, but point A stays locked at start
         }
-        updateTrikeRoute();
       }
 
-      state.map.setView(latlng, state.map.getZoom() < 15 ? 15 : state.map.getZoom());
+      // Always keep map centered on live dot
+      if (!_liveOriginLocked || !state.trike.endMarker) {
+        state.map.setView(latlng, state.map.getZoom() < 15 ? 15 : state.map.getZoom());
+      }
     },
     (err) => { showToast('❌ Could not get live location'); console.error(err); },
-    { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 }
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
   );
 }
 
@@ -419,19 +587,28 @@ function stopLiveLocation() {
 function handleMapClick(e) {
   if (state.currentMode !== 'trike') return;
   const { startMarker, endMarker } = state.trike;
-  if (!startMarker) {
+  const liveActive = !!state.liveLocationWatchId;
+
+  if (!startMarker && !liveActive) {
+    // No live location: allow setting point A manually
     state.trike.startMarker = L.marker(e.latlng, { draggable: true, icon: createMarkerIcon('A', '#10b981') }).addTo(state.map);
     state.trike.startMarker.on('dragend', updateTrikeRoute);
     state.trike._startManuallySet = true;
     showToast('📍 Start point set');
   } else if (!endMarker) {
+    // Set point B (always allowed)
     state.trike.endMarker = L.marker(e.latlng, { draggable: true, icon: createMarkerIcon('B', '#ef4444') }).addTo(state.map);
     state.trike.endMarker.on('dragend', updateTrikeRoute);
     showToast('🎯 Calculating routes...');
-  } else {
+  } else if (!liveActive) {
+    // No live: update both points
     state.trike.startMarker.setLatLng(state.trike.endMarker.getLatLng());
     state.trike.endMarker.setLatLng(e.latlng);
     showToast('🔄 Route updated');
+  } else {
+    // Live active: only move point B
+    state.trike.endMarker.setLatLng(e.latlng);
+    showToast('🎯 Destination updated');
   }
   updateTrikeRoute();
 }
@@ -479,35 +656,51 @@ async function updateTrikeRoute() {
       return;
     }
 
-    state.trike.routes = data.routes;
+    // Always guarantee at least 3 routes — synthesize extras if OSRM only returns 1
+    let routes = data.routes;
+    const synthFetches = [
+      { dlat: 0.003, dlng: -0.003 },
+      { dlat: -0.003, dlng: 0.003 },
+      { dlat: (end.lat-start.lat)*0.3 + 0.005, dlng: (end.lng-start.lng)*0.3 - 0.005 }
+    ];
+    for (const { dlat, dlng } of synthFetches) {
+      if (routes.length >= 3) break;
+      try {
+        const midLat = (start.lat + end.lat) / 2 + dlat;
+        const midLng = (start.lng + end.lng) / 2 + dlng;
+        const altUrl = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${midLng},${midLat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
+        const altRes = await fetch(altUrl);
+        const altData = await altRes.json();
+        if (altData.routes && altData.routes[0]) routes = [...routes, altData.routes[0]];
+      } catch(e) {}
+    }
 
-    // Draw alt routes (broken dashed lines) first
-    data.routes.slice(1).forEach((route, idx) => {
+    state.trike.routes = routes;
+
+    // Draw alt routes — glowing blue dashed lines
+    routes.slice(1).forEach((route, idx) => {
       const coords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+      const glowLayer = L.polyline(coords, {
+        color: '#60a5fa', weight: 12, opacity: 0.2, dashArray: '12, 10', pane: 'altRoutePane'
+      }).addTo(state.map);
       const layer = L.polyline(coords, {
-        color: '#94a3b8',
-        weight: 4,
-        opacity: 0.6,
-        dashArray: '8, 8',
-        pane: 'altRoutePane'
+        color: '#3b82f6', weight: 4, opacity: 0.9, dashArray: '12, 10', pane: 'altRoutePane'
       }).addTo(state.map);
       layer.on('click', () => selectAlternativeRoute(idx + 1));
-      layer.bindTooltip(`Alternative Route ${idx + 2} (${(route.distance / 1000).toFixed(1)} km)`, { sticky: true });
-      state.trike.altRouteLayers.push(layer);
+      glowLayer.on('click', () => selectAlternativeRoute(idx + 1));
+      layer.bindTooltip(`Route ${idx + 2} — ${(route.distance / 1000).toFixed(1)} km (tap to select)`, { sticky: true });
+      state.trike.altRouteLayers.push(glowLayer, layer);
     });
 
-    // Draw primary (shortest) route
-    const primary = data.routes[0];
+    // Draw primary (shortest) route — solid bright blue
+    const primary = routes[0];
     const primaryCoords = primary.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
     state.trike.primaryRouteLayer = L.polyline(primaryCoords, {
-      color: '#2563eb',
-      weight: 6,
-      opacity: 0.9,
-      pane: 'busRoutePane'
+      color: '#2563eb', weight: 6, opacity: 1, pane: 'busRoutePane'
     }).addTo(state.map);
 
     // Fit bounds
-    const allCoords = data.routes.flatMap(r => r.geometry.coordinates.map(([lng, lat]) => [lat, lng]));
+    const allCoords = routes.flatMap(r => r.geometry.coordinates.map(([lng, lat]) => [lat, lng]));
     state.map.fitBounds(L.latLngBounds(allCoords), { padding: [50, 50] });
 
     const distanceKm = primary.distance / 1000;
@@ -527,8 +720,8 @@ async function updateTrikeRoute() {
     displayFare(fareData);
     expandPanelOnMobile();
 
-    if (data.routes.length > 1) {
-      showToast(`🛣️ ${data.routes.length} routes found — tap dashed line for alternatives`, 3500);
+    if (routes.length > 1) {
+      showToast(`🛣️ ${routes.length} routes found — tap dashed line for alternatives`, 3500);
     }
   } catch (err) {
     hideLoading();
@@ -552,12 +745,14 @@ function selectAlternativeRoute(index) {
   routes.forEach((route, i) => {
     const coords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
     if (i === index) {
-      state.trike.primaryRouteLayer = L.polyline(coords, { color: '#2563eb', weight: 6, opacity: 0.9, pane: 'busRoutePane' }).addTo(state.map);
+      state.trike.primaryRouteLayer = L.polyline(coords, { color: '#2563eb', weight: 6, opacity: 1, pane: 'busRoutePane' }).addTo(state.map);
     } else {
-      const layer = L.polyline(coords, { color: '#94a3b8', weight: 4, opacity: 0.6, dashArray: '8, 8', pane: 'altRoutePane' }).addTo(state.map);
+      const glowLayer = L.polyline(coords, { color: '#60a5fa', weight: 12, opacity: 0.2, dashArray: '12, 10', pane: 'altRoutePane' }).addTo(state.map);
+      const layer = L.polyline(coords, { color: '#3b82f6', weight: 4, opacity: 0.9, dashArray: '12, 10', pane: 'altRoutePane' }).addTo(state.map);
       layer.on('click', () => selectAlternativeRoute(i));
-      layer.bindTooltip(`Route ${i + 1} (${(route.distance / 1000).toFixed(1)} km)`, { sticky: true });
-      state.trike.altRouteLayers.push(layer);
+      glowLayer.on('click', () => selectAlternativeRoute(i));
+      layer.bindTooltip(`Route ${i + 1} — ${(route.distance / 1000).toFixed(1)} km (tap to select)`, { sticky: true });
+      state.trike.altRouteLayers.push(glowLayer, layer);
     }
   });
 
@@ -646,12 +841,22 @@ function clearTrikeMarkers() {
 }
 
 // ─── BUS/JEEP ROUTES ─────────────────────────────────────────────────────────
-function showRoute(routeKey) {
+async function showRoute(routeKey) {
   clearBusJeepRoute();
   const route = ROUTES[routeKey];
   if (!route) return;
   state.busjeep.selectedRoute = routeKey;
   const isWhite = route.color === '#ffffff';
+
+  // Load bus fare from Firebase config
+  try {
+    const config = await getFareConfig();
+    const busFare = config.bus ? config.bus.minimumFare : 30;
+    const busMinFareEl = document.getElementById('bus-min-fare-display');
+    if (busMinFareEl) busMinFareEl.textContent = `₱${busFare}`;
+    // Also update route card fare badges
+    document.querySelectorAll('.route-fare').forEach(el => { el.textContent = `₱${busFare}`; });
+  } catch(e) {}
 
   route.stops.forEach((coords, idx) => {
     const marker = L.circleMarker(coords, {
@@ -675,13 +880,17 @@ function showRoute(routeKey) {
     createMarker: () => null, addWaypoints: false, draggableWaypoints: false, fitSelectedRoutes: true, show: false
   }).addTo(state.map);
 
-  // ETA for bus
+  // ETA for bus — based on number of stops (avg 2.5 min per stop)
   state.busjeep.routeControl.on('routesfound', (e) => {
     const dist = e.routes[0].summary.totalDistance / 1000;
+    const stopCount = route.stops.length;
+    const etaMins = Math.round(stopCount * 2.5);
     const etaEl = document.getElementById('bus-eta-display');
-    if (etaEl) etaEl.textContent = estimateETA(dist, 'bus');
+    if (etaEl) etaEl.textContent = etaMins < 60 ? `~${etaMins} min` : `~${Math.floor(etaMins/60)}h ${etaMins%60}m`;
     const distEl = document.getElementById('bus-dist-display');
     if (distEl) distEl.textContent = `${dist.toFixed(1)} km`;
+    const stopsEl = document.getElementById('bus-stops-count-display');
+    if (stopsEl) stopsEl.textContent = `${stopCount} stops`;
   });
 
   const bounds = L.latLngBounds(waypoints);
@@ -765,7 +974,7 @@ function switchMode(mode) {
 function updatePassengerCount(type, delta) {
   if (type === 'regular') {
     const newVal = state.regularPassengers + delta;
-    if (newVal < 1 || newVal > 6) return;
+    if (newVal < 0 || newVal > 6) return;
     state.regularPassengers = newVal;
     document.getElementById('regular-count').textContent = newVal;
   } else {
