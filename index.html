@@ -50,8 +50,16 @@
     .eta-value {
       font-size: 14px;
       font-weight: 700;
-      color: var(--success);
+      color: #ffffff;
       font-family: var(--font-mono);
+      background: linear-gradient(135deg, #10b981, #2563eb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 6px rgba(16,185,129,0.6));
+    }
+    body.dark-mode .eta-value {
+      filter: drop-shadow(0 0 8px rgba(52,211,153,0.8));
     }
 
     /* ── Passenger controls ── */
@@ -406,8 +414,12 @@
             <div class="bus-stat-val" id="bus-eta-display">—</div>
           </div>
           <div class="bus-stat">
+            <div class="bus-stat-label">Total Stops</div>
+            <div class="bus-stat-val" id="bus-stops-count-display">—</div>
+          </div>
+          <div class="bus-stat">
             <div class="bus-stat-label">Min. Fare</div>
-            <div class="bus-stat-val">₱30</div>
+            <div class="bus-stat-val" id="bus-min-fare-display">₱30</div>
           </div>
         </div>
 
@@ -581,15 +593,6 @@
             </ul>
             <p class="matrix-legal"><strong>Legal Notice:</strong> Republic Act No. 10909 prohibits short charging. Drivers who refuse passengers due to short distance routes are subject to penalties under the law.</p>
           </div>
-        </div>
-
-        <!-- Admin Access -->
-        <div class="info-section">
-          <h3>Admin Access</h3>
-          <p style="margin-bottom:10px; font-size:13px; color: var(--gray-600);">City officials can manage fare logic and complaint reports.</p>
-          <a href="admin.html" style="display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:linear-gradient(135deg,#2563eb,#7c3aed);color:white;border-radius:10px;font-weight:700;font-size:13px;text-decoration:none;">
-            ⚙️ Open Admin Panel
-          </a>
         </div>
 
         <div class="disclaimer">
