@@ -357,6 +357,21 @@
     }
     .fare-history-item:last-child { border-bottom: none; }
     .fare-history-formula { font-family: var(--mono); font-weight: 700; color: var(--text); }
+
+    /* ── Firebase status banner ── */
+    .fb-status {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9999;
+      padding: 12px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      display: block;
+    }
+    .fb-status.ok { background: #052e16; color: #4ade80; border-bottom: 1px solid #166534; }
+    .fb-status.error { background: #450a0a; color: #fca5a5; border-bottom: 1px solid #991b1b; }
+    .fb-status code { background: rgba(255,255,255,0.1); padding: 1px 5px; border-radius: 3px; font-family: monospace; }
   </style>
 </head>
 <body>
@@ -570,6 +585,7 @@
 <!-- Print/PDF area -->
 <div id="print-area"></div>
 
+<div id="firebase-status" class="fb-status" style="display:none"></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -591,17 +607,45 @@ function showToast(msg, ms = 2600) {
 
 /* ── Firebase ─────────────────────────────────────────────────── */
 async function fbGetAll() {
-  // Fetch all reports (sorted client-side)
   const url = `${FIREBASE_DB_URL}/reports.json`;
-  const res  = await fetch(url);
-  if (!res.ok) throw new Error('read failed');
+  const res = await fetch(url);
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`HTTP ${res.status}: ${body.slice(0, 120)}`);
+  }
   const data = await res.json();
   if (!data) return [];
   return Object.entries(data).map(([k, v]) => ({ _key: k, ...v }));
 }
 async function fbDelete(key) {
   const res = await fetch(`${FIREBASE_DB_URL}/reports/${key}.json`, { method: 'DELETE' });
-  if (!res.ok) throw new Error('delete failed');
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`HTTP ${res.status}: ${body.slice(0, 80)}`);
+  }
+}
+
+// Test Firebase connectivity and rules — shows actionable error
+async function testFirebaseConnection() {
+  const statusEl = document.getElementById('firebase-status');
+  if (!statusEl) return;
+  try {
+    const res = await fetch(`${FIREBASE_DB_URL}/reports.json`);
+    if (res.status === 401 || res.status === 403) {
+      statusEl.innerHTML = '🔴 <strong>Firebase rules blocking reads.</strong> Go to Firebase Console → Realtime Database → Rules and set <code>".read": true</code> under <code>reports</code>.';
+      statusEl.className = 'fb-status error';
+    } else if (!res.ok) {
+      statusEl.innerHTML = `🔴 Firebase error: HTTP ${res.status}`;
+      statusEl.className = 'fb-status error';
+    } else {
+      statusEl.innerHTML = '🟢 Firebase connected';
+      statusEl.className = 'fb-status ok';
+      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    }
+  } catch (e) {
+    statusEl.innerHTML = `🔴 Network error: ${e.message}`;
+    statusEl.className = 'fb-status error';
+  }
 }
 
 /* ── Type maps ────────────────────────────────────────────────── */
@@ -1268,13 +1312,28 @@ async function loadReports() {
     updateStats();
     applyAndRender();
   } catch (err) {
-    console.error(err);
+    console.error('loadReports error:', err);
+    const msg = err && err.message ? err.message : String(err);
+    let hint = 'Failed to load reports.';
+    if (msg.includes('401') || msg.includes('403') || msg.includes('Permission denied')) {
+      hint = '⚠️ Firebase rules are blocking reads. In Firebase Console → Realtime Database → Rules, set <code>".read": true</code> under <code>reports</code>.';
+    } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+      hint = '⚠️ No internet connection.';
+    } else {
+      hint = `⚠️ ${msg}`;
+    }
     if (isFirstLoad)
       document.getElementById('reports-tbody').innerHTML =
-        `<tr><td colspan="8"><div class="empty-state"><div class="ei">Error</div><p>Failed to load. Check your connection.</p></div></td></tr>`;
+        `<tr><td colspan="8"><div class="empty-state"><div class="ei">Error</div><p>${hint}</p></div></td></tr>`;
   }
 }
-function startPolling() { loadReports(); pollInterval = setInterval(loadReports, 10000); }
+function startPolling() {
+  const statusEl = document.getElementById('firebase-status');
+  if (statusEl) statusEl.style.display = 'block';
+  testFirebaseConnection();
+  loadReports();
+  pollInterval = setInterval(loadReports, 10000);
+}
 function stopPolling()  { clearInterval(pollInterval); pollInterval = null; }
 
 /* ================================================================
@@ -1307,7 +1366,10 @@ async function saveFareConfig(config) {
   const res = await fetch(`${FIREBASE_DB_URL}/fareConfig.json`, {
     method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config)
   });
-  if (!res.ok) throw new Error('Save failed');
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(`HTTP ${res.status}: ${body.slice(0,100)}`);
+  }
   // Save to history
   const histEntry = {
     timestamp: Date.now(),
@@ -1394,8 +1456,9 @@ async function initFareEditor() {
       const history = await loadFareHistory();
       renderFareHistory(history);
     } catch(err) {
-      showToast('Failed to save fare config');
-      console.error(err);
+      const msg = err && err.message ? err.message : String(err);
+      showToast(`❌ Save failed: ${msg.slice(0,60)}`, 5000);
+      console.error('saveFareConfig error:', err);
     } finally {
       btn.disabled = false; btn.textContent = '💾 Save Fare Config';
     }
