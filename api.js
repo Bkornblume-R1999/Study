@@ -11,7 +11,7 @@ const DEFAULT_FARE_CONFIG = {
     discountRate: 0.20,
   },
   bus: {
-    minimumFare: 30
+    minimumFare: 15
   }
 };
 
