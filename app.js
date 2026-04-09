@@ -231,7 +231,6 @@ const GENSAN_PLACES = [
   { name: 'Barangay Conel', lat: 6.05500, lng: 125.09000, tags: ['barangay','conel'] },
   { name: 'Barangay Buayan', lat: 6.05800, lng: 125.10200, tags: ['barangay','buayan'] },
   { name: 'Barangay Katangawan', lat: 6.08600, lng: 125.16500, tags: ['barangay','katangawan'] },
-  { name: 'Barangay Sinawal', lat: 6.04000, lng: 125.14000, tags: ['barangay','sinawal'] },
   { name: 'Barangay Fatima', lat: 6.07200, lng: 125.11500, tags: ['barangay','fatima'] },
   { name: 'Barangay Bula', lat: 6.10700, lng: 125.16000, tags: ['barangay','bula'] },
   { name: 'Barangay Mabuhay', lat: 6.15400, lng: 125.16400, tags: ['barangay','mabuhay'] },
@@ -265,6 +264,47 @@ const GENSAN_PLACES = [
   { name: 'Queenies Love Village', lat: 6.12049, lng: 125.17247, tags: ['subdivision','queenies'] },
   { name: 'Isabella Homes', lat: 6.14059, lng: 125.15214, tags: ['subdivision','isabella'] },
   { name: 'VS Homes', lat: 6.14174, lng: 125.16679, tags: ['subdivision','vs homes'] },
+  // ── Apopong Area ──
+  { name: 'Apopong Public Market', lat: 6.11300, lng: 125.16000, tags: ['market','apopong','palengke'] },
+  { name: 'Apopong Barangay Hall', lat: 6.11400, lng: 125.16100, tags: ['government','barangay hall','apopong'] },
+  { name: 'Apopong Elementary School', lat: 6.11350, lng: 125.15900, tags: ['school','elementary','apopong'] },
+  { name: 'Apopong Health Center', lat: 6.11420, lng: 125.16050, tags: ['health','clinic','apopong'] },
+  { name: 'Apopong Junction', lat: 6.11500, lng: 125.15800, tags: ['junction','intersection','apopong'] },
+  { name: 'Ecoland Subdivision, Apopong', lat: 6.11600, lng: 125.15700, tags: ['subdivision','ecoland','apopong'] },
+  { name: 'Padre Rada Street, Apopong', lat: 6.11250, lng: 125.16200, tags: ['street','road','apopong'] },
+  { name: 'Bulaong Road, Apopong', lat: 6.11380, lng: 125.16300, tags: ['road','bulaong','apopong'] },
+  { name: 'Purok 1 Apopong', lat: 6.11200, lng: 125.15700, tags: ['purok','apopong','residential'] },
+  { name: 'Purok Mabuhay Satellite Market', lat: 6.11500, lng: 125.16400, tags: ['market','apopong','mabuhay','satellite'] },
+  { name: 'Apopong Chapel', lat: 6.11310, lng: 125.16000, tags: ['church','chapel','apopong'] },
+  { name: 'Hadano Avenue', lat: 6.11877, lng: 125.14512, tags: ['road','avenue','hadano'] },
+  { name: 'City Heights Apopong', lat: 6.12900, lng: 125.16000, tags: ['subdivision','city heights','apopong'] },
+  // ── Bula Area ──
+  { name: 'Bula Barangay Hall', lat: 6.10800, lng: 125.16100, tags: ['government','barangay hall','bula'] },
+  { name: 'Bula Elementary School', lat: 6.10750, lng: 125.16050, tags: ['school','elementary','bula'] },
+  { name: 'Bula Health Center', lat: 6.10820, lng: 125.16150, tags: ['health','clinic','bula'] },
+  { name: 'Bula Public Market', lat: 6.10850, lng: 125.16200, tags: ['market','bula','palengke'] },
+  { name: 'Bula Junction', lat: 6.10900, lng: 125.16000, tags: ['junction','bula','intersection'] },
+  { name: 'Makar Wharf Road', lat: 6.09800, lng: 125.15600, tags: ['road','wharf','makar'] },
+  { name: 'Purok Sampaloc, Bula', lat: 6.10650, lng: 125.16200, tags: ['purok','bula','residential'] },
+  { name: 'Bula National High School', lat: 6.10900, lng: 125.16100, tags: ['school','high school','bula'] },
+  { name: 'St. Benedict Parish School, Bula', lat: 6.10800, lng: 125.16050, tags: ['school','parish','bula','catholic'] },
+  { name: 'Bula Chapel', lat: 6.10860, lng: 125.16080, tags: ['church','chapel','bula'] },
+  { name: 'Labangal Fishport', lat: 6.09800, lng: 125.15700, tags: ['port','fish','labangal'] },
+  { name: 'Maharlika Highway, Bula', lat: 6.10700, lng: 125.16400, tags: ['road','highway','bula','maharlika'] },
+  { name: 'Purok Santiago, Bula', lat: 6.10720, lng: 125.16300, tags: ['purok','bula','residential'] },
+  // ── Additional GenSan Streets & Landmarks ──
+  { name: 'Magsaysay Avenue', lat: 6.10800, lng: 125.17800, tags: ['road','avenue','magsaysay'] },
+  { name: 'Santiago Boulevard', lat: 6.11780, lng: 125.17973, tags: ['road','boulevard','santiago'] },
+  { name: 'Malakas Street', lat: 6.13820, lng: 125.16848, tags: ['road','street','malakas'] },
+  { name: 'Osmeña Street', lat: 6.11450, lng: 125.17300, tags: ['road','street','osmena'] },
+  { name: 'Roxas Avenue', lat: 6.11300, lng: 125.17100, tags: ['road','avenue','roxas'] },
+  { name: 'Bulaong Extension', lat: 6.11200, lng: 125.16100, tags: ['road','bulaong','extension'] },
+  { name: 'Cagampang Street', lat: 6.10850, lng: 125.17970, tags: ['road','street','cagampang'] },
+  { name: 'NCCC Mall GenSan', lat: 6.11650, lng: 125.18200, tags: ['mall','nccc','shopping'] },
+  { name: 'GenSan Night Market', lat: 6.10800, lng: 125.17800, tags: ['market','night market','street food'] },
+  { name: 'Crossing Lagao', lat: 6.13200, lng: 125.18200, tags: ['crossing','lagao','intersection'] },
+  { name: 'Motorpool Area', lat: 6.11100, lng: 125.16800, tags: ['area','motorpool'] },
+  { name: 'SM City GenSan Annex', lat: 6.11700, lng: 125.18000, tags: ['mall','sm','annex'] },
 ];
 
 // ─── SEARCH HISTORYRY ────────────────────────────────────────────────────────────
@@ -351,9 +391,9 @@ function removeAutocomplete(inputEl) {
 }
 
 // ─── GEOCODING ────────────────────────────────────────────────────────────────
-const REGION12_VIEWBOX = '124.55,5.85,125.45,6.55';
+const REGION12_VIEWBOX = '125.05,5.95,125.25,6.20';
 function isWithinRegion12(lat, lng) {
-  return lat >= 5.85 && lat <= 6.55 && lng >= 124.55 && lng <= 125.45;
+  return lat >= 5.95 && lat <= 6.20 && lng >= 125.05 && lng <= 125.25;
 }
 
 async function reverseGeocode(latlng) {
@@ -377,7 +417,7 @@ async function reverseGeocode(latlng) {
 
 async function geocodeWithNominatim(query) {
   try {
-    const url1 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', South Cotabato, Philippines')}&viewbox=${REGION12_VIEWBOX}&bounded=1&limit=5&addressdetails=1`;
+    const url1 = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', General Santos City, Philippines')}&viewbox=${REGION12_VIEWBOX}&bounded=1&limit=5&addressdetails=1`;
     const r1 = await fetch(url1, { headers: { 'Accept-Language': 'en' } });
     const d1 = await r1.json();
     const v1 = d1.filter(r => isWithinRegion12(parseFloat(r.lat), parseFloat(r.lon)));
@@ -517,6 +557,18 @@ function initMap() {
 }
 
 // ─── LIVE LOCATION ────────────────────────────────────────────────────────────
+// Helper: get distance from latlng to nearest point on a polyline
+function distanceToRoute(latlng, coords) {
+  let minDist = Infinity;
+  for (let i = 0; i < coords.length - 1; i++) {
+    const a = L.latLng(coords[i]);
+    const b = L.latLng(coords[i + 1]);
+    const d = latlng.distanceTo(a);
+    if (d < minDist) minDist = d;
+  }
+  return minDist;
+}
+
 function startLiveLocation() {
   if (!navigator.geolocation) { showToast('❌ Geolocation not supported'); return; }
   if (state.liveLocationWatchId) { stopLiveLocation(); return; }
@@ -527,6 +579,9 @@ function startLiveLocation() {
 
   // Grab initial position to lock point A — fare calculation uses THIS fixed point
   let _liveOriginLocked = false;
+  // Fare is locked at the initial route taken — do NOT recalculate fare on auto-switch
+  let _lockedFareData = null;
+  let _lastAutoSwitchTime = 0;
 
   state.liveLocationWatchId = navigator.geolocation.watchPosition(
     (pos) => {
@@ -554,15 +609,34 @@ function startLiveLocation() {
           }
           state.trike._startManuallySet = true;
           // Only trigger route calculation if B already exists
-          if (state.trike.endMarker) updateTrikeRoute();
+          if (state.trike.endMarker) updateTrikeRoute().then(fd => { _lockedFareData = fd; });
           state.map.setView(latlng, 15);
-        } else {
-          // Subsequent GPS updates: just move the live dot, do NOT recalculate fare or move marker A
-          // The live dot shows current position, but point A stays locked at start
+        } else if (state.trike.routes.length > 1) {
+          // Auto-switch to whichever route the user is physically closer to
+          // Throttle: only check every 8 seconds
+          const now = Date.now();
+          if (now - _lastAutoSwitchTime < 8000) return;
+          _lastAutoSwitchTime = now;
+
+          const currentIdx = state.trike.activeRouteIndex;
+          let closestIdx = currentIdx;
+          let closestDist = Infinity;
+
+          state.trike.routes.forEach((route, i) => {
+            const coords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+            const d = distanceToRoute(latlng, coords);
+            if (d < closestDist) { closestDist = d; closestIdx = i; }
+          });
+
+          if (closestIdx !== currentIdx && closestDist < 150) {
+            // User is on the alternative route — switch display but KEEP original fare
+            selectAlternativeRouteNoFareChange(closestIdx, _lockedFareData);
+            showToast(`🔄 Auto-switched to Route ${closestIdx + 1} (fare unchanged)`, 3000);
+          }
         }
       }
 
-      // Always keep map centered on live dot
+      // Keep map centered on live dot only before destination is set
       if (!_liveOriginLocked || !state.trike.endMarker) {
         state.map.setView(latlng, state.map.getZoom() < 15 ? 15 : state.map.getZoom());
       }
@@ -570,6 +644,41 @@ function startLiveLocation() {
     (err) => { showToast('❌ Could not get live location'); console.error(err); },
     { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
   );
+}
+
+// Switch routes visually without changing the fare
+function selectAlternativeRouteNoFareChange(index, lockedFareData) {
+  if (!state.trike.routes[index]) return;
+  state.trike.activeRouteIndex = index;
+
+  if (state.trike.primaryRouteLayer) { state.trike.primaryRouteLayer.remove(); }
+  state.trike.altRouteLayers.forEach(l => l.remove());
+  state.trike.altRouteLayers = [];
+
+  const routes = state.trike.routes;
+  routes.forEach((route, i) => {
+    const coords = route.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
+    if (i === index) {
+      state.trike.primaryRouteLayer = L.polyline(coords, { color: '#2563eb', weight: 6, opacity: 1, pane: 'busRoutePane' }).addTo(state.map);
+    } else {
+      const glowLayer = L.polyline(coords, { color: '#60a5fa', weight: 12, opacity: 0.2, dashArray: '12, 10', pane: 'altRoutePane' }).addTo(state.map);
+      const layer = L.polyline(coords, { color: '#3b82f6', weight: 4, opacity: 0.9, dashArray: '12, 10', pane: 'altRoutePane' }).addTo(state.map);
+      layer.on('click', () => selectAlternativeRoute(i));
+      glowLayer.on('click', () => selectAlternativeRoute(i));
+      layer.bindTooltip(`Alternative Route — ${(route.distance / 1000).toFixed(1)} km (tap to select)`, { sticky: true });
+      state.trike.altRouteLayers.push(glowLayer, layer);
+    }
+  });
+
+  // Update displayed distance for the active route but keep fare locked
+  const selected = routes[index];
+  const distanceKm = selected.distance / 1000;
+  document.getElementById('distance-display').textContent = `${distanceKm.toFixed(2)} km`;
+  const etaEl = document.getElementById('eta-display');
+  if (etaEl) etaEl.textContent = estimateETA(distanceKm, 'trike');
+
+  // Restore locked fare if available
+  if (lockedFareData) displayFare(lockedFareData);
 }
 
 function stopLiveLocation() {
@@ -646,7 +755,7 @@ async function updateTrikeRoute() {
 
   try {
     // Fetch up to 3 alternative routes from OSRM
-    const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?alternatives=3&overview=full&geometries=geojson`;
+    const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?alternatives=2&overview=full&geometries=geojson`;
     const res = await fetch(url);
     const data = await res.json();
     hideLoading();
@@ -656,16 +765,12 @@ async function updateTrikeRoute() {
       return;
     }
 
-    // Always guarantee at least 3 routes — synthesize extras if OSRM only returns 1
-    let routes = data.routes;
-    const synthFetches = [
-      { dlat: 0.003, dlng: -0.003 },
-      { dlat: -0.003, dlng: 0.003 },
-      { dlat: (end.lat-start.lat)*0.3 + 0.005, dlng: (end.lng-start.lng)*0.3 - 0.005 }
-    ];
-    for (const { dlat, dlng } of synthFetches) {
-      if (routes.length >= 3) break;
+    // Use up to 2 routes: 1 primary + 1 alternative max
+    let routes = data.routes.slice(0, 2);
+    // If OSRM only returned 1, try to get an alternative via a mild waypoint offset
+    if (routes.length < 2) {
       try {
+        const dlat = 0.003, dlng = -0.003;
         const midLat = (start.lat + end.lat) / 2 + dlat;
         const midLng = (start.lng + end.lng) / 2 + dlng;
         const altUrl = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${midLng},${midLat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
@@ -719,9 +824,11 @@ async function updateTrikeRoute() {
     });
     displayFare(fareData);
     expandPanelOnMobile();
+    // Return fareData so live location can lock it
+    state.trike._lastFareData = fareData;
 
     if (routes.length > 1) {
-      showToast(`🛣️ ${routes.length} routes found — tap dashed line for alternatives`, 3500);
+      showToast(`🛣️ ${routes.length} routes found — tap dashed line for the alternative`, 3500);
     }
   } catch (err) {
     hideLoading();
@@ -904,12 +1011,20 @@ function showRouteDetail(route) {
   const nameEl = document.getElementById('route-detail-name');
   const stopsEl = document.getElementById('stops-list');
   nameEl.textContent = route.name;
-  stopsEl.innerHTML = route.labels.map((label, idx) => `
+  // Bus fare per stop: ₱15 base, +₱1 for each stop beyond the 4th (approx based on distance)
+  const baseFare = 15;
+  stopsEl.innerHTML = route.labels.map((label, idx) => {
+    // Estimate fare by stop position (cumulative distance approximation)
+    const stopFare = baseFare; // minimum fare applies to all stops - same flat rate
+    return `
     <div class="stop-item clickable-stop" data-idx="${idx}" style="cursor:pointer;">
       <div class="stop-number">${idx + 1}</div>
-      <div>${label}</div>
+      <div class="stop-info">
+        <span class="stop-label">${label}</span>
+        <span class="stop-fare-badge">₱${stopFare}</span>
+      </div>
     </div>
-  `).join('');
+  `}).join('');
   stopsEl.querySelectorAll('.clickable-stop').forEach(item => {
     item.addEventListener('click', () => {
       const idx = parseInt(item.dataset.idx);
