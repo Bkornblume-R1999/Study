@@ -503,7 +503,11 @@ async function uploadToImgBB(base64DataUrl) {
 
 async function fbPush(path, value) {
   const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value) });
-  if (!res.ok) throw new Error('Firebase write failed');
+  if (!res.ok) {
+    const body = await res.text().catch(() => '(no body)');
+    console.error(`Firebase write failed — HTTP ${res.status}:`, body);
+    throw new Error(`Firebase ${res.status}: ${body}`);
+  }
   return res.json();
 }
 
@@ -1247,7 +1251,18 @@ function initComplaintModal() {
       modal.style.display = 'none';
       showToast('✅ Report submitted!', 3000);
     } catch (err) {
-      console.error(err); showToast('❌ Submission failed');
+      console.error('Report submission error:', err);
+      // Show specific error — helps diagnose Firebase rules vs network vs ImgBB
+      const msg = err && err.message ? err.message : String(err);
+      if (msg.includes('403') || msg.includes('Permission denied') || msg.includes('Unauthorized')) {
+        showToast('❌ Firebase permission denied — check database rules', 5000);
+      } else if (msg.includes('ImgBB')) {
+        showToast('❌ Photo upload failed — try without a photo', 4000);
+      } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+        showToast('❌ No internet connection', 4000);
+      } else {
+        showToast(`❌ Submission failed: ${msg.slice(0, 60)}`, 5000);
+      }
     } finally {
       submitBtn.disabled = false; submitBtn.textContent = 'Submit Report';
     }
