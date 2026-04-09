@@ -826,7 +826,7 @@ async function updateTrikeRoute() {
     });
 
     // Draw primary (shortest) route — solid bright blue
-    const primary = routes[0];
+    // (primary is already declared above as data.routes[0])
     const primaryCoords = primary.geometry.coordinates.map(([lng, lat]) => [lat, lng]);
     state.trike.primaryRouteLayer = L.polyline(primaryCoords, {
       color: '#2563eb', weight: 6, opacity: 1, pane: 'busRoutePane'
