@@ -416,7 +416,7 @@
             </div>
             <div class="fare-field">
               <label>Bus Min. Fare (₱)</label>
-              <input type="number" id="fe-bus-fare" value="30" min="1" max="999" step="1">
+              <input type="number" id="fe-bus-fare" value="15" min="1" max="999" step="1">
               <div class="fare-field-hint">Minimum bus/jeep fare</div>
             </div>
           </div>
@@ -1290,7 +1290,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') lightbox.cla
 /* ================================================================
    FARE LOGIC EDITOR
 ================================================================ */
-const DEFAULT_FARE = { trike: { baseFare: 15, baseKm: 4, perKmRate: 1, discountRate: 0.20 }, bus: { minimumFare: 30 } };
+const DEFAULT_FARE = { trike: { baseFare: 15, baseKm: 4, perKmRate: 1, discountRate: 0.20 }, bus: { minimumFare: 15 } };
 
 async function loadFareConfig() {
   try {
@@ -1333,7 +1333,7 @@ function updateFarePreview() {
   const baseKm   = parseFloat(document.getElementById('fe-base-km').value) || 4;
   const perKm    = parseFloat(document.getElementById('fe-per-km').value) || 1;
   const disc     = parseFloat(document.getElementById('fe-discount').value) || 20;
-  const busFare  = parseFloat(document.getElementById('fe-bus-fare').value) || 30;
+  const busFare  = parseFloat(document.getElementById('fe-bus-fare').value) || 15;
   document.getElementById('fare-preview-formula').textContent =
     `₱${baseFare} for first ${baseKm}km, then ₱${perKm}/km per additional km. Special passengers (PWD/Senior/Student) get ${disc}% off. Bus/Jeep minimum ₱${busFare}.`;
 }
@@ -1385,7 +1385,7 @@ async function initFareEditor() {
           perKmRate:    parseFloat(document.getElementById('fe-per-km').value) || 1,
           discountRate: (parseFloat(document.getElementById('fe-discount').value) || 20) / 100,
         },
-        bus: { minimumFare: parseFloat(document.getElementById('fe-bus-fare').value) || 30 }
+        bus: { minimumFare: parseFloat(document.getElementById('fe-bus-fare').value) || 15 }
       };
       await saveFareConfig(config);
       status.textContent = '✅ Saved!'; status.classList.add('visible');
