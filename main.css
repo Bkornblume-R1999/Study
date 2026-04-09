@@ -889,13 +889,14 @@ body.dark-mode .toggle-icon {
 .summary-label {
   font-size: 13px;
   font-weight: 500;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .summary-value {
   font-family: var(--font-mono);
   font-size: 15px;
   font-weight: 700;
+  color: #ffffff;
 }
 
 .summary-divider {
@@ -919,7 +920,7 @@ body.dark-mode .toggle-icon {
 .fare-label {
   font-size: 13px;
   font-weight: 500;
-  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .fare-amount {
@@ -954,7 +955,7 @@ body.dark-mode .toggle-icon {
 
 .fare-formula {
   font-size: 12px;
-  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.75);
   text-align: right;
   font-family: var(--font-mono);
   margin-top: var(--space-2);
