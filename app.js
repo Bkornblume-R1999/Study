@@ -573,7 +573,7 @@ function startLiveLocation() {
   if (!navigator.geolocation) { showToast('❌ Geolocation not supported'); return; }
   if (state.liveLocationWatchId) { stopLiveLocation(); return; }
 
-  showToast('📡 Live location active');
+  showToast('📡 Getting your location...');
   const btn = document.getElementById('use-location');
   if (btn) btn.classList.add('live-active');
 
@@ -582,6 +582,33 @@ function startLiveLocation() {
   // Fare is locked at the initial route taken — do NOT recalculate fare on auto-switch
   let _lockedFareData = null;
   let _lastAutoSwitchTime = 0;
+
+  // Get a fast first fix immediately to set point A without waiting for watchPosition
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      if (_liveOriginLocked) return; // watchPosition already fired first
+      const latlng = L.latLng(pos.coords.latitude, pos.coords.longitude);
+      _liveOriginLocked = true;
+      state.trike._liveStartLatLng = latlng;
+      if (!state.liveMarker) {
+        state.liveMarker = L.marker(latlng, { icon: createLiveMarkerIcon(), zIndexOffset: 1000 }).addTo(state.map);
+        state.liveMarker.bindTooltip('You are here', { permanent: false, direction: 'top' });
+      } else {
+        state.liveMarker.setLatLng(latlng);
+      }
+      if (!state.trike.startMarker) {
+        state.trike.startMarker = L.marker(latlng, { draggable: false, icon: createMarkerIcon('A', '#10b981') }).addTo(state.map);
+      } else {
+        state.trike.startMarker.setLatLng(latlng);
+      }
+      state.trike._startManuallySet = true;
+      state.map.setView(latlng, 15);
+      showToast('📍 Live location set as start point');
+      if (state.trike.endMarker) updateTrikeRoute().then(fd => { _lockedFareData = fd; });
+    },
+    () => {}, // silent fail — watchPosition will handle it
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+  );
 
   state.liveLocationWatchId = navigator.geolocation.watchPosition(
     (pos) => {
@@ -598,7 +625,7 @@ function startLiveLocation() {
 
       if (state.currentMode === 'trike') {
         if (!_liveOriginLocked) {
-          // First fix: lock point A here and never move it again
+          // First watchPosition fix: lock point A (only if getCurrentPosition didn't already do it)
           _liveOriginLocked = true;
           state.trike._liveStartLatLng = latlng;
 
@@ -608,6 +635,7 @@ function startLiveLocation() {
             state.trike.startMarker.setLatLng(latlng);
           }
           state.trike._startManuallySet = true;
+          showToast('📍 Live location set as start point');
           // Only trigger route calculation if B already exists
           if (state.trike.endMarker) updateTrikeRoute().then(fd => { _lockedFareData = fd; });
           state.map.setView(latlng, 15);
@@ -754,8 +782,9 @@ async function updateTrikeRoute() {
   const end = endMarker.getLatLng();
 
   try {
-    // Fetch up to 3 alternative routes from OSRM
-    const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?alternatives=2&overview=full&geometries=geojson`;
+    // Fetch alternative routes from OSRM — request up to 3, keep best 2 (primary + 1 alt)
+    // Use alternatives=true for OSRM to return genuine road-network alternatives
+    const url = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${end.lng},${end.lat}?alternatives=true&steps=false&overview=full&geometries=geojson&continue_straight=false`;
     const res = await fetch(url);
     const data = await res.json();
     hideLoading();
@@ -765,19 +794,18 @@ async function updateTrikeRoute() {
       return;
     }
 
-    // Use up to 2 routes: 1 primary + 1 alternative max
-    let routes = data.routes.slice(0, 2);
-    // If OSRM only returned 1, try to get an alternative via a mild waypoint offset
-    if (routes.length < 2) {
-      try {
-        const dlat = 0.003, dlng = -0.003;
-        const midLat = (start.lat + end.lat) / 2 + dlat;
-        const midLng = (start.lng + end.lng) / 2 + dlng;
-        const altUrl = `https://router.project-osrm.org/route/v1/driving/${start.lng},${start.lat};${midLng},${midLat};${end.lng},${end.lat}?overview=full&geometries=geojson`;
-        const altRes = await fetch(altUrl);
-        const altData = await altRes.json();
-        if (altData.routes && altData.routes[0]) routes = [...routes, altData.routes[0]];
-      } catch(e) {}
+    // Keep only genuine OSRM alternatives (real road-network divergences, not synthesized)
+    // Filter: alternative must differ by at least 5% in distance to be meaningful
+    // and must not be longer than 2x the primary route (avoid wildly inefficient paths)
+    const primary = data.routes[0];
+    let routes = [primary];
+    for (let i = 1; i < data.routes.length && routes.length < 2; i++) {
+      const alt = data.routes[i];
+      const ratio = alt.distance / primary.distance;
+      // Accept if: different enough path AND not more than 60% longer than primary
+      if (ratio <= 1.6) {
+        routes.push(alt);
+      }
     }
 
     state.trike.routes = routes;
@@ -828,7 +856,9 @@ async function updateTrikeRoute() {
     state.trike._lastFareData = fareData;
 
     if (routes.length > 1) {
-      showToast(`🛣️ ${routes.length} routes found — tap dashed line for the alternative`, 3500);
+      if (routes.length > 1) {
+      showToast(`🛣️ 2 routes found — tap dashed line for the alternative`, 3500);
+    }
     }
   } catch (err) {
     hideLoading();
@@ -1303,7 +1333,11 @@ function initEventListeners() {
   document.querySelectorAll('.discount-btn').forEach(btn => btn.addEventListener('click', () => selectDiscount(btn.dataset.discount)));
   const dmToggle = document.getElementById('dark-mode-toggle');
   if (dmToggle) dmToggle.addEventListener('click', toggleDarkMode);
-  document.getElementById('reset-trike').addEventListener('click', () => { clearTrikeMarkers(); showToast('🔄 Reset'); });
+  document.getElementById('reset-trike').addEventListener('click', () => {
+    if (state.liveLocationWatchId) stopLiveLocation();
+    clearTrikeMarkers();
+    showToast('🔄 Reset');
+  });
 
   // Live location toggle
   document.getElementById('use-location').addEventListener('click', () => {
