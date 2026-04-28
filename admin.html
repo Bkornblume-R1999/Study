@@ -13,7 +13,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #f5f7fa; --surface: #ffffff; --border: #e5e7eb;
-      --primary: #2563eb; --danger: #ef4444; --danger-light: #fee2e2;
+      --primary: #ea580c; --danger: #ef4444; --danger-light: #fee2e2;
       --success: #10b981; --text: #111827; --muted: #6b7280;
       --font: 'DM Sans', -apple-system, sans-serif;
       --mono: 'Space Mono', monospace;
@@ -25,14 +25,14 @@
     /* ── LOGIN ── */
     #login-screen {
       min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #1e3a8a 0%, #4c1d95 100%); padding: 24px;
+      background: linear-gradient(135deg, #7c2d12 0%, #991b1b 100%); padding: 24px;
     }
     .login-card {
       background: white; border-radius: 20px; padding: 40px 36px;
       width: 100%; max-width: 380px;
       box-shadow: 0 24px 64px rgba(0,0,0,0.3); text-align: center;
     }
-    .login-logo { font-size: 32px; font-weight: 900; color: #2563eb; letter-spacing: -1px; margin-bottom: 8px; }
+    .login-logo { font-size: 32px; font-weight: 900; color: #ea580c; letter-spacing: -1px; margin-bottom: 8px; }
     .login-title { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
     .login-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
     .login-label { display: block; text-align: left; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px; }
@@ -45,7 +45,7 @@
     .login-error { font-size: 13px; color: var(--danger); margin-bottom: 14px; min-height: 18px; }
     .login-btn {
       width: 100%; padding: 14px;
-      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
       color: white; border: none; border-radius: 10px;
       font-family: var(--font); font-size: 15px; font-weight: 700;
       cursor: pointer; transition: opacity 0.15s, transform 0.15s;
@@ -55,7 +55,7 @@
     /* ── ADMIN SCREEN ── */
     #admin-screen { display: none; }
     .topbar {
-      background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
       color: white; padding: 0 24px; height: 60px;
       display: flex; align-items: center; justify-content: flex-end;
       position: sticky; top: 0; z-index: 100;
@@ -93,7 +93,7 @@
       text-transform: uppercase;
     }
     .toggle-breakdown-btn:hover { border-color: var(--primary); color: var(--primary); }
-    .toggle-breakdown-btn.active { background: #eff6ff; border-color: var(--primary); color: var(--primary); }
+    .toggle-breakdown-btn.active { background: #fff7ed; border-color: var(--primary); color: var(--primary); }
 
     /* Type breakdown cards — collapsible */
     .breakdown-row {
@@ -186,13 +186,13 @@
     /* Selection banner */
     .sel-banner {
       display: none; align-items: center; gap: 10px;
-      background: #eff6ff; border-bottom: 1px solid #bfdbfe;
-      padding: 9px 18px; font-size: 13px; font-weight: 600; color: #1d4ed8;
+      background: #fff7ed; border-bottom: 1px solid #fed7aa;
+      padding: 9px 18px; font-size: 13px; font-weight: 600; color: #c2410c;
     }
     .sel-banner.show { display: flex; }
     .sel-banner-count { flex: 1; }
     .sel-banner-desel {
-      background: white; border: 1.5px solid #bfdbfe; color: #1d4ed8;
+      background: white; border: 1.5px solid #bfdbfe; color: #c2410c;
       padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 700;
       cursor: pointer; font-family: var(--font);
     }
@@ -201,7 +201,7 @@
       padding: 6px 13px; border-radius: 7px; font-size: 12px; font-weight: 700;
       cursor: pointer; font-family: var(--font);
     }
-    .sel-banner-desel:hover { background: #dbeafe; }
+    .sel-banner-desel:hover { background: #ffedd5; }
     .sel-banner-del:hover { background: #dc2626; }
 
     /* ── TABLE ── */
@@ -222,8 +222,8 @@
     tbody td { padding: 12px 14px; border-bottom: 1px solid #f3f4f6; font-size: 14px; color: var(--text); vertical-align: middle; }
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover td { background: #f9fafb; }
-    tbody tr.sel-row td { background: #eff6ff !important; }
-    @keyframes hl { 0% { background: #dbeafe; } 100% { background: transparent; } }
+    tbody tr.sel-row td { background: #fff7ed !important; }
+    @keyframes hl { 0% { background: #ffedd5; } 100% { background: transparent; } }
     tbody tr.new-row td { animation: hl 2s ease-out; }
 
     .col-chk  { width: 38px; text-align: center; }
@@ -256,11 +256,11 @@
       transition: all 0.15s; white-space: nowrap; letter-spacing: 0.02em;
       text-transform: uppercase;
     }
-    .act-btn.save-pdf:hover  { border-color: #1e40af; color: #1e40af; background: #eff6ff; }
+    .act-btn.save-pdf:hover  { border-color: #1e40af; color: #1e40af; background: #fff7ed; }
     .act-btn.print-r:hover   { border-color: #374151; color: #374151; background: #f9fafb; }
     .act-btn.del-r:hover     { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
 
-    input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--primary); cursor: pointer; }
+    input[type=checkbox] { width: 15px; height: 15px; accent-color: #ea580c; cursor: pointer; }
 
     /* ── LIGHTBOX ── */
     .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; align-items: center; justify-content: center; padding: 20px; }
@@ -312,7 +312,7 @@
       border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px;
     }
     .fare-editor-header {
-      background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(124,58,237,0.08));
+      background: linear-gradient(135deg, rgba(234,88,12,0.08), rgba(220,38,38,0.08));
       border-bottom: 1px solid var(--border);
       padding: 16px 20px;
       display: flex; align-items: center; justify-content: space-between;
@@ -342,7 +342,7 @@
     .fare-preview-label { font-weight: 700; margin-bottom: 4px; }
     .fare-preview-formula { font-family: var(--mono); font-size: 14px; }
     .fare-save-btn {
-      padding: 11px 24px; background: linear-gradient(135deg, #2563eb, #7c3aed);
+      padding: 11px 24px; background: linear-gradient(135deg, #ea580c, #dc2626);
       color: white; border: none; border-radius: 10px; font-family: var(--font);
       font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
     }
@@ -379,7 +379,7 @@
 <!-- ── LOGIN ── -->
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo">Geo Gensan</div>
+    <div class="login-logo" style="color:#ea580c">Geo Gensan</div>
     <div class="login-title">Admin</div>
     <div class="login-subtitle">Tricycle Reports Dashboard</div>
     <label class="login-label" for="login-input">Password</label>
@@ -392,6 +392,7 @@
 <!-- ── ADMIN SCREEN ── -->
 <div id="admin-screen">
   <div class="topbar">
+    <span style="color:white;font-weight:800;font-size:16px;letter-spacing:-0.3px;">GeoGensan Admin</span>
     <button class="logout-btn" id="logout-btn">Logout</button>
   </div>
 
@@ -638,9 +639,8 @@ async function testFirebaseConnection() {
       statusEl.innerHTML = `🔴 Firebase error: HTTP ${res.status}`;
       statusEl.className = 'fb-status error';
     } else {
-      statusEl.innerHTML = '🟢 Firebase connected';
-      statusEl.className = 'fb-status ok';
-      setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+      // Firebase connected - silently hide status
+      statusEl.style.display = 'none';
     }
   } catch (e) {
     statusEl.innerHTML = `🔴 Network error: ${e.message}`;
@@ -718,9 +718,9 @@ function updateStats() {
   const sorted = [...allReports].sort((a,b) => (b.timestamp||0)-(a.timestamp||0));
   if (sorted.length > 0) {
     const latest = sorted[0];
-    const d = latest.timestamp ? new Date(latest.timestamp) : new Date(latest.date);
-    const dateStr = isNaN(d) ? (latest.date||'—') :
-      d.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
+    const dateRaw = latest.date || latest.dateString || (latest.timestamp ? new Date(latest.timestamp).toLocaleString('en-PH',{timeZone:'Asia/Manila'}) : null);
+    const d = latest.timestamp ? new Date(latest.timestamp) : (dateRaw ? new Date(dateRaw) : null);
+    const dateStr = (d && !isNaN(d)) ? d.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}) : (dateRaw||'—');
     document.getElementById('stat-recent').textContent = dateStr;
   } else {
     document.getElementById('stat-recent').textContent = '—';
@@ -867,8 +867,8 @@ function matchesDateFilter(r) {
   if (!g) return true;
   if (!r.timestamp && !r.date) return false;
 
-  const ts = r.timestamp ? new Date(r.timestamp) : new Date(r.date);
-  if (isNaN(ts)) return false;
+  const ts = r.timestamp ? new Date(r.timestamp) : (r.date ? new Date(r.date) : (r.dateString ? new Date(r.dateString) : null));
+  if (!ts || isNaN(ts)) return false;
 
   if (g === 'year')  return ts.getFullYear() === dateFilter.year;
   if (g === 'month') return ts.getFullYear() === dateFilter.year && ts.getMonth() === dateFilter.month;
@@ -951,7 +951,7 @@ function renderTable(filtered) {
       <td class="col-num">${i+1}</td>
       <td class="col-img">${imgCell}</td>
       <td class="col-plate">${esc(r.plate||'—')}</td>
-      <td class="col-date">${esc(r.date||'—')}</td>
+      <td class="col-date">${esc(r.date || (r.dateString ? new Date(r.dateString).toLocaleString('en-PH', {timeZone:'Asia/Manila',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : (r.timestamp ? new Date(r.timestamp).toLocaleString('en-PH', {timeZone:'Asia/Manila',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—')))}</td>
       <td><span class="type-badge ${cls}">${esc(r.type)}</span></td>
       <td class="col-desc">${esc(r.description||'')}</td>
       <td class="col-act">
@@ -1252,7 +1252,7 @@ function buildPrintHTML(r) {
       <div class="doc-sub">Official report filed through the Geo GenSan public reporting system.</div>
       <div class="grid">
         <div class="field"><label>Plate Number</label><span>${esc(r.plate||'—')}</span></div>
-        <div class="field"><label>Date &amp; Time Filed</label><span>${esc(r.date||'—')}</span></div>
+        <div class="field"><label>Date &amp; Time Filed</label><span>${esc(r.date || (r.dateString ? new Date(r.dateString).toLocaleString('en-PH', {timeZone:'Asia/Manila'}) : (r.timestamp ? new Date(r.timestamp).toLocaleString('en-PH', {timeZone:'Asia/Manila'}) : '—')))}</span></div>
         <div class="field"><label>Violation Type</label><span class="badge">${esc(r.type||'—')}</span></div>
       </div>
       <div class="desc-box">
@@ -1328,8 +1328,6 @@ async function loadReports() {
   }
 }
 function startPolling() {
-  const statusEl = document.getElementById('firebase-status');
-  if (statusEl) statusEl.style.display = 'block';
   testFirebaseConnection();
   loadReports();
   pollInterval = setInterval(loadReports, 10000);
