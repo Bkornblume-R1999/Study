@@ -442,7 +442,7 @@ async function geocode(query) {
     addToSearchHistory({ name: result.name || query, lat: result.lat, lng: result.lng });
     return L.latLng(result.lat, result.lng);
   }
-  showToast('❌ Location not found');
+  showToast('Location not found');
   return null;
 }
 
@@ -466,7 +466,7 @@ function createMarkerIcon(label, color) {
 
 function createLiveMarkerIcon() {
   return L.divIcon({
-    html: `<div style="width:20px;height:20px;background:#2563eb;border:3px solid white;border-radius:50%;box-shadow:0 0 0 6px rgba(37,99,235,0.25);animation:live-pulse 2s ease-in-out infinite;"></div>`,
+    html: `<div style="width:20px;height:20px;background:#ea580c;border:3px solid white;border-radius:50%;box-shadow:0 0 0 6px rgba(234,88,12,0.25);animation:live-pulse 2s ease-in-out infinite;"></div>`,
     className: '', iconSize: [20, 20], iconAnchor: [10, 10]
   });
 }
@@ -574,10 +574,10 @@ function distanceToRoute(latlng, coords) {
 }
 
 function startLiveLocation() {
-  if (!navigator.geolocation) { showToast('❌ Geolocation not supported'); return; }
+  if (!navigator.geolocation) { showToast('Geolocation not supported'); return; }
   if (state.liveLocationWatchId) { stopLiveLocation(); return; }
 
-  showToast('📡 Getting your location...');
+  showToast('Getting your location...');
   const btn = document.getElementById('use-location');
   if (btn) btn.classList.add('live-active');
 
@@ -607,7 +607,7 @@ function startLiveLocation() {
       }
       state.trike._startManuallySet = true;
       state.map.setView(latlng, 15);
-      showToast('📍 Live location set as start point');
+      showToast('Live location set as start point');
       if (state.trike.endMarker) updateTrikeRoute().then(fd => { _lockedFareData = fd; });
     },
     () => {}, // silent fail — watchPosition will handle it
@@ -639,15 +639,15 @@ function startLiveLocation() {
             state.trike.startMarker.setLatLng(latlng);
           }
           state.trike._startManuallySet = true;
-          showToast('📍 Live location set as start point');
+          showToast('Live location set as start point');
           // Only trigger route calculation if B already exists
           if (state.trike.endMarker) updateTrikeRoute().then(fd => { _lockedFareData = fd; });
           state.map.setView(latlng, 15);
         } else if (state.trike.routes.length > 1) {
-          // Auto-switch to whichever route the user is physically closer to
-          // Throttle: only check every 8 seconds
+          // Auto-switch to whichever route the user is physically closest to
+          // Throttle: only check every 5 seconds
           const now = Date.now();
-          if (now - _lastAutoSwitchTime < 8000) return;
+          if (now - _lastAutoSwitchTime < 5000) return;
           _lastAutoSwitchTime = now;
 
           const currentIdx = state.trike.activeRouteIndex;
@@ -660,10 +660,18 @@ function startLiveLocation() {
             if (d < closestDist) { closestDist = d; closestIdx = i; }
           });
 
-          if (closestIdx !== currentIdx && closestDist < 150) {
-            // User is on the alternative route — switch display but KEEP original fare
+          // Switch if user is closer to a different route (threshold: 80m for snap, 300m for off-route warning)
+          if (closestIdx !== currentIdx && closestDist < 80) {
+            // User is clearly on the alternative route — switch display but KEEP original fare
+            // Force map redraw by clearing existing layers before switching
+            if (state.trike.primaryRouteLayer) { state.trike.primaryRouteLayer.remove(); state.trike.primaryRouteLayer = null; }
+            state.trike.altRouteLayers.forEach(l => l.remove());
+            state.trike.altRouteLayers = [];
             selectAlternativeRouteNoFareChange(closestIdx, _lockedFareData);
-            showToast(`🔄 Auto-switched to Route ${closestIdx + 1} (fare unchanged)`, 3000);
+            showToast(`Auto-switched to Route ${closestIdx + 1} (fare unchanged)`, 3000);
+          } else if (closestDist > 300) {
+            // User appears to be off all known routes
+            showToast('You appear to be off the plotted route', 2500);
           }
         }
       }
@@ -673,7 +681,7 @@ function startLiveLocation() {
         state.map.setView(latlng, state.map.getZoom() < 15 ? 15 : state.map.getZoom());
       }
     },
-    (err) => { showToast('❌ Could not get live location'); console.error(err); },
+    (err) => { showToast('Could not get live location'); console.error(err); },
     { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 }
   );
 }
@@ -721,7 +729,7 @@ function stopLiveLocation() {
   if (state.liveMarker) { state.liveMarker.remove(); state.liveMarker = null; }
   const btn = document.getElementById('use-location');
   if (btn) btn.classList.remove('live-active');
-  showToast('📍 Live location stopped');
+  showToast('Live location stopped');
 }
 
 // ─── MAP CLICK ────────────────────────────────────────────────────────────────
@@ -735,21 +743,21 @@ function handleMapClick(e) {
     state.trike.startMarker = L.marker(e.latlng, { draggable: true, icon: createMarkerIcon('A', '#10b981') }).addTo(state.map);
     state.trike.startMarker.on('dragend', updateTrikeRoute);
     state.trike._startManuallySet = true;
-    showToast('📍 Start point set');
+    showToast('Start point set');
   } else if (!endMarker) {
     // Set point B (always allowed)
     state.trike.endMarker = L.marker(e.latlng, { draggable: true, icon: createMarkerIcon('B', '#ef4444') }).addTo(state.map);
     state.trike.endMarker.on('dragend', updateTrikeRoute);
-    showToast('🎯 Calculating routes...');
+    showToast('Calculating routes...');
   } else if (!liveActive) {
     // No live: update both points
     state.trike.startMarker.setLatLng(state.trike.endMarker.getLatLng());
     state.trike.endMarker.setLatLng(e.latlng);
-    showToast('🔄 Route updated');
+    showToast('Route updated');
   } else {
     // Live active: only move point B
     state.trike.endMarker.setLatLng(e.latlng);
-    showToast('🎯 Destination updated');
+    showToast('Destination updated');
   }
   updateTrikeRoute();
 }
@@ -794,7 +802,7 @@ async function updateTrikeRoute() {
     hideLoading();
 
     if (!data.routes || !data.routes.length) {
-      showToast('❌ No routes found');
+      showToast('No routes found');
       return;
     }
 
@@ -861,13 +869,13 @@ async function updateTrikeRoute() {
 
     if (routes.length > 1) {
       if (routes.length > 1) {
-      showToast(`🛣️ 2 routes found — tap dashed line for the alternative`, 3500);
+      showToast('2 routes found — tap dashed line for alternative', 3500);
     }
     }
   } catch (err) {
     hideLoading();
     console.error(err);
-    showToast('❌ Could not calculate route');
+    showToast('Could not calculate route');
   }
 }
 
@@ -911,7 +919,7 @@ function selectAlternativeRoute(index) {
     discountedPassengers: state.discountedPassengers
   }).then(displayFare);
 
-  showToast(`✅ Route ${index + 1} selected (${distanceKm.toFixed(1)} km)`);
+  showToast(`Route ${index + 1} selected (${distanceKm.toFixed(1)} km)`);
 }
 
 function expandPanelOnMobile() {
@@ -1024,14 +1032,6 @@ async function showRoute(routeKey) {
   // ETA for bus — based on number of stops (avg 2.5 min per stop)
   state.busjeep.routeControl.on('routesfound', (e) => {
     const dist = e.routes[0].summary.totalDistance / 1000;
-    const stopCount = route.stops.length;
-    const etaMins = Math.round(stopCount * 2.5);
-    const etaEl = document.getElementById('bus-eta-display');
-    if (etaEl) etaEl.textContent = etaMins < 60 ? `~${etaMins} min` : `~${Math.floor(etaMins/60)}h ${etaMins%60}m`;
-    const distEl = document.getElementById('bus-dist-display');
-    if (distEl) distEl.textContent = `${dist.toFixed(1)} km`;
-    const stopsEl = document.getElementById('bus-stops-count-display');
-    if (stopsEl) stopsEl.textContent = `${stopCount} stops`;
   });
 
   const bounds = L.latLngBounds(waypoints);
@@ -1045,20 +1045,14 @@ function showRouteDetail(route) {
   const nameEl = document.getElementById('route-detail-name');
   const stopsEl = document.getElementById('stops-list');
   nameEl.textContent = route.name;
-  // Bus fare per stop: ₱15 base, +₱1 for each stop beyond the 4th (approx based on distance)
-  const baseFare = 15;
-  stopsEl.innerHTML = route.labels.map((label, idx) => {
-    // Estimate fare by stop position (cumulative distance approximation)
-    const stopFare = baseFare; // minimum fare applies to all stops - same flat rate
-    return `
+  stopsEl.innerHTML = route.labels.map((label, idx) => `
     <div class="stop-item clickable-stop" data-idx="${idx}" style="cursor:pointer;">
       <div class="stop-number">${idx + 1}</div>
       <div class="stop-info">
         <span class="stop-label">${label}</span>
-        <span class="stop-fare-badge">₱${stopFare}</span>
       </div>
     </div>
-  `}).join('');
+  `).join('');
   stopsEl.querySelectorAll('.clickable-stop').forEach(item => {
     item.addEventListener('click', () => {
       const idx = parseInt(item.dataset.idx);
@@ -1198,8 +1192,8 @@ function initComplaintModal() {
   }
 
   function handleImageFile(file) {
-    if (!file || !file.type.startsWith('image/')) { showToast('❌ Invalid image'); return; }
-    if (file.size > 5 * 1024 * 1024) { showToast('❌ Image must be under 5MB'); return; }
+    if (!file || !file.type.startsWith('image/')) { showToast('Invalid image'); return; }
+    if (file.size > 5 * 1024 * 1024) { showToast('Image must be under 5MB'); return; }
     pendingImageFile = file;
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -1231,11 +1225,11 @@ function initComplaintModal() {
     if (!plate && !pendingImageData) { showToast('❌ Enter a plate number or attach a photo'); return; }
     if (!type) { showToast('❌ Please select a report type'); return; }
     if (!desc) { showToast('❌ Please enter a description'); return; }
-    if (!canSubmitReport()) { showToast('⏳ Please wait before submitting again'); return; }
+    if (!canSubmitReport()) { showToast('Please wait before submitting again'); return; }
     submitBtn.disabled = true; submitBtn.textContent = '⏳ Submitting...';
     try {
       let imageUrl = null;
-      if (pendingImageData) { showToast('📤 Uploading photo...', 10000); imageUrl = await uploadToImgBB(pendingImageData); }
+      if (pendingImageData) { showToast('Uploading photo...', 10000); imageUrl = await uploadToImgBB(pendingImageData); }
       await fbPush('reports', {
         plate: plate.toUpperCase() || '(photo only)', type, description: desc,
         imageUrl: imageUrl || null, timestamp: Date.now(),
@@ -1249,17 +1243,17 @@ function initComplaintModal() {
       descCount.textContent = '0';
       resetImageState();
       modal.style.display = 'none';
-      showToast('✅ Report submitted!', 3000);
+      showToast('Report submitted!', 3000);
     } catch (err) {
       console.error('Report submission error:', err);
       // Show specific error — helps diagnose Firebase rules vs network vs ImgBB
       const msg = err && err.message ? err.message : String(err);
       if (msg.includes('403') || msg.includes('Permission denied') || msg.includes('Unauthorized')) {
-        showToast('❌ Firebase permission denied — check database rules', 5000);
+        showToast('Firebase permission denied — check database rules', 5000);
       } else if (msg.includes('ImgBB')) {
-        showToast('❌ Photo upload failed — try without a photo', 4000);
+        showToast('Photo upload failed — try without a photo', 4000);
       } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
-        showToast('❌ No internet connection', 4000);
+        showToast('No internet connection', 4000);
       } else {
         showToast(`❌ Submission failed: ${msg.slice(0, 60)}`, 5000);
       }
@@ -1351,7 +1345,7 @@ function initEventListeners() {
   document.getElementById('reset-trike').addEventListener('click', () => {
     if (state.liveLocationWatchId) stopLiveLocation();
     clearTrikeMarkers();
-    showToast('🔄 Reset');
+    showToast('Reset');
   });
 
   // Live location toggle
@@ -1471,8 +1465,483 @@ function init() {
   const totalEl = document.getElementById('total-pax-display');
   if (totalEl) totalEl.textContent = '1 passenger';
 
-  setTimeout(() => showToast('👋 Welcome to GeoGensan!', 3000), 500);
+  setTimeout(() => showToast('Welcome to GeoGensan!', 3000), 500);
 }
 
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', () => { if (state.map) state.map.invalidateSize(); });
+
+// ═══════════════════════════════════════════════════════════════
+// LEFT TOOLS PANEL — Fare Calculator + Report Trike
+// ═══════════════════════════════════════════════════════════════
+
+(function initLeftPanel() {
+
+  // ── Panel open/close: bubble hides when panel is open ─────────
+  const bubbleBtn = document.getElementById('left-bubble-btn');
+  const panel     = document.getElementById('left-tools-panel');
+  const closeBtn  = document.getElementById('ltp-close');
+
+  function openPanel()  { panel.classList.add('open');    bubbleBtn.classList.add('panel-open'); }
+  function closePanel() { panel.classList.remove('open'); bubbleBtn.classList.remove('panel-open'); }
+  bubbleBtn.addEventListener('click', () => panel.classList.contains('open') ? closePanel() : openPanel());
+  closeBtn.addEventListener('click', closePanel);
+
+  // ── Tab switching ─────────────────────────────────────────────
+  document.querySelectorAll('.ltp-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.ltp-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.ltp-view').forEach(v => v.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelector(`.ltp-view[data-ltpview="${tab.dataset.ltptab}"]`).classList.add('active');
+    });
+  });
+
+  // ══════════════════════════════════════════════════════════════
+  // FARE CALCULATOR — autocomplete From/To + OSRM distance fill
+  // ══════════════════════════════════════════════════════════════
+  let lfcReg = 1, lfcDisc = 0;
+  const MAX_PAX = 6;
+  // Resolved latlng for from/to
+  let lfcFromLatLng = null, lfcToLatLng = null;
+
+  function updateLfcPax() {
+    document.getElementById('lfc-reg-count').textContent = lfcReg;
+    document.getElementById('lfc-disc-count').textContent = lfcDisc;
+  }
+  document.getElementById('lfc-reg-minus').addEventListener('click',  () => { if (lfcReg > 0) { lfcReg--; updateLfcPax(); } });
+  document.getElementById('lfc-reg-plus').addEventListener('click',   () => { if (lfcReg + lfcDisc < MAX_PAX) { lfcReg++; updateLfcPax(); } });
+  document.getElementById('lfc-disc-minus').addEventListener('click', () => { if (lfcDisc > 0) { lfcDisc--; updateLfcPax(); } });
+  document.getElementById('lfc-disc-plus').addEventListener('click',  () => { if (lfcReg + lfcDisc < MAX_PAX) { lfcDisc++; updateLfcPax(); } });
+
+  // ── Autocomplete for From / To ────────────────────────────────
+  function lfcSearchPlaces(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) return [];
+    return GENSAN_PLACES.map(p => {
+      const n = p.name.toLowerCase();
+      let score = 0;
+      if (n.startsWith(q)) score = 100;
+      else if (n.includes(q)) score = 80;
+      else if (p.tags && p.tags.some(t => t.includes(q))) score = 55;
+      return { ...p, score };
+    }).filter(p => p.score > 0).sort((a, b) => b.score - a.score).slice(0, 5);
+  }
+
+  function createLfcDropdown(inputEl, onSelect) {
+    // Remove any existing dropdown
+    inputEl.parentElement.querySelectorAll('.lfc-autocomplete-drop').forEach(d => d.remove());
+    const q = inputEl.value.trim();
+    const history = (() => { try { return JSON.parse(localStorage.getItem('geoGensan_searchHistory') || '[]'); } catch { return []; } })();
+    let results = q ? lfcSearchPlaces(q) : history.slice(0, 4).map(h => ({ ...h, isHistory: true }));
+    if (!results.length) return;
+
+    const drop = document.createElement('div');
+    drop.className = 'lfc-autocomplete-drop';
+    if (!q && results.length) {
+      const hdr = document.createElement('div');
+      hdr.className = 'lfc-drop-header';
+      hdr.textContent = '🕐 Recent';
+      drop.appendChild(hdr);
+    }
+    results.forEach(place => {
+      const item = document.createElement('div');
+      item.className = 'lfc-drop-item';
+      item.innerHTML = `<span>${place.isHistory ? '🕐' : '📍'}</span><span>${place.name}</span>`;
+      const pick = (e) => {
+        e.preventDefault();
+        inputEl.value = place.name;
+        drop.remove();
+        onSelect({ lat: place.lat, lng: place.lng, name: place.name });
+      };
+      item.addEventListener('mousedown', pick);
+      item.addEventListener('touchend', pick);
+      drop.appendChild(item);
+    });
+    inputEl.parentElement.style.position = 'relative';
+    inputEl.parentElement.appendChild(drop);
+  }
+
+  function removeLfcDropdowns() {
+    document.querySelectorAll('.lfc-autocomplete-drop').forEach(d => d.remove());
+  }
+
+  // Also allow Nominatim fallback for typed entries
+  async function lfcGeocode(query) {
+    const local = lfcSearchPlaces(query);
+    if (local.length && local[0].score >= 70) return { lat: local[0].lat, lng: local[0].lng, name: local[0].name };
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ', General Santos City, Philippines')}&limit=3&addressdetails=1`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+      const data = await res.json();
+      if (data && data.length) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), name: data[0].display_name.split(',')[0] };
+    } catch {}
+    return null;
+  }
+
+  // ── Fetch driving distance via OSRM ──────────────────────────
+  async function fetchOsrmDistance(from, to) {
+    const url = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=false`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    if (data.routes && data.routes.length) return data.routes[0].distance / 1000; // metres → km
+    return null;
+  }
+
+  // ── Set route status text ─────────────────────────────────────
+  function setRouteStatus(msg, isError) {
+    const el = document.getElementById('lfc-route-status');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = isError ? 'var(--danger)' : 'var(--success, #16a34a)';
+  }
+
+  // Auto-fetch distance whenever both locations are resolved
+  async function tryAutoFillDistance() {
+    if (!lfcFromLatLng || !lfcToLatLng) return;
+    const kmEl     = document.getElementById('lfc-km');
+    const statusEl = document.getElementById('lfc-km-status');
+    if (statusEl) statusEl.textContent = '⏳';
+    setRouteStatus('Calculating distance…');
+    try {
+      const km = await fetchOsrmDistance(lfcFromLatLng, lfcToLatLng);
+      if (km !== null) {
+        kmEl.value = km.toFixed(2);
+        kmEl.style.borderColor = '#16a34a';
+        if (statusEl) statusEl.textContent = '✅';
+        setRouteStatus(`Route found: ${km.toFixed(2)} km`);
+      } else {
+        if (statusEl) statusEl.textContent = '⚠️';
+        setRouteStatus('Could not find route — enter km manually', true);
+        kmEl.removeAttribute('readonly');
+      }
+    } catch {
+      if (statusEl) statusEl.textContent = '⚠️';
+      setRouteStatus('Network error — enter km manually', true);
+      kmEl.removeAttribute('readonly');
+    }
+  }
+
+  // Wire up From input
+  const lfcFromEl = document.getElementById('lfc-from');
+  const lfcToEl   = document.getElementById('lfc-to');
+
+  function wireLocationInput(inputEl, onResolved) {
+    inputEl.addEventListener('focus',  () => createLfcDropdown(inputEl, onResolved));
+    inputEl.addEventListener('input',  () => createLfcDropdown(inputEl, onResolved));
+    inputEl.addEventListener('blur',   () => setTimeout(removeLfcDropdowns, 180));
+    inputEl.addEventListener('keydown', async (e) => {
+      if (e.key !== 'Enter') return;
+      const q = inputEl.value.trim();
+      if (!q) return;
+      removeLfcDropdowns();
+      const result = await lfcGeocode(q);
+      if (result) {
+        inputEl.value = result.name;
+        onResolved(result);
+      } else {
+        inputEl.style.borderColor = 'var(--danger)';
+        setTimeout(() => inputEl.style.borderColor = '', 1500);
+      }
+    });
+  }
+
+  wireLocationInput(lfcFromEl, (place) => {
+    lfcFromLatLng = { lat: place.lat, lng: place.lng };
+    lfcFromEl.value = place.name;
+    tryAutoFillDistance();
+  });
+  wireLocationInput(lfcToEl, (place) => {
+    lfcToLatLng = { lat: place.lat, lng: place.lng };
+    lfcToEl.value = place.name;
+    tryAutoFillDistance();
+  });
+
+  // Also allow manual km override any time
+  document.getElementById('lfc-km').addEventListener('focus', function() {
+    this.removeAttribute('readonly');
+  });
+
+  // ── Calculate fare ────────────────────────────────────────────
+  document.getElementById('lfc-calc-btn').addEventListener('click', async () => {
+    const fromVal = lfcFromEl.value.trim();
+    const toVal   = lfcToEl.value.trim();
+    const kmEl    = document.getElementById('lfc-km');
+
+    // From/To are optional — if both provided try to get route distance
+    // If km not filled yet and both locations exist, try geocoding/routing
+    if (!kmEl.value || parseFloat(kmEl.value) <= 0) {
+      if (fromVal && !lfcFromLatLng) {
+        setRouteStatus('Locating "From" address…');
+        const r = await lfcGeocode(fromVal);
+        if (r) { lfcFromLatLng = r; lfcFromEl.value = r.name; }
+      }
+      if (toVal && !lfcToLatLng) {
+        setRouteStatus('Locating "To" address…');
+        const r = await lfcGeocode(toVal);
+        if (r) { lfcToLatLng = r; lfcToEl.value = r.name; }
+      }
+      if (lfcFromLatLng && lfcToLatLng) {
+        await tryAutoFillDistance();
+      }
+    }
+
+    const kmInput = parseFloat(kmEl.value);
+    if (!kmInput || kmInput <= 0) {
+      kmEl.style.borderColor = 'var(--danger)';
+      setTimeout(() => kmEl.style.borderColor = '', 1500);
+      setRouteStatus('Could not determine distance — enter km manually', true);
+      kmEl.removeAttribute('readonly');
+      return;
+    }
+
+    // Compute fare (same formula as api.js)
+    const BASE = 15, BASE_KM = 4, PER_KM = 1, DISC = 0.20;
+    const baseFare  = kmInput <= BASE_KM ? BASE : BASE + Math.ceil(kmInput - BASE_KM) * PER_KM;
+    const discAmt   = Math.round(baseFare * DISC);
+    const discFare  = baseFare - discAmt;
+    const regTotal  = baseFare * lfcReg;
+    const discTotal = discFare * lfcDisc;
+    const total     = regTotal + discTotal;
+
+    const routeLabel = fromVal && toVal ? `${fromVal} → ${toVal}` : (fromVal || toVal || 'Custom Route');
+    document.getElementById('lfc-result-route').textContent  = routeLabel;
+    document.getElementById('lfc-result-dist').textContent   = `${kmInput.toFixed(2)} km`;
+    document.getElementById('lfc-result-amount').textContent = `₱${total}`;
+
+    let bHtml = `Base: ₱${baseFare}/person`;
+    if (lfcReg > 0)  bHtml += `<br>Regular ×${lfcReg}: ₱${regTotal}`;
+    if (lfcDisc > 0) bHtml += `<br>Special (20% off) ×${lfcDisc}: ₱${discTotal} (₱${discFare}/ea)`;
+    document.getElementById('lfc-result-breakdown').innerHTML = bHtml;
+
+    // Pre-fill the save label with route name
+    const saveLabelEl = document.getElementById('lfc-save-label');
+    if (saveLabelEl && !saveLabelEl.value) saveLabelEl.value = routeLabel;
+
+    // Store pending save
+    document.getElementById('lfc-save-btn')._pendingSave = {
+      route: routeLabel, km: kmInput, total, reg: lfcReg, disc: lfcDisc, baseFare, ts: Date.now()
+    };
+    document.getElementById('lfc-result').style.display = 'block';
+  });
+
+  // ── History: editable names + individual delete ───────────────
+  const HIST_KEY = 'geoGensan_fareHistory';
+  function loadHistory() { try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { return []; } }
+  function saveHistory(arr) { localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0, 50))); }
+
+  function renderHistory() {
+    const list = loadHistory();
+    const el   = document.getElementById('lfc-history-list');
+    if (!list.length) { el.innerHTML = '<div class="lfc-history-empty">No saved fares yet.</div>'; return; }
+    el.innerHTML = list.map((item, i) => `
+      <div class="lfc-history-item" data-idx="${i}">
+        <div class="lfc-hist-top">
+          <input class="lfc-hist-name-input" data-idx="${i}" value="${item.label || item.route}" title="Tap to rename" aria-label="Edit name">
+          <span class="lfc-hist-amount">₱${item.total}</span>
+          <button class="lfc-hist-del-top" data-idx="${i}" title="Delete this entry">✕</button>
+        </div>
+        <div class="lfc-hist-meta">${item.km.toFixed(2)} km · ${item.reg} reg${item.disc ? ` + ${item.disc} special` : ''} · ${new Date(item.ts).toLocaleDateString('en-PH', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+      </div>
+    `).join('');
+
+    // Editable name: save on blur or Enter
+    el.querySelectorAll('.lfc-hist-name-input').forEach(inp => {
+      inp.addEventListener('blur', () => {
+        const arr = loadHistory();
+        const idx = parseInt(inp.dataset.idx);
+        if (arr[idx]) { arr[idx].label = inp.value.trim() || arr[idx].route; saveHistory(arr); }
+      });
+      inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') inp.blur(); });
+    });
+
+    // Individual delete
+    el.querySelectorAll('.lfc-hist-del-top').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const arr = loadHistory();
+        arr.splice(parseInt(btn.dataset.idx), 1);
+        saveHistory(arr);
+        renderHistory();
+      });
+    });
+  }
+
+  document.getElementById('lfc-save-btn').addEventListener('click', () => {
+    const data = document.getElementById('lfc-save-btn')._pendingSave;
+    if (!data) return;
+    const labelEl = document.getElementById('lfc-save-label');
+    const label   = (labelEl && labelEl.value.trim()) ? labelEl.value.trim() : data.route;
+    const arr = loadHistory();
+    arr.unshift({ ...data, label });
+    saveHistory(arr);
+    renderHistory();
+    const btn = document.getElementById('lfc-save-btn');
+    btn.textContent = '✅ Saved!';
+    setTimeout(() => btn.textContent = '💾 Save', 1800);
+  });
+
+  document.getElementById('lfc-history-clear').addEventListener('click', () => {
+    if (!confirm('Clear all saved fare history?')) return;
+    localStorage.removeItem(HIST_KEY);
+    renderHistory();
+  });
+
+  renderHistory();
+
+  // ══════════════════════════════════════════════════════════════
+  // REPORT TRIKE — uses shared Firebase helpers (fbPush, uploadToImgBB)
+  // ══════════════════════════════════════════════════════════════
+  // Re-use the global COOLDOWN constants from the main report system
+  const LTP_REPORT_KEY = LAST_REPORT_KEY; // same key → same 2hr cooldown across both UIs
+  let ltpCooldownInterval = null;
+
+  function ltpCanSubmit() { return canSubmitReport(); }
+  function ltpGetRemaining() { return getRemainingCooldown(); }
+
+  function showLtpCooldown(msLeft) {
+    document.getElementById('ltp-cooldown-notice').style.display = 'flex';
+    document.getElementById('ltp-report-form').style.cssText = 'opacity:0.45;pointer-events:none;';
+    clearInterval(ltpCooldownInterval);
+    const tick = () => {
+      if (msLeft <= 0) {
+        clearInterval(ltpCooldownInterval);
+        document.getElementById('ltp-cooldown-notice').style.display = 'none';
+        document.getElementById('ltp-report-form').style.cssText = '';
+        return;
+      }
+      document.getElementById('ltp-cooldown-timer').textContent = formatCooldown(msLeft);
+      msLeft -= 1000;
+    };
+    tick();
+    ltpCooldownInterval = setInterval(tick, 1000);
+  }
+
+  // Image drop zone
+  const ltpDropZone = document.getElementById('ltp-image-drop-zone');
+  const ltpImgInput = document.getElementById('ltp-image-input');
+  ltpDropZone.addEventListener('click', () => ltpImgInput.click());
+  ltpImgInput.addEventListener('change', () => {
+    const file = ltpImgInput.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5MB'); ltpImgInput.value = ''; return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('ltp-img-preview').src = e.target.result;
+      document.getElementById('ltp-drop-zone-idle').style.display = 'none';
+      document.getElementById('ltp-drop-zone-preview').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('ltp-drop-remove-img').addEventListener('click', e => {
+    e.stopPropagation();
+    ltpImgInput.value = '';
+    document.getElementById('ltp-img-preview').src = '';
+    document.getElementById('ltp-drop-zone-idle').style.display = '';
+    document.getElementById('ltp-drop-zone-preview').style.display = 'none';
+  });
+
+  // Char count
+  document.getElementById('ltp-desc').addEventListener('input', function() {
+    document.getElementById('ltp-desc-count').textContent = this.value.length;
+  });
+
+  // Submit — fully wired to Firebase via fbPush + uploadToImgBB
+  document.getElementById('ltp-submit-btn').addEventListener('click', async () => {
+    if (!ltpCanSubmit()) { showLtpCooldown(ltpGetRemaining()); return; }
+
+    const plate   = document.getElementById('ltp-plate').value.trim();
+    const type    = document.getElementById('ltp-type').value;
+    const desc    = document.getElementById('ltp-desc').value.trim();
+    const imgFile = ltpImgInput.files[0] || null;
+
+    if (!plate) { document.getElementById('ltp-plate').style.borderColor='var(--danger)'; setTimeout(()=>document.getElementById('ltp-plate').style.borderColor='',1500); document.getElementById('ltp-plate').focus(); return; }
+    if (!type)  { document.getElementById('ltp-type').style.borderColor='var(--danger)'; setTimeout(()=>document.getElementById('ltp-type').style.borderColor='',1500); return; }
+    if (!desc)  { document.getElementById('ltp-desc').style.borderColor='var(--danger)'; setTimeout(()=>document.getElementById('ltp-desc').style.borderColor='',1500); document.getElementById('ltp-desc').focus(); return; }
+
+    const submitBtn = document.getElementById('ltp-submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting…';
+
+    try {
+      let imageUrl = null;
+      if (imgFile) {
+        const reader = new FileReader();
+        const base64 = await new Promise((res, rej) => { reader.onload = e => res(e.target.result); reader.onerror = rej; reader.readAsDataURL(imgFile); });
+        try { imageUrl = await uploadToImgBB(base64); } catch { imageUrl = null; }
+      }
+
+      const payload = {
+        plate,
+        type,
+        description: desc,
+        imageUrl,
+        timestamp: Date.now(),
+        source: 'left-panel',
+        date: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' }),
+        dateString: new Date().toISOString()
+      };
+
+      await fbPush('reports', payload);
+      try { await enforceReportCap(); } catch {}
+
+      localStorage.setItem(LAST_REPORT_KEY, Date.now().toString());
+      showLtpCooldown(COOLDOWN_MS);
+
+      // Reset form
+      document.getElementById('ltp-plate').value = '';
+      document.getElementById('ltp-type').value  = '';
+      document.getElementById('ltp-desc').value  = '';
+      document.getElementById('ltp-desc-count').textContent = '0';
+      ltpImgInput.value = '';
+      document.getElementById('ltp-img-preview').src = '';
+      document.getElementById('ltp-drop-zone-idle').style.display    = '';
+      document.getElementById('ltp-drop-zone-preview').style.display = 'none';
+
+      showToast('Report submitted! Thank you.', 3500);
+    } catch (err) {
+      console.error('Report submit failed:', err);
+      showToast('Submission failed — check connection', 3500);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Report';
+    }
+  });
+
+  // ── Print / Save PDF ──────────────────────────────────────────
+  document.getElementById('ltp-print-btn').addEventListener('click', () => {
+    const plate = document.getElementById('ltp-plate').value.trim() || '(not filled)';
+    const type  = document.getElementById('ltp-type').value || '(not selected)';
+    const desc  = document.getElementById('ltp-desc').value.trim() || '(no description)';
+    const imgSrc = document.getElementById('ltp-img-preview').src;
+    const now   = new Date().toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' });
+
+    const printWin = window.open('', '_blank', 'width=720,height=640');
+    printWin.document.write(`<!DOCTYPE html>
+<html><head><title>Tricycle Report — GeoGensan</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 620px; margin: 40px auto; color: #111; }
+  h1 { font-size: 22px; margin-bottom: 2px; }
+  .sub { font-size: 12px; color: #666; margin-bottom: 24px; }
+  .field { margin-bottom: 16px; }
+  .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: #999; font-weight: 700; margin-bottom: 3px; }
+  .val { font-size: 15px; color: #111; border-bottom: 1px solid #e5e5e5; padding-bottom: 8px; }
+  .plate { font-size: 24px; font-weight: 900; letter-spacing: 2px; font-family: monospace; }
+  img.photo { max-width: 100%; border-radius: 6px; margin: 8px 0; border: 1px solid #ddd; }
+  .footer { margin-top: 40px; font-size: 10px; color: #bbb; border-top: 1px solid #eee; padding-top: 12px; }
+  @media print { body { margin: 20px; } }
+</style></head><body>
+<h1>🚨 Tricycle Complaint Report</h1>
+<div class="sub">GeoGensan · General Santos City · ${now}</div>
+<div class="field"><div class="lbl">Plate Number</div><div class="val plate">${plate}</div></div>
+${imgSrc && imgSrc.length > 10 ? `<div class="field"><div class="lbl">Plate Photo</div><img class="photo" src="${imgSrc}"></div>` : ''}
+<div class="field"><div class="lbl">Report Type</div><div class="val">${type}</div></div>
+<div class="field"><div class="lbl">Description</div><div class="val">${desc}</div></div>
+<div class="footer">Generated by GeoGensan — General Santos City Transport Navigator · City Ordinance No. 08, Series of 2023</div>
+<script>window.onload = () => { window.print(); }<\/script>
+</body></html>`);
+    printWin.document.close();
+  });
+
+  // Init: check if still in cooldown on load
+  if (!ltpCanSubmit()) showLtpCooldown(ltpGetRemaining());
+})();
