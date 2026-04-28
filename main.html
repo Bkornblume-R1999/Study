@@ -14,14 +14,14 @@
   <style>
     /* ── Live pulse animation ── */
     @keyframes live-pulse {
-      0%, 100% { box-shadow: 0 0 0 6px rgba(37,99,235,0.25); }
-      50% { box-shadow: 0 0 0 12px rgba(37,99,235,0.1); }
+      0%, 100% { box-shadow: 0 0 0 6px rgba(234,88,12,0.25); }
+      50% { box-shadow: 0 0 0 12px rgba(234,88,12,0.1); }
     }
 
     /* ── Live active state for My Location button ── */
     .action-card.live-active {
-      background: linear-gradient(135deg, rgba(37,99,235,0.15), rgba(37,99,235,0.05));
-      border: 1.5px solid rgba(37,99,235,0.4);
+      background: linear-gradient(135deg, rgba(234,88,12,0.15), rgba(234,88,12,0.05));
+      border: 1.5px solid rgba(234,88,12,0.4);
       color: var(--primary);
     }
     .action-card.live-active .action-icon::after {
@@ -132,7 +132,7 @@
       display: inline-flex;
       align-items: center;
       padding: 4px 10px;
-      background: rgba(37,99,235,0.08);
+      background: rgba(234,88,12,0.08);
       color: var(--primary);
       border-radius: 50px;
       font-size: 11px;
@@ -165,22 +165,7 @@
     }
     .alt-routes-hint.visible { display: flex; }
 
-    /* ── Bus ETA box ── */
-    .bus-stats-box {
-      background: var(--gray-50);
-      border: 1.5px solid var(--gray-200);
-      border-radius: var(--radius-md);
-      padding: 12px 16px;
-      margin-bottom: 12px;
-      display: flex;
-      gap: 20px;
-    }
-    .bus-stat { flex: 1; }
-    .bus-stat-label { font-size: 11px; color: var(--gray-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 2px; }
-    .bus-stat-val { font-size: 16px; font-weight: 700; color: var(--black); font-family: var(--font-mono); }
-    body.dark-mode .bus-stats-box { background: var(--gray-200); border-color: var(--gray-300); }
-    body.dark-mode .bus-stat-label { color: var(--gray-600); }
-    body.dark-mode .bus-stat-val { color: var(--gray-900); }
+    /* Bus stats box removed — stats shown inline in route cards */
 
     /* ── Bus stop fare badge ── */
     .stop-info {
@@ -199,14 +184,14 @@
       font-size: 12px;
       font-weight: 700;
       color: var(--primary);
-      background: rgba(37,99,235,0.08);
+      background: rgba(234,88,12,0.08);
       border-radius: 50px;
       padding: 2px 8px;
       white-space: nowrap;
       font-family: var(--font-mono);
     }
     body.dark-mode .stop-label { color: var(--gray-900); }
-    body.dark-mode .stop-fare-badge { background: rgba(96,165,250,0.15); color: #60a5fa; }
+    body.dark-mode .stop-fare-badge { background: rgba(251,146,60,0.15); color: #fb923c; }
   </style>
 </head>
 <body>
@@ -278,6 +263,155 @@
       </div>
     </div>
   </div>
+
+  <!-- ── LEFT BUBBLE BUTTON ── -->
+  <button class="left-bubble-btn" id="left-bubble-btn" title="Tools">
+    <img src="others.png" alt="Tools" class="bubble-logo" id="left-bubble-logo">
+  </button>
+
+  <!-- ── LEFT TOOLS PANEL ── -->
+  <aside class="left-tools-panel" id="left-tools-panel">
+    <div class="ltp-header">
+      <span class="ltp-title">Tools</span>
+      <button class="ltp-close" id="ltp-close">✕</button>
+    </div>
+    <div class="ltp-tabs">
+      <button class="ltp-tab active" data-ltptab="calc">🧮 Fare Calc</button>
+      <button class="ltp-tab" data-ltptab="report">🚨 Report</button>
+    </div>
+
+    <!-- FARE CALCULATOR TAB -->
+    <div class="ltp-view active" data-ltpview="calc">
+      <div class="ltp-section-title">Quick Fare Calculator</div>
+      <p class="ltp-section-desc">Enter your start and destination — distance fills automatically.</p>
+
+      <div class="lfc-input-group lfc-location-group" id="lfc-from-group">
+        <label class="lfc-label">From <span class="lfc-optional">(optional)</span></label>
+        <div class="lfc-location-wrap" id="lfc-from-wrap">
+          <input type="text" id="lfc-from" class="lfc-input" placeholder="e.g. SM City GenSan" autocomplete="off">
+        </div>
+      </div>
+      <div class="lfc-input-group lfc-location-group" id="lfc-to-group">
+        <label class="lfc-label">To <span class="lfc-optional">(optional)</span></label>
+        <div class="lfc-location-wrap" id="lfc-to-wrap">
+          <input type="text" id="lfc-to" class="lfc-input" placeholder="e.g. Robinsons" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="lfc-input-group">
+        <label class="lfc-label">Distance (km) <span class="lfc-req">*</span></label>
+        <div class="lfc-km-row">
+          <input type="number" id="lfc-km" class="lfc-input" placeholder="Auto-filled or enter manually" min="0" max="100" step="0.1" readonly>
+          <span class="lfc-km-unit">km</span>
+          <span class="lfc-km-status" id="lfc-km-status"></span>
+        </div>
+        <div class="lfc-route-status" id="lfc-route-status"></div>
+      </div>
+
+      <div class="lfc-pax-row">
+        <div class="lfc-pax-group">
+          <label class="lfc-label">👤 Regular</label>
+          <div class="lfc-pax-ctrl">
+            <button class="lfc-pax-btn" id="lfc-reg-minus">−</button>
+            <span id="lfc-reg-count" class="lfc-pax-num">1</span>
+            <button class="lfc-pax-btn" id="lfc-reg-plus">+</button>
+          </div>
+        </div>
+        <div class="lfc-pax-group">
+          <label class="lfc-label">💳 Special</label>
+          <div class="lfc-pax-ctrl">
+            <button class="lfc-pax-btn" id="lfc-disc-minus">−</button>
+            <span id="lfc-disc-count" class="lfc-pax-num">0</span>
+            <button class="lfc-pax-btn" id="lfc-disc-plus">+</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="lfc-calc-btn" id="lfc-calc-btn">Calculate Fare</button>
+
+      <div class="lfc-result" id="lfc-result" style="display:none;">
+        <div class="lfc-result-header">
+          <span id="lfc-result-route" class="lfc-result-route"></span>
+          <span id="lfc-result-dist" class="lfc-result-dist"></span>
+        </div>
+        <div class="lfc-result-fare">
+          <span class="lfc-result-label">Total Fare</span>
+          <span class="lfc-result-amount" id="lfc-result-amount">₱—</span>
+        </div>
+        <div class="lfc-result-breakdown" id="lfc-result-breakdown"></div>
+        <div class="lfc-save-row">
+          <input type="text" id="lfc-save-label" class="lfc-save-label-input" placeholder="Label (e.g. Work commute)">
+          <button class="lfc-save-btn" id="lfc-save-btn">💾 Save</button>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="lfc-history-wrap" id="lfc-history-wrap">
+        <div class="lfc-history-header">
+          <span class="lfc-history-title">📋 Saved History</span>
+          <button class="lfc-history-clear" id="lfc-history-clear">Clear all</button>
+        </div>
+        <div class="lfc-history-list" id="lfc-history-list">
+          <div class="lfc-history-empty">No saved fares yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORT TRIKE TAB -->
+    <div class="ltp-view" data-ltpview="report">
+      <div class="ltp-section-title">Report a Tricycle</div>
+      <p class="ltp-section-desc">Report overcharging, reckless driving, or other violations.</p>
+
+      <div id="ltp-cooldown-notice" class="cooldown-notice" style="display:none;">
+        <span>⏳</span>
+        <p>You may submit another report in <strong id="ltp-cooldown-timer"></strong>.</p>
+      </div>
+
+      <div id="ltp-report-form">
+        <div class="lfc-input-group">
+          <label class="lfc-label">Plate Number <span class="lfc-req">*</span></label>
+          <input type="text" id="ltp-plate" class="lfc-input" placeholder="e.g. AB-1234" maxlength="20" autocomplete="off">
+        </div>
+        <div class="lfc-input-group">
+          <label class="lfc-label">Plate Photo <span class="lfc-optional">(optional)</span></label>
+          <div class="image-drop-zone" id="ltp-image-drop-zone">
+            <input type="file" id="ltp-image-input" accept="image/*" style="display:none;">
+            <div class="drop-zone-idle" id="ltp-drop-zone-idle">
+              <span class="drop-icon">📷</span>
+              <span class="drop-text">Tap to take photo or browse</span>
+              <span class="drop-sub">JPG, PNG — max 5MB</span>
+            </div>
+            <div class="drop-zone-preview" id="ltp-drop-zone-preview" style="display:none;">
+              <img id="ltp-img-preview" src="" alt="preview">
+              <button class="drop-remove-btn" id="ltp-drop-remove-img" type="button">✕</button>
+            </div>
+          </div>
+        </div>
+        <div class="lfc-input-group">
+          <label class="lfc-label">Report Type <span class="lfc-req">*</span></label>
+          <select id="ltp-type" class="lfc-input lfc-select">
+            <option value="">— Select type —</option>
+            <option value="Overcharging">Overcharging</option>
+            <option value="Reckless Driving">Reckless Driving</option>
+            <option value="Refusal of Service">Refusal of Service</option>
+            <option value="Verbal Abuse">Verbal Abuse</option>
+            <option value="Unsafe Vehicle">Unsafe Vehicle</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="lfc-input-group">
+          <label class="lfc-label">Description <span class="lfc-req">*</span></label>
+          <textarea id="ltp-desc" class="lfc-input lfc-textarea" placeholder="Describe what happened..." rows="4" maxlength="500"></textarea>
+          <span class="lfc-char-count"><span id="ltp-desc-count">0</span>/500</span>
+        </div>
+
+        <div class="ltp-report-actions">
+          <button class="lfc-calc-btn" id="ltp-submit-btn">Submit Report</button>
+          <button class="ltp-print-btn" id="ltp-print-btn">🖨️ Print / Save PDF</button>
+        </div>
+      </div>
+    </div>
+  </aside>
 
   <!-- Mode switcher -->
   <nav class="mode-switcher" role="tablist">
@@ -401,21 +535,11 @@
 
         <!-- Instructions -->
         <div class="instruction-card">
-          <p>💡 Tap two points on the map — up to 2 route options will appear. With live location, it auto-switches to the route you're on!</p>
+          <p>Tap two points on the map — up to 2 route options will appear. With live location, it auto-switches to the route you're on!</p>
         </div>
 
-        <!-- Report a Tricycle -->
-        <button class="report-trike-btn" id="open-complaint">
-          <span class="report-trike-icon">🚨</span>
-          <div class="report-trike-text">
-            <strong>Report a Tricycle</strong>
-            <span>Overcharging, reckless driving, etc.</span>
-          </div>
-          <span class="report-trike-arrow">›</span>
-        </button>
-
         <div class="warning-box">
-          <p><strong>⚠️ Route Advisory:</strong> Actual routes may differ due to traffic or driver preference. Always confirm with your driver before paying.</p>
+          <p><strong>Route Advisory:</strong> Actual routes may differ due to traffic or driver preference. Always confirm with your driver before paying.</p>
         </div>
       </div>
     </div>
@@ -426,26 +550,6 @@
         <h2 class="panel-title">Bus & Jeep Routes</h2>
       </div>
       <div class="panel-content">
-        <!-- Bus ETA box -->
-        <div class="bus-stats-box">
-          <div class="bus-stat">
-            <div class="bus-stat-label">Route Length</div>
-            <div class="bus-stat-val" id="bus-dist-display">—</div>
-          </div>
-          <div class="bus-stat">
-            <div class="bus-stat-label">Est. Time</div>
-            <div class="bus-stat-val" id="bus-eta-display">—</div>
-          </div>
-          <div class="bus-stat">
-            <div class="bus-stat-label">Total Stops</div>
-            <div class="bus-stat-val" id="bus-stops-count-display">—</div>
-          </div>
-          <div class="bus-stat">
-            <div class="bus-stat-label">Min. Fare</div>
-            <div class="bus-stat-val" id="bus-min-fare-display">₱15</div>
-          </div>
-        </div>
-
         <div class="route-grid">
           <button class="route-card" data-route="uhaw">
             <div class="route-badge green">🟢</div>
