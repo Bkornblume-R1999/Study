@@ -2,18 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https:; font-src 'self' https://fonts.gstatic.com;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Geo GenSan — Reports</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="config.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg: #f5f7fa; --surface: #ffffff; --border: #e5e7eb;
-      --primary: #ea580c; --danger: #ef4444; --danger-light: #fee2e2;
+      --primary: #e67e22; --danger: #ef4444; --danger-light: #fee2e2;
       --success: #10b981; --text: #111827; --muted: #6b7280;
       --font: 'DM Sans', -apple-system, sans-serif;
       --mono: 'Space Mono', monospace;
@@ -22,17 +25,17 @@
     }
     body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
 
-    /* ── LOGIN ── */
+    /*  LOGIN  */
     #login-screen {
       min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, #7c2d12 0%, #991b1b 100%); padding: 24px;
+      background: linear-gradient(135deg, #7f1d1d 0%, #92400e 100%); padding: 24px;
     }
     .login-card {
       background: white; border-radius: 20px; padding: 40px 36px;
       width: 100%; max-width: 380px;
       box-shadow: 0 24px 64px rgba(0,0,0,0.3); text-align: center;
     }
-    .login-logo { font-size: 32px; font-weight: 900; color: #ea580c; letter-spacing: -1px; margin-bottom: 8px; }
+    .login-logo { font-size: 32px; font-weight: 900; color: #e67e22; letter-spacing: -1px; margin-bottom: 8px; }
     .login-title { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
     .login-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 28px; }
     .login-label { display: block; text-align: left; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px; }
@@ -45,21 +48,21 @@
     .login-error { font-size: 13px; color: var(--danger); margin-bottom: 14px; min-height: 18px; }
     .login-btn {
       width: 100%; padding: 14px;
-      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
       color: white; border: none; border-radius: 10px;
       font-family: var(--font); font-size: 15px; font-weight: 700;
       cursor: pointer; transition: opacity 0.15s, transform 0.15s;
     }
     .login-btn:hover { opacity: 0.92; transform: translateY(-1px); }
 
-    /* ── ADMIN SCREEN ── */
+    /*  ADMIN SCREEN  */
     #admin-screen { display: none; }
     .topbar {
-      background: linear-gradient(135deg, #ea580c 0%, #dc2626 100%);
+      background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%);
       color: white; padding: 0 24px; height: 60px;
       display: flex; align-items: center; justify-content: flex-end;
       position: sticky; top: 0; z-index: 100;
-      box-shadow: 0 2px 12px rgba(37,99,235,0.3);
+      box-shadow: 0 2px 12px rgba(230,126,34,0.3);
     }
     .logout-btn {
       background: rgba(255,255,255,0.18); border: none; color: white;
@@ -70,7 +73,7 @@
 
     .container { max-width: 1200px; margin: 0 auto; padding: 28px 24px 48px; }
 
-    /* ── STATS SECTION ── */
+    /*  STATS SECTION  */
     .stats-section { margin-bottom: 20px; }
     .stats-header { margin-bottom: 12px; }
     .stats-top-row {
@@ -117,7 +120,7 @@
       cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
     }
     .stat-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
-    .stat-card.active-filter { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.18); }
+    .stat-card.active-filter { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(230,126,34,0.18); }
     .stat-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 7px; }
     .stat-value { font-family: var(--mono); font-size: 26px; font-weight: 700; line-height: 1; }
     .stat-overcharging .stat-value { color: #c2410c; }
@@ -127,7 +130,7 @@
     .stat-unsafe       .stat-value { color: #a16207; }
     .stat-other        .stat-value { color: #15803d; }
 
-    /* ── TABLE CARD ── */
+    /*  TABLE CARD  */
     .table-card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden; }
     .table-toolbar { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 11px; }
     .toolbar-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
@@ -172,8 +175,8 @@
     }
     .btn-excel  { background: #16a34a; color: white; border-color: #16a34a; }
     .btn-excel:hover { background: #15803d; }
-    .btn-pdf    { background: #1e40af; color: white; border-color: #1e40af; }
-    .btn-pdf:hover { background: #1e3a8a; }
+    .btn-pdf    { background: #c0392b; color: white; border-color: #c0392b; }
+    .btn-pdf:hover { background: #922b21; }
     .btn-print  { background: var(--surface); color: var(--text); border-color: var(--border); }
     .btn-print:hover { border-color: #9ca3af; background: #f9fafb; }
     .btn-clear-date {
@@ -186,13 +189,13 @@
     /* Selection banner */
     .sel-banner {
       display: none; align-items: center; gap: 10px;
-      background: #fff7ed; border-bottom: 1px solid #fed7aa;
-      padding: 9px 18px; font-size: 13px; font-weight: 600; color: #c2410c;
+      background: #fff7ed; border-bottom: 1px solid #fde68a;
+      padding: 9px 18px; font-size: 13px; font-weight: 600; color: #c0392b;
     }
     .sel-banner.show { display: flex; }
     .sel-banner-count { flex: 1; }
     .sel-banner-desel {
-      background: white; border: 1.5px solid #bfdbfe; color: #c2410c;
+      background: white; border: 1.5px solid #fde68a; color: #c0392b;
       padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 700;
       cursor: pointer; font-family: var(--font);
     }
@@ -201,10 +204,10 @@
       padding: 6px 13px; border-radius: 7px; font-size: 12px; font-weight: 700;
       cursor: pointer; font-family: var(--font);
     }
-    .sel-banner-desel:hover { background: #ffedd5; }
+    .sel-banner-desel:hover { background: #fef3c7; }
     .sel-banner-del:hover { background: #dc2626; }
 
-    /* ── TABLE ── */
+    /*  TABLE  */
     .table-wrapper { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; }
     thead th {
@@ -223,7 +226,7 @@
     tbody tr:last-child td { border-bottom: none; }
     tbody tr:hover td { background: #f9fafb; }
     tbody tr.sel-row td { background: #fff7ed !important; }
-    @keyframes hl { 0% { background: #ffedd5; } 100% { background: transparent; } }
+    @keyframes hl { 0% { background: #fef3c7; } 100% { background: transparent; } }
     tbody tr.new-row td { animation: hl 2s ease-out; }
 
     .col-chk  { width: 38px; text-align: center; }
@@ -256,20 +259,20 @@
       transition: all 0.15s; white-space: nowrap; letter-spacing: 0.02em;
       text-transform: uppercase;
     }
-    .act-btn.save-pdf:hover  { border-color: #1e40af; color: #1e40af; background: #fff7ed; }
+    .act-btn.save-pdf:hover  { border-color: #c0392b; color: #c0392b; background: #fff7ed; }
     .act-btn.print-r:hover   { border-color: #374151; color: #374151; background: #f9fafb; }
     .act-btn.del-r:hover     { border-color: var(--danger); color: var(--danger); background: var(--danger-light); }
 
-    input[type=checkbox] { width: 15px; height: 15px; accent-color: #ea580c; cursor: pointer; }
+    input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--primary); cursor: pointer; }
 
-    /* ── LIGHTBOX ── */
+    /*  LIGHTBOX  */
     .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 9999; align-items: center; justify-content: center; padding: 20px; }
     .lightbox.show { display: flex; }
     .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
     .lb-close { position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,0.15); border: none; color: white; font-size: 22px; width: 42px; height: 42px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
     .lb-close:hover { background: rgba(255,255,255,0.28); }
 
-    /* ── CONFIRM MODAL ── */
+    /*  CONFIRM MODAL  */
     .confirm-ov { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 8888; align-items: center; justify-content: center; padding: 20px; }
     .confirm-ov.show { display: flex; }
     .confirm-box { background: white; border-radius: 16px; padding: 28px; max-width: 360px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.25); text-align: center; }
@@ -281,7 +284,7 @@
     .c-ok     { background: var(--danger); color: white; }
     .c-cancel:hover, .c-ok:hover { opacity: 0.85; }
 
-    /* ── MISC ── */
+    /*  MISC  */
     .empty-state { text-align: center; padding: 52px 24px; color: var(--muted); }
     .empty-state .ei { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; opacity: 0.4; }
     .empty-state p { font-size: 15px; }
@@ -299,20 +302,20 @@
       .search-input:focus { width: 170px; }
     }
 
-    /* ── PRINT ── */
+    /*  PRINT  */
     #print-area { display: none; }
     @media print {
       body > *:not(#print-area) { display: none !important; }
       #print-area { display: block !important; }
     }
 
-    /* ── FARE EDITOR ── */
+    /*  FARE EDITOR  */
     .fare-editor-card {
       background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow);
       border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px;
     }
     .fare-editor-header {
-      background: linear-gradient(135deg, rgba(234,88,12,0.08), rgba(220,38,38,0.08));
+      background: linear-gradient(135deg, rgba(230,126,34,0.08), rgba(192,57,43,0.08));
       border-bottom: 1px solid var(--border);
       padding: 16px 20px;
       display: flex; align-items: center; justify-content: space-between;
@@ -342,7 +345,7 @@
     .fare-preview-label { font-weight: 700; margin-bottom: 4px; }
     .fare-preview-formula { font-family: var(--mono); font-size: 14px; }
     .fare-save-btn {
-      padding: 11px 24px; background: linear-gradient(135deg, #ea580c, #dc2626);
+      padding: 11px 24px; background: linear-gradient(135deg, #e67e22, #7c3aed);
       color: white; border: none; border-radius: 10px; font-family: var(--font);
       font-size: 14px; font-weight: 700; cursor: pointer; transition: opacity 0.15s, transform 0.15s;
     }
@@ -358,7 +361,7 @@
     .fare-history-item:last-child { border-bottom: none; }
     .fare-history-formula { font-family: var(--mono); font-weight: 700; color: var(--text); }
 
-    /* ── Firebase status banner ── */
+    /*  Firebase status banner  */
     .fb-status {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -376,10 +379,10 @@
 </head>
 <body>
 
-<!-- ── LOGIN ── -->
+<!--  LOGIN  -->
 <div id="login-screen">
   <div class="login-card">
-    <div class="login-logo" style="color:#ea580c">Geo Gensan</div>
+    <div class="login-logo">Geo Gensan</div>
     <div class="login-title">Admin</div>
     <div class="login-subtitle">Tricycle Reports Dashboard</div>
     <label class="login-label" for="login-input">Password</label>
@@ -389,10 +392,9 @@
   </div>
 </div>
 
-<!-- ── ADMIN SCREEN ── -->
+<!--  ADMIN SCREEN  -->
 <div id="admin-screen">
   <div class="topbar">
-    <span style="color:white;font-weight:800;font-size:16px;letter-spacing:-0.3px;">GeoGensan Admin</span>
     <button class="logout-btn" id="logout-btn">Logout</button>
   </div>
 
@@ -402,7 +404,7 @@
     <div class="fare-editor-card" id="fare-editor-card">
       <div class="fare-editor-header">
         <div>
-          <div class="fare-editor-title">⚙️ Trike Fare Logic Editor</div>
+          <div class="fare-editor-title"> Trike Fare Logic Editor</div>
           <div class="fare-editor-sub">Changes apply immediately to the live app — loaded from Firebase</div>
         </div>
         <button class="toggle-breakdown-btn" id="toggle-fare-editor">Edit Fare</button>
@@ -438,13 +440,13 @@
           </div>
 
           <div class="fare-preview-box" id="fare-preview-box">
-            <div class="fare-preview-label">📋 Current Formula Preview:</div>
+            <div class="fare-preview-label"> Current Formula Preview:</div>
             <div class="fare-preview-formula" id="fare-preview-formula">₱15 for first 4 km, then ₱1/km. Special passengers get 20% off.</div>
           </div>
 
           <div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;">
-            <button class="fare-save-btn" id="fare-save-btn">💾 Save Fare Config</button>
-            <span class="fare-save-status" id="fare-save-status">✅ Saved successfully!</span>
+            <button class="fare-save-btn" id="fare-save-btn"> Save Fare Config</button>
+            <span class="fare-save-status" id="fare-save-status"> Saved successfully!</span>
             <button class="toggle-breakdown-btn" id="fare-reset-btn" style="margin-left:auto;">Reset to Default</button>
           </div>
 
@@ -593,12 +595,20 @@
 /* ================================================================
    CONFIG
 ================================================================ */
-const FIREBASE_DB_URL = 'https://gentrike-75c7c-default-rtdb.asia-southeast1.firebasedatabase.app';
-const ADMIN_PASSWORD  = '00000000';
+const FIREBASE_DB_URL = window.__GG_CFG__?.dbUrl || 'https://gentrike-75c7c-default-rtdb.asia-southeast1.firebasedatabase.app';
+// Security: password validation (use server-side auth in production)
+const ADMIN_PASSWORD  = atob('MDAwMDAwMDA='); // base64 encoded — replace with server-side auth
 
-/* ── helpers ──────────────────────────────────────────────────── */
+/*  helpers  */
 function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  if (s === null || s === undefined) return '—';
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;')
+    .replace(/\//g,'&#x2F;');
 }
 function showToast(msg, ms = 2600) {
   const t = document.getElementById('toast');
@@ -606,7 +616,7 @@ function showToast(msg, ms = 2600) {
   setTimeout(() => t.classList.remove('show'), ms);
 }
 
-/* ── Firebase ─────────────────────────────────────────────────── */
+/*  Firebase  */
 async function fbGetAll() {
   const url = `${FIREBASE_DB_URL}/reports.json`;
   const res = await fetch(url);
@@ -633,22 +643,22 @@ async function testFirebaseConnection() {
   try {
     const res = await fetch(`${FIREBASE_DB_URL}/reports.json`);
     if (res.status === 401 || res.status === 403) {
-      statusEl.innerHTML = '🔴 <strong>Firebase rules blocking reads.</strong> Go to Firebase Console → Realtime Database → Rules and set <code>".read": true</code> under <code>reports</code>.';
+      statusEl.innerHTML = ' <strong>Firebase rules blocking reads.</strong> Go to Firebase Console → Realtime Database → Rules and set <code>".read": true</code> under <code>reports</code>.';
       statusEl.className = 'fb-status error';
     } else if (!res.ok) {
-      statusEl.innerHTML = `🔴 Firebase error: HTTP ${res.status}`;
+      statusEl.innerHTML = ` Firebase error: HTTP ${res.status}`;
       statusEl.className = 'fb-status error';
     } else {
-      // Firebase connected - silently hide status
+      // Success: no status message — keep UI clean
       statusEl.style.display = 'none';
     }
   } catch (e) {
-    statusEl.innerHTML = `🔴 Network error: ${e.message}`;
+    statusEl.innerHTML = ` Network error: ${e.message}`;
     statusEl.className = 'fb-status error';
   }
 }
 
-/* ── Type maps ────────────────────────────────────────────────── */
+/*  Type maps  */
 const TYPE_CLS = {
   'Overcharging':'overcharging','Reckless Driving':'reckless',
   'Refusal of Service':'refusal','Verbal Abuse':'verbal',
@@ -671,7 +681,7 @@ let pollInterval = null;
 let isFirstLoad  = true;
 let breakdownOpen = false;
 
-/* ── active date filter ── */
+/*  active date filter  */
 let dateFilter = { granularity: '', year: null, month: null, week: null, day: null };
 
 /* ================================================================
@@ -718,9 +728,9 @@ function updateStats() {
   const sorted = [...allReports].sort((a,b) => (b.timestamp||0)-(a.timestamp||0));
   if (sorted.length > 0) {
     const latest = sorted[0];
-    const dateRaw = latest.date || latest.dateString || (latest.timestamp ? new Date(latest.timestamp).toLocaleString('en-PH',{timeZone:'Asia/Manila'}) : null);
-    const d = latest.timestamp ? new Date(latest.timestamp) : (dateRaw ? new Date(dateRaw) : null);
-    const dateStr = (d && !isNaN(d)) ? d.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}) : (dateRaw||'—');
+    const d = latest.timestamp ? new Date(latest.timestamp) : new Date(latest.date);
+    const dateStr = isNaN(d) ? (latest.date||'—') :
+      d.toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'});
     document.getElementById('stat-recent').textContent = dateStr;
   } else {
     document.getElementById('stat-recent').textContent = '—';
@@ -867,8 +877,8 @@ function matchesDateFilter(r) {
   if (!g) return true;
   if (!r.timestamp && !r.date) return false;
 
-  const ts = r.timestamp ? new Date(r.timestamp) : (r.date ? new Date(r.date) : (r.dateString ? new Date(r.dateString) : null));
-  if (!ts || isNaN(ts)) return false;
+  const ts = r.timestamp ? new Date(r.timestamp) : new Date(r.date);
+  if (isNaN(ts)) return false;
 
   if (g === 'year')  return ts.getFullYear() === dateFilter.year;
   if (g === 'month') return ts.getFullYear() === dateFilter.year && ts.getMonth() === dateFilter.month;
@@ -907,7 +917,8 @@ function getFiltered() {
 
   let list = [...allReports];
   if (ft)     list = list.filter(r => r.type === ft);
-  if (search) list = list.filter(r => (r.plate||'').toLowerCase().includes(search));
+  const safeSearch = search.replace(/[<>'"]/g,'');
+  if (safeSearch) list = list.filter(r => (r.plate||'').toLowerCase().includes(safeSearch));
   list = list.filter(r => matchesDateFilter(r));
 
   list.sort((a, b) => {
@@ -951,7 +962,7 @@ function renderTable(filtered) {
       <td class="col-num">${i+1}</td>
       <td class="col-img">${imgCell}</td>
       <td class="col-plate">${esc(r.plate||'—')}</td>
-      <td class="col-date">${esc(r.date || (r.dateString ? new Date(r.dateString).toLocaleString('en-PH', {timeZone:'Asia/Manila',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : (r.timestamp ? new Date(r.timestamp).toLocaleString('en-PH', {timeZone:'Asia/Manila',year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '—')))}</td>
+      <td class="col-date">${esc(r.date || (r.timestamp ? new Date(r.timestamp).toLocaleString('en-PH', {timeZone:'Asia/Manila',dateStyle:'medium',timeStyle:'short'}) : (r.dateString ? new Date(r.dateString).toLocaleString('en-PH',{timeZone:'Asia/Manila',dateStyle:'medium',timeStyle:'short'}) : '—')))}</td>
       <td><span class="type-badge ${cls}">${esc(r.type)}</span></td>
       <td class="col-desc">${esc(r.description||'')}</td>
       <td class="col-act">
@@ -972,7 +983,7 @@ function renderTable(filtered) {
   tbody.querySelectorAll('.act-btn.del-r').forEach(btn =>
     btn.addEventListener('click', () => deleteSingle(btn.dataset.key)));
 
-  // Save PDF
+  //Save PDF
   tbody.querySelectorAll('.act-btn.save-pdf').forEach(btn =>
     btn.addEventListener('click', () => {
       const r = allReports.find(x => x._key === btn.dataset.key);
@@ -1217,8 +1228,8 @@ function buildPrintHTML(r) {
       *{box-sizing:border-box;margin:0;padding:0;}
       body{font-family:'DM Sans',Arial,sans-serif;color:#111827;background:white;}
       .wrap{max-width:680px;margin:0 auto;padding:36px 40px;}
-      .hdr{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:14px;border-bottom:3px solid #2563eb;margin-bottom:26px;}
-      .hdr-logo{font-size:22px;font-weight:900;color:#2563eb;letter-spacing:-0.5px;}
+      .hdr{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:14px;border-bottom:3px solid #e67e22;margin-bottom:26px;}
+      .hdr-logo{font-size:22px;font-weight:900;color:#e67e22;letter-spacing:-0.5px;}
       .hdr-sub{font-size:11px;color:#6b7280;margin-top:3px;}
       .hdr-ref{text-align:right;font-size:11px;color:#6b7280;line-height:1.8;}
       .hdr-ref strong{color:#111827;}
@@ -1228,7 +1239,7 @@ function buildPrintHTML(r) {
       .field label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;display:block;margin-bottom:4px;}
       .field span{font-size:14px;font-weight:600;color:#111827;}
       .badge{display:inline-block;padding:3px 12px;border-radius:99px;font-size:12px;font-weight:700;background:#fff7ed;color:#c2410c;}
-      .desc-box{background:#f9fafb;border-left:4px solid #2563eb;border-radius:6px;padding:14px 16px;margin-bottom:22px;}
+      .desc-box{background:#f9fafb;border-left:4px solid #e67e22;border-radius:6px;padding:14px 16px;margin-bottom:22px;}
       .desc-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin-bottom:7px;}
       .desc-txt{font-size:14px;line-height:1.65;color:#374151;}
       .img-box{margin-bottom:22px;}
@@ -1252,7 +1263,7 @@ function buildPrintHTML(r) {
       <div class="doc-sub">Official report filed through the Geo GenSan public reporting system.</div>
       <div class="grid">
         <div class="field"><label>Plate Number</label><span>${esc(r.plate||'—')}</span></div>
-        <div class="field"><label>Date &amp; Time Filed</label><span>${esc(r.date || (r.dateString ? new Date(r.dateString).toLocaleString('en-PH', {timeZone:'Asia/Manila'}) : (r.timestamp ? new Date(r.timestamp).toLocaleString('en-PH', {timeZone:'Asia/Manila'}) : '—')))}</span></div>
+        <div class="field"><label>Date &amp; Time Filed</label><span>${esc(r.date||'—')}</span></div>
         <div class="field"><label>Violation Type</label><span class="badge">${esc(r.type||'—')}</span></div>
       </div>
       <div class="desc-box">
@@ -1316,11 +1327,11 @@ async function loadReports() {
     const msg = err && err.message ? err.message : String(err);
     let hint = 'Failed to load reports.';
     if (msg.includes('401') || msg.includes('403') || msg.includes('Permission denied')) {
-      hint = '⚠️ Firebase rules are blocking reads. In Firebase Console → Realtime Database → Rules, set <code>".read": true</code> under <code>reports</code>.';
+      hint = ' Firebase rules are blocking reads. In Firebase Console → Realtime Database → Rules, set <code>".read": true</code> under <code>reports</code>.';
     } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
-      hint = '⚠️ No internet connection.';
+      hint = ' No internet connection.';
     } else {
-      hint = `⚠️ ${msg}`;
+      hint = ` ${msg}`;
     }
     if (isFirstLoad)
       document.getElementById('reports-tbody').innerHTML =
@@ -1328,6 +1339,8 @@ async function loadReports() {
   }
 }
 function startPolling() {
+  const statusEl = document.getElementById('firebase-status');
+  if (statusEl) statusEl.style.display = 'block';
   testFirebaseConnection();
   loadReports();
   pollInterval = setInterval(loadReports, 10000);
@@ -1448,17 +1461,17 @@ async function initFareEditor() {
         bus: { minimumFare: parseFloat(document.getElementById('fe-bus-fare').value) || 15 }
       };
       await saveFareConfig(config);
-      status.textContent = '✅ Saved!'; status.classList.add('visible');
+      status.textContent = 'Saved!'; status.classList.add('visible');
       setTimeout(() => status.classList.remove('visible'), 3000);
       showToast('Fare config saved to Firebase');
       const history = await loadFareHistory();
       renderFareHistory(history);
     } catch(err) {
       const msg = err && err.message ? err.message : String(err);
-      showToast(`❌ Save failed: ${msg.slice(0,60)}`, 5000);
+      showToast(` Save failed: ${msg.slice(0,60)}`, 5000);
       console.error('saveFareConfig error:', err);
     } finally {
-      btn.disabled = false; btn.textContent = '💾 Save Fare Config';
+      btn.disabled = false; btn.textContent = 'Save Fare Config';
     }
   });
 
