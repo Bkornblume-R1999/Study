@@ -12,16 +12,16 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="icon" type="png" href="geogensan.png"/>
   <style>
-    /* ── Live pulse animation ── */
+    /*  Live pulse animation  */
     @keyframes live-pulse {
-      0%, 100% { box-shadow: 0 0 0 6px rgba(234,88,12,0.25); }
-      50% { box-shadow: 0 0 0 12px rgba(234,88,12,0.1); }
+      0%, 100% { box-shadow: 0 0 0 6px rgba(230,126,34,0.25); }
+      50% { box-shadow: 0 0 0 12px rgba(230,126,34,0.1); }
     }
 
-    /* ── Live active state for My Location button ── */
+    /*  Live active state for My Location button  */
     .action-card.live-active {
-      background: linear-gradient(135deg, rgba(234,88,12,0.15), rgba(234,88,12,0.05));
-      border: 1.5px solid rgba(234,88,12,0.4);
+      background: linear-gradient(135deg, rgba(230,126,34,0.15), rgba(230,126,34,0.05));
+      border: 1.5px solid rgba(230,126,34,0.4);
       color: var(--primary);
     }
     .action-card.live-active .action-icon::after {
@@ -39,7 +39,7 @@
       50% { opacity: 0.2; }
     }
 
-    /* ── ETA display ── */
+    /*  ETA display  */
     .eta-row {
       display: flex;
       align-items: center;
@@ -59,7 +59,7 @@
       text-shadow: 0 0 10px rgba(255,255,255,0.4);
     }
 
-    /* ── Passenger controls ── */
+    /*  Passenger controls  */
     .passenger-section {
       background: var(--gray-50);
       border: 1.5px solid var(--gray-200);
@@ -117,7 +117,7 @@
       line-height: 1;
       padding: 0;
     }
-    .pax-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(37,99,235,0.06); }
+    .pax-btn:hover { border-color: var(--primary); color: var(--primary); background: rgba(230,126,34,0.06); }
 
     .pax-count {
       font-family: var(--font-mono);
@@ -132,7 +132,7 @@
       display: inline-flex;
       align-items: center;
       padding: 4px 10px;
-      background: rgba(234,88,12,0.08);
+      background: rgba(230,126,34,0.08);
       color: var(--primary);
       border-radius: 50px;
       font-size: 11px;
@@ -149,14 +149,14 @@
     body.dark-mode .pax-btn { background: var(--gray-100); border-color: var(--gray-400); color: var(--gray-900); }
     body.dark-mode .pax-count { color: var(--gray-900); }
 
-    /* ── Alt routes info ── */
+    /*  Alt routes info  */
     .alt-routes-hint {
       display: none;
       align-items: center;
       gap: 8px;
       padding: 8px 12px;
-      background: rgba(37,99,235,0.06);
-      border: 1px solid rgba(37,99,235,0.15);
+      background: rgba(230,126,34,0.06);
+      border: 1px solid rgba(230,126,34,0.15);
       border-radius: var(--radius-sm);
       font-size: 12px;
       color: var(--primary);
@@ -167,7 +167,7 @@
 
     /* Bus stats box removed — stats shown inline in route cards */
 
-    /* ── Bus stop fare badge ── */
+    /*  Bus stop fare badge  */
     .stop-info {
       display: flex;
       align-items: center;
@@ -184,15 +184,45 @@
       font-size: 12px;
       font-weight: 700;
       color: var(--primary);
-      background: rgba(234,88,12,0.08);
+      background: rgba(230,126,34,0.08);
       border-radius: 50px;
       padding: 2px 8px;
       white-space: nowrap;
       font-family: var(--font-mono);
     }
     body.dark-mode .stop-label { color: var(--gray-900); }
-    body.dark-mode .stop-fare-badge { background: rgba(251,146,60,0.15); color: #fb923c; }
-  </style>
+    body.dark-mode .stop-fare-badge { background: rgba(96,165,250,0.15); color: #60a5fa; }
+  
+    /* Discount button images */
+    .discount-img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-bottom: 4px;
+    }
+    .discount-btn.active .discount-img {
+      filter: brightness(0) invert(1);
+    }
+
+    /* Mobile drag handle for left panel */
+    .ltp-drag-handle {
+      display: none;
+      justify-content: center;
+      padding: 10px 0 4px;
+      cursor: grab;
+      touch-action: none;
+    }
+    .ltp-drag-bar {
+      width: 44px;
+      height: 4px;
+      background: var(--gray-300);
+      border-radius: 99px;
+    }
+    @media (max-width: 640px) {
+      .ltp-drag-handle { display: flex; }
+    }
+</style>
 </head>
 <body>
   <!-- Full-screen map container -->
@@ -213,8 +243,8 @@
   <div id="complaint-modal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
       <div class="modal-header">
-        <h2>🚨 Report a Tricycle</h2>
-        <button class="modal-close" id="close-complaint">✕</button>
+        <h2>Report a Tricycle</h2>
+        <button class="modal-close" id="close-complaint"></button>
       </div>
       <div class="modal-body">
         <div id="complaint-cooldown-notice" class="cooldown-notice" style="display:none;">
@@ -231,13 +261,13 @@
             <div class="image-drop-zone" id="image-drop-zone">
               <input type="file" id="complaint-image-input" accept="image/*" style="display:none;">
               <div class="drop-zone-idle" id="drop-zone-idle">
-                <span class="drop-icon">📷</span>
+                <span class="drop-icon"></span>
                 <span class="drop-text">Tap to take photo or browse files</span>
                 <span class="drop-sub">JPG, PNG, HEIC — max 5MB</span>
               </div>
               <div class="drop-zone-preview" id="drop-zone-preview" style="display:none;">
                 <img id="complaint-img-preview" src="" alt="preview">
-                <button class="drop-remove-btn" id="drop-remove-img" type="button">✕</button>
+                <button class="drop-remove-btn" id="drop-remove-img" type="button"></button>
               </div>
             </div>
           </div>
@@ -264,20 +294,21 @@
     </div>
   </div>
 
-  <!-- ── LEFT BUBBLE BUTTON ── -->
+  <!--  LEFT BUBBLE BUTTON  -->
   <button class="left-bubble-btn" id="left-bubble-btn" title="Tools">
     <img src="others.png" alt="Tools" class="bubble-logo" id="left-bubble-logo">
   </button>
 
-  <!-- ── LEFT TOOLS PANEL ── -->
+  <!--  LEFT TOOLS PANEL  -->
   <aside class="left-tools-panel" id="left-tools-panel">
+    <div class="ltp-drag-handle" id="ltp-drag-handle" aria-hidden="true"><div class="ltp-drag-bar"></div></div>
     <div class="ltp-header">
       <span class="ltp-title">Tools</span>
-      <button class="ltp-close" id="ltp-close">✕</button>
+      <button class="ltp-close" id="ltp-close"></button>
     </div>
     <div class="ltp-tabs">
-      <button class="ltp-tab active" data-ltptab="calc">🧮 Fare Calc</button>
-      <button class="ltp-tab" data-ltptab="report">🚨 Report</button>
+      <button class="ltp-tab active" data-ltptab="calc">Fare Calc</button>
+      <button class="ltp-tab" data-ltptab="report">Report</button>
     </div>
 
     <!-- FARE CALCULATOR TAB -->
@@ -301,7 +332,7 @@
       <div class="lfc-input-group">
         <label class="lfc-label">Distance (km) <span class="lfc-req">*</span></label>
         <div class="lfc-km-row">
-          <input type="number" id="lfc-km" class="lfc-input" placeholder="Auto-filled or enter manually" min="0" max="100" step="0.1" readonly>
+          <input type="number" id="lfc-km" class="lfc-input" placeholder="Auto-filled from route" min="0" max="100" step="0.1" readonly>
           <span class="lfc-km-unit">km</span>
           <span class="lfc-km-status" id="lfc-km-status"></span>
         </div>
@@ -310,7 +341,7 @@
 
       <div class="lfc-pax-row">
         <div class="lfc-pax-group">
-          <label class="lfc-label">👤 Regular</label>
+          <label class="lfc-label">Regular</label>
           <div class="lfc-pax-ctrl">
             <button class="lfc-pax-btn" id="lfc-reg-minus">−</button>
             <span id="lfc-reg-count" class="lfc-pax-num">1</span>
@@ -318,7 +349,7 @@
           </div>
         </div>
         <div class="lfc-pax-group">
-          <label class="lfc-label">💳 Special</label>
+          <label class="lfc-label">Special</label>
           <div class="lfc-pax-ctrl">
             <button class="lfc-pax-btn" id="lfc-disc-minus">−</button>
             <span id="lfc-disc-count" class="lfc-pax-num">0</span>
@@ -341,14 +372,14 @@
         <div class="lfc-result-breakdown" id="lfc-result-breakdown"></div>
         <div class="lfc-save-row">
           <input type="text" id="lfc-save-label" class="lfc-save-label-input" placeholder="Label (e.g. Work commute)">
-          <button class="lfc-save-btn" id="lfc-save-btn">💾 Save</button>
+          <button class="lfc-save-btn" id="lfc-save-btn">Save</button>
         </div>
       </div>
 
       <!-- History -->
       <div class="lfc-history-wrap" id="lfc-history-wrap">
         <div class="lfc-history-header">
-          <span class="lfc-history-title">📋 Saved History</span>
+          <span class="lfc-history-title">Saved History</span>
           <button class="lfc-history-clear" id="lfc-history-clear">Clear all</button>
         </div>
         <div class="lfc-history-list" id="lfc-history-list">
@@ -377,13 +408,13 @@
           <div class="image-drop-zone" id="ltp-image-drop-zone">
             <input type="file" id="ltp-image-input" accept="image/*" style="display:none;">
             <div class="drop-zone-idle" id="ltp-drop-zone-idle">
-              <span class="drop-icon">📷</span>
+              <span class="drop-icon"></span>
               <span class="drop-text">Tap to take photo or browse</span>
               <span class="drop-sub">JPG, PNG — max 5MB</span>
             </div>
             <div class="drop-zone-preview" id="ltp-drop-zone-preview" style="display:none;">
               <img id="ltp-img-preview" src="" alt="preview">
-              <button class="drop-remove-btn" id="ltp-drop-remove-img" type="button">✕</button>
+              <button class="drop-remove-btn" id="ltp-drop-remove-img" type="button"></button>
             </div>
           </div>
         </div>
@@ -407,7 +438,7 @@
 
         <div class="ltp-report-actions">
           <button class="lfc-calc-btn" id="ltp-submit-btn">Submit Report</button>
-          <button class="ltp-print-btn" id="ltp-print-btn">🖨️ Print / Save PDF</button>
+          <button class="ltp-print-btn" id="ltp-print-btn">Print / Save PDF</button>
         </div>
       </div>
     </div>
@@ -442,11 +473,11 @@
         <!-- Quick actions -->
         <div class="quick-actions">
           <button class="action-card" id="use-location">
-            <span class="action-icon">📍</span>
+            <span class="action-icon"></span>
             <span class="action-text">Live Location</span>
           </button>
           <button class="action-card" id="reset-trike">
-            <span class="action-icon">🔄</span>
+            <span class="action-icon"></span>
             <span class="action-text">Reset</span>
           </button>
         </div>
@@ -456,11 +487,11 @@
           <label class="discount-label">Passenger Type</label>
           <div class="discount-options">
             <button class="discount-btn active" data-discount="none">
-              <span class="discount-icon">👤</span>
+              <img src="Regular.png" alt="Regular" class="discount-img" onerror="this.style.display='none'">
               <span class="discount-name">Regular</span>
             </button>
             <button class="discount-btn" data-discount="special">
-              <span class="discount-icon">💳</span>
+              <img src="pwd.png" alt="Special" class="discount-img" onerror="this.style.display='none'">
               <span class="discount-name">PWD / Senior / Student</span>
             </button>
           </div>
@@ -470,7 +501,7 @@
         <div class="passenger-section">
           <div class="passenger-section-title">Passengers</div>
           <div class="passenger-row">
-            <span class="passenger-label">👤 Regular</span>
+            <span class="passenger-label">Regular</span>
             <div class="passenger-controls">
               <button class="pax-btn" id="regular-minus">−</button>
               <span class="pax-count" id="regular-count">1</span>
@@ -478,7 +509,7 @@
             </div>
           </div>
           <div class="passenger-row" id="discounted-pax-row" style="display:none;">
-            <span class="passenger-label">💳 Special</span>
+            <span class="passenger-label">Special</span>
             <div class="passenger-controls">
               <button class="pax-btn" id="discounted-minus">−</button>
               <span class="pax-count" id="discounted-count">0</span>
@@ -508,8 +539,7 @@
         </div>
 
         <!-- Alt routes hint -->
-        <div class="alt-routes-hint" id="alt-routes-hint">
-          🛣️ Tap a dashed route on the map to switch
+        <div class="alt-routes-hint" id="alt-routes-hint">Tap a dashed route on the map to switch
         </div>
 
         <!-- Trip summary -->
@@ -539,7 +569,7 @@
         </div>
 
         <div class="warning-box">
-          <p><strong>Route Advisory:</strong> Actual routes may differ due to traffic or driver preference. Always confirm with your driver before paying.</p>
+          <p><strong>Route Advisory:</strong>Actual routes may differ due to traffic or driver preference. Always confirm with your driver before paying.</p>
         </div>
       </div>
     </div>
@@ -552,7 +582,7 @@
       <div class="panel-content">
         <div class="route-grid">
           <button class="route-card" data-route="uhaw">
-            <div class="route-badge green">🟢</div>
+            <div class="route-badge green"></div>
             <div class="route-info">
               <h3 class="route-name">Uhaw Route</h3>
               <p class="route-stops">12 stops • Airport to Robinsons</p>
@@ -560,7 +590,7 @@
             <div class="route-fare">₱15</div>
           </button>
           <button class="route-card" data-route="calumpang">
-            <div class="route-badge yellow">🟡</div>
+            <div class="route-badge yellow"></div>
             <div class="route-info">
               <h3 class="route-name">Calumpang Route</h3>
               <p class="route-stops">8 stops • Lado to Lagao Market</p>
@@ -568,7 +598,7 @@
             <div class="route-fare">₱15</div>
           </button>
           <button class="route-card" data-route="mabuhay">
-            <div class="route-badge white">⚪</div>
+            <div class="route-badge white"></div>
             <div class="route-info">
               <h3 class="route-name">Mabuhay Route</h3>
               <p class="route-stops">10 stops • Market to Mabuhay</p>
@@ -590,7 +620,7 @@
         </div>
 
         <div class="warning-box">
-          <strong>Route Advisory:</strong> Drivers may take alternative routes due to traffic. Always confirm fare before paying.
+          <strong>Route Advisory:</strong>Drivers may take alternative routes due to traffic. Always confirm fare before paying.
         </div>
       </div>
     </div>
@@ -623,9 +653,9 @@
           <h3>Special Discounts (20% off)</h3>
           <div class="discount-info-box">
             <ul>
-              <li><strong>PWD:</strong> Persons with Disability (with valid ID)</li>
+              <li><strong>PWD:</strong>Persons with Disability (with valid ID)</li>
               <li><strong>Senior Citizens:</strong> 60 years old and above (with valid ID)</li>
-              <li><strong>Students:</strong> With valid school ID</li>
+              <li><strong>Students:</strong>With valid school ID</li>
             </ul>
           </div>
         </div>
@@ -718,12 +748,12 @@
               <li>Senior Citizens (60 years and above) with valid ID</li>
               <li>Students with valid school ID</li>
             </ul>
-            <p class="matrix-legal"><strong>Legal Notice:</strong> Republic Act No. 10909 prohibits short charging. Drivers who refuse passengers due to short distance routes are subject to penalties under the law.</p>
+            <p class="matrix-legal"><strong>Legal Notice:</strong>Republic Act No. 10909 prohibits short charging. Drivers who refuse passengers due to short distance routes are subject to penalties under the law.</p>
           </div>
         </div>
 
         <div class="disclaimer">
-          <strong>Disclaimer:</strong> Fares are based on GenSan City Ordinance No. 08, Series of 2023. This calculator provides estimates only.
+          <strong>Disclaimer:</strong>Fares are based on GenSan City Ordinance No. 08, Series of 2023. This calculator provides estimates only.
         </div>
       </div>
     </div>
@@ -738,6 +768,7 @@
     <p>Calculating route...</p>
   </div>
 
+  <script src="config.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
   <script type="module" src="app.js"></script>
