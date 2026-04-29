@@ -1,6 +1,6 @@
 import { Api, getFareConfig, invalidateFareCache } from './api.js';
 
-// ─── STATE ─────────────────────────────────────────────────────────────────────
+//  STATE 
 const state = {
   map: null,
   currentMode: 'trike',
@@ -25,7 +25,7 @@ const state = {
   }
 };
 
-// ─── BUS/JEEP ROUTES ──────────────────────────────────────────────────────────
+//  BUS/JEEP ROUTES 
 const ROUTES = {
   'uhaw': {
     name: 'Uhaw Route',
@@ -59,9 +59,9 @@ const ROUTES = {
   }
 };
 
-// ─── PLACES DATABASE ──────────────────────────────────────────────────────────
+//  PLACES DATABASE 
 const GENSAN_PLACES = [
-  // ── Malls & Commercial ──
+  //  Malls & Commercial 
   { name: 'SM Mall of GenSan', lat: 6.11615, lng: 125.18107, tags: ['mall','shopping','sm','cinema'] },
   { name: 'KCC Mall of GenSan', lat: 6.11605, lng: 125.18691, tags: ['mall','shopping','kcc','cinema'] },
   { name: 'Robinsons Mall of GenSan', lat: 6.12099, lng: 125.19069, tags: ['mall','shopping','robinsons'] },
@@ -74,7 +74,7 @@ const GENSAN_PLACES = [
   { name: 'Acharon Boulevard', lat: 6.10800, lng: 125.17300, tags: ['street','boulevard'] },
   { name: 'Digos-Makar Road', lat: 6.11900, lng: 125.18000, tags: ['road','street'] },
   { name: 'Jose Catolico Sr. Avenue', lat: 6.12600, lng: 125.19400, tags: ['road','street','lagao'] },
-  // ── Hospitals & Clinics ──
+  //  Hospitals & Clinics 
   { name: 'St. Elizabeth Hospital', lat: 6.11821, lng: 125.17995, tags: ['hospital','clinic','emergency'] },
   { name: 'GenSan Doctors Hospital', lat: 6.12011, lng: 125.17839, tags: ['hospital','clinic','doctor'] },
   { name: 'Mindanao Medical Center', lat: 6.12801, lng: 125.15985, tags: ['hospital','clinic','mmc'] },
@@ -92,7 +92,7 @@ const GENSAN_PLACES = [
   { name: 'Rojon Pharmacy, Cagampang Street', lat: 6.10844, lng: 125.17971, tags: ['pharmacy','drugstore'] },
   { name: 'Decolongon Pharmacy', lat: 6.11821, lng: 125.17912, tags: ['pharmacy','drugstore'] },
   { name: 'Navis Pharmacy', lat: 6.11289, lng: 125.16905, tags: ['pharmacy','drugstore'] },
-  // ── Schools / Universities ──
+  //  Schools / Universities 
   { name: 'Notre Dame of Dadiangas University', lat: 6.11748, lng: 125.17165, tags: ['nddu','university','college','school'] },
   { name: 'Mindanao State University - General Santos', lat: 6.11652, lng: 125.17171, tags: ['msu','university','college','school'] },
   { name: 'STI College, GenSan', lat: 6.11471, lng: 125.18297, tags: ['sti','school','college'] },
@@ -117,7 +117,7 @@ const GENSAN_PLACES = [
   { name: 'Saavedra Saway Central Elementary School', lat: 6.10276, lng: 125.15781, tags: ['school','elementary'] },
   { name: 'King Solomon Institute', lat: 6.11150, lng: 125.17050, tags: ['school','institute'] },
   { name: 'Legaspi National High School', lat: 6.10800, lng: 125.16900, tags: ['school','high school','legaspi'] },
-  // ── Transport Terminals ──
+  //  Transport Terminals 
   { name: 'Bulaong Terminal', lat: 6.11335, lng: 125.16237, tags: ['bus','van','terminal','bulaong'] },
   { name: 'Husky Terminal', lat: 6.11326, lng: 125.16428, tags: ['bus','transport','terminal','husky'] },
   { name: 'Yellow Bus Terminal, Gensan', lat: 6.11950, lng: 125.17742, tags: ['bus','terminal','yellow'] },
@@ -126,7 +126,7 @@ const GENSAN_PLACES = [
   { name: 'International Airport, GenSan', lat: 6.05762, lng: 125.10083, tags: ['airport','plane','fly','sasa'] },
   { name: 'Port of General Santos', lat: 6.09277, lng: 125.15536, tags: ['port','boat','ferry','ship'] },
   { name: 'Kanto Uhaw Station', lat: 6.06688, lng: 125.14346, tags: ['terminal','station','uhaw','jeep'] },
-  // ── Government ──
+  //  Government 
   { name: 'City Hall of GenSan', lat: 6.11302, lng: 125.17173, tags: ['government','city hall','LGU'] },
   { name: 'Senior Citizens Office, GenSan', lat: 6.11440, lng: 125.17221, tags: ['government','senior'] },
   { name: 'General Santos City Public Library', lat: 6.11456, lng: 125.17184, tags: ['government','library'] },
@@ -144,7 +144,7 @@ const GENSAN_PLACES = [
   { name: 'Land Transportation Office, Gensan', lat: 6.11100, lng: 125.17600, tags: ['lto','government','driver license'] },
   { name: 'COMELEC Gensan', lat: 6.11350, lng: 125.17200, tags: ['comelec','government','election'] },
   { name: 'Gensan City PESO', lat: 6.11300, lng: 125.17250, tags: ['peso','employment','government'] },
-  // ── Markets ──
+  //  Markets 
   { name: 'GenSan Public Market', lat: 6.10790, lng: 125.17848, tags: ['market','palengke','public market'] },
   { name: 'Bagsakan Market', lat: 6.11017, lng: 125.18225, tags: ['market','bagsakan'] },
   { name: 'SM Savemore Market, Yumang', lat: 6.13274, lng: 125.16061, tags: ['market','savemore','grocery','sm'] },
@@ -152,7 +152,7 @@ const GENSAN_PLACES = [
   { name: 'Lagao Public Market', lat: 6.12732, lng: 125.19660, tags: ['market','palengke','lagao'] },
   { name: 'SM Savemore Market, Calumpang', lat: 6.07740, lng: 125.14651, tags: ['market','savemore','grocery','calumpang'] },
   { name: 'Gaisano Supermarket, Digos-Makar', lat: 6.11765, lng: 125.18393, tags: ['market','supermarket','gaisano','grocery'] },
-  // ── Parks, Sports & Landmarks ──
+  //  Parks, Sports & Landmarks 
   { name: 'Carlos P. Garcia Freedom Park', lat: 6.11538, lng: 125.17177, tags: ['park','plaza','garcia'] },
   { name: 'Plaza Heneral Santos', lat: 6.11214, lng: 125.17179, tags: ['park','plaza','heneral'] },
   { name: 'Queen Tuna Park', lat: 6.10678, lng: 125.17574, tags: ['park','beach','tuna','waterfront'] },
@@ -169,7 +169,7 @@ const GENSAN_PLACES = [
   { name: 'GenSan Tunaville Baywalk', lat: 6.10400, lng: 125.17500, tags: ['baywalk','park','beach','waterfront'] },
   { name: 'Venue 88', lat: 6.13397, lng: 125.16035, tags: ['pool','resort','venue','events'] },
   { name: 'Emjake Aquawave Resort', lat: 6.14353, lng: 125.19596, tags: ['pool','resort','aquawave'] },
-  // ── Hotels ──
+  //  Hotels 
   { name: 'Green Leaf Hotel', lat: 6.11470, lng: 125.18220, tags: ['hotel','pool','restaurant','venue'] },
   { name: 'Grand Imperial Hotel', lat: 6.11970, lng: 125.18958, tags: ['hotel','pool','casino','venue'] },
   { name: 'T Boli Hotel', lat: 6.11903, lng: 125.17770, tags: ['hotel','tboli'] },
@@ -191,7 +191,7 @@ const GENSAN_PLACES = [
   { name: 'Jovinaj Travellers Inn', lat: 6.11132, lng: 125.18577, tags: ['hotel','inn','travellers'] },
   { name: 'Matutum Hotel & Restaurant', lat: 6.10709, lng: 125.17347, tags: ['hotel','restaurant','matutum'] },
   { name: 'Roadhaus Hotel', lat: 6.12249, lng: 125.17192, tags: ['hotel','roadhaus'] },
-  // ── Restaurants & Cafes ──
+  //  Restaurants & Cafes 
   { name: 'McDonalds, Digos-Makar Road', lat: 6.11912, lng: 125.17981, tags: ['mcdo','restaurant','fastfood','mcdonalds'] },
   { name: 'McDonalds, Jose Catolico Sr. Ave', lat: 6.12625, lng: 125.19532, tags: ['mcdo','restaurant','fastfood','mcdonalds'] },
   { name: 'Jollibee, Digos-Makar Road', lat: 6.11854, lng: 125.17887, tags: ['jollibee','restaurant','fastfood'] },
@@ -212,13 +212,13 @@ const GENSAN_PLACES = [
   { name: 'KFC, Gensan', lat: 6.11600, lng: 125.18400, tags: ['kfc','chicken','fastfood','restaurant'] },
   { name: 'Greenwich Pizza, Gensan', lat: 6.11650, lng: 125.18500, tags: ['greenwich','pizza','restaurant'] },
   { name: 'Andoks Litson, Gensan', lat: 6.11550, lng: 125.18200, tags: ['andoks','chicken','litson','restaurant'] },
-  // ── Churches ──
+  //  Churches 
   { name: 'Cathedral Parish of Our Lady of Peace & Good Voyage', lat: 6.11280, lng: 125.17440, tags: ['church','cathedral','parish','catholic'] },
   { name: 'San Jose Parish, Lagao', lat: 6.13500, lng: 125.18500, tags: ['church','parish','catholic','lagao'] },
   { name: 'Bula Parish Church', lat: 6.10900, lng: 125.16100, tags: ['church','parish','bula','catholic'] },
   { name: 'Kingdom Hall of Jehovahs Witnesses', lat: 6.11600, lng: 125.17300, tags: ['church','jehovah'] },
   { name: 'Iglesia ni Cristo, Gensan', lat: 6.11700, lng: 125.16600, tags: ['church','inc','iglesia ni cristo'] },
-  // ── Barangays / Areas ──
+  //  Barangays / Areas 
   { name: 'Barangay Lagao', lat: 6.13000, lng: 125.18000, tags: ['barangay','lagao','area'] },
   { name: 'Barangay Calumpang', lat: 6.08000, lng: 125.14000, tags: ['barangay','calumpang','area'] },
   { name: 'Barangay Labangal', lat: 6.10200, lng: 125.15500, tags: ['barangay','labangal','area'] },
@@ -234,7 +234,7 @@ const GENSAN_PLACES = [
   { name: 'Barangay Fatima', lat: 6.07200, lng: 125.11500, tags: ['barangay','fatima'] },
   { name: 'Barangay Bula', lat: 6.10700, lng: 125.16000, tags: ['barangay','bula'] },
   { name: 'Barangay Mabuhay', lat: 6.15400, lng: 125.16400, tags: ['barangay','mabuhay'] },
-  // ── Subdivisions ──
+  //  Subdivisions 
   { name: 'Bloomfields Subdivision, Dadiangas North', lat: 6.11843, lng: 125.15354, tags: ['subdivision','bloomfields','homes'] },
   { name: 'Las Villas, City Heights', lat: 6.12984, lng: 125.16021, tags: ['subdivision','las villas'] },
   { name: 'Agan Grandville', lat: 6.12734, lng: 125.17880, tags: ['subdivision','agan'] },
@@ -264,7 +264,7 @@ const GENSAN_PLACES = [
   { name: 'Queenies Love Village', lat: 6.12049, lng: 125.17247, tags: ['subdivision','queenies'] },
   { name: 'Isabella Homes', lat: 6.14059, lng: 125.15214, tags: ['subdivision','isabella'] },
   { name: 'VS Homes', lat: 6.14174, lng: 125.16679, tags: ['subdivision','vs homes'] },
-  // ── Apopong Area ──
+  //  Apopong Area 
   { name: 'Apopong Public Market', lat: 6.11300, lng: 125.16000, tags: ['market','apopong','palengke'] },
   { name: 'Apopong Barangay Hall', lat: 6.11400, lng: 125.16100, tags: ['government','barangay hall','apopong'] },
   { name: 'Apopong Elementary School', lat: 6.11350, lng: 125.15900, tags: ['school','elementary','apopong'] },
@@ -278,7 +278,7 @@ const GENSAN_PLACES = [
   { name: 'Apopong Chapel', lat: 6.11310, lng: 125.16000, tags: ['church','chapel','apopong'] },
   { name: 'Hadano Avenue', lat: 6.11877, lng: 125.14512, tags: ['road','avenue','hadano'] },
   { name: 'City Heights Apopong', lat: 6.12900, lng: 125.16000, tags: ['subdivision','city heights','apopong'] },
-  // ── Bula Area ──
+  //  Bula Area 
   { name: 'Bula Barangay Hall', lat: 6.10800, lng: 125.16100, tags: ['government','barangay hall','bula'] },
   { name: 'Bula Elementary School', lat: 6.10750, lng: 125.16050, tags: ['school','elementary','bula'] },
   { name: 'Bula Health Center', lat: 6.10820, lng: 125.16150, tags: ['health','clinic','bula'] },
@@ -292,7 +292,7 @@ const GENSAN_PLACES = [
   { name: 'Labangal Fishport', lat: 6.09800, lng: 125.15700, tags: ['port','fish','labangal'] },
   { name: 'Maharlika Highway, Bula', lat: 6.10700, lng: 125.16400, tags: ['road','highway','bula','maharlika'] },
   { name: 'Purok Santiago, Bula', lat: 6.10720, lng: 125.16300, tags: ['purok','bula','residential'] },
-  // ── Additional GenSan Streets & Landmarks ──
+  //  Additional GenSan Streets & Landmarks 
   { name: 'Magsaysay Avenue', lat: 6.10800, lng: 125.17800, tags: ['road','avenue','magsaysay'] },
   { name: 'Santiago Boulevard', lat: 6.11780, lng: 125.17973, tags: ['road','boulevard','santiago'] },
   { name: 'Malakas Street', lat: 6.13820, lng: 125.16848, tags: ['road','street','malakas'] },
@@ -307,7 +307,7 @@ const GENSAN_PLACES = [
   { name: 'SM City GenSan Annex', lat: 6.11700, lng: 125.18000, tags: ['mall','sm','annex'] },
 ];
 
-// ─── SEARCH HISTORYRY ────────────────────────────────────────────────────────────
+//  SEARCH HISTORYRY 
 const MAX_HISTORY = 4;
 function getSearchHistory() {
   try { return JSON.parse(localStorage.getItem('geoGensan_searchHistory') || '[]'); }
@@ -320,7 +320,7 @@ function addToSearchHistory(place) {
   localStorage.setItem('geoGensan_searchHistory', JSON.stringify(h));
 }
 
-// ─── AUTOCOMPLETE ──────────────────────────────────────────────────────────────
+//  AUTOCOMPLETE 
 function searchLocalPlaces(query) {
   const q = query.toLowerCase().trim();
   if (!q) return [];
@@ -367,13 +367,13 @@ function createAutocompleteDropdown(inputEl, onSelect) {
   if (!query && results.length) {
     const header = document.createElement('div');
     header.className = 'autocomplete-header';
-    header.textContent = '🕐 Recent Searches';
+    header.textContent = ' Recent Searches';
     dropdown.appendChild(header);
   }
   results.forEach(place => {
     const item = document.createElement('div');
     item.className = 'autocomplete-item';
-    item.innerHTML = `<span class="autocomplete-icon">${place.isHistory ? '🕐' : '📍'}</span><span class="autocomplete-name">${place.name}</span>`;
+    item.innerHTML = `<span class="autocomplete-icon">${place.isHistory ? '' : ''}</span><span class="autocomplete-name">${place.name}</span>`;
     const pick = (e) => { e.preventDefault(); onSelect(place); closeAllAutocompletes(); };
     item.addEventListener('mousedown', pick);
     item.addEventListener('touchend', pick);
@@ -390,7 +390,7 @@ function removeAutocomplete(inputEl) {
   if (_activeAutocompleteInput === inputEl) _activeAutocompleteInput = null;
 }
 
-// ─── GEOCODING ────────────────────────────────────────────────────────────────
+//  GEOCODING 
 const REGION12_VIEWBOX = '125.05,5.95,125.25,6.20';
 function isWithinRegion12(lat, lng) {
   return lat >= 5.95 && lat <= 6.20 && lng >= 125.05 && lng <= 125.25;
@@ -446,10 +446,11 @@ async function geocode(query) {
   return null;
 }
 
-// ─── UTILITIES ────────────────────────────────────────────────────────────────
+//  UTILITIES 
 function showToast(message, duration = 2500) {
   const toast = document.getElementById('toast');
-  toast.textContent = message;
+  // Use textContent (not innerHTML) to prevent XSS
+  toast.textContent = typeof message === 'string' ? message.slice(0, 200) : String(message);
   toast.classList.add('show');
   clearTimeout(toast._timeout);
   toast._timeout = setTimeout(() => toast.classList.remove('show'), duration);
@@ -466,7 +467,7 @@ function createMarkerIcon(label, color) {
 
 function createLiveMarkerIcon() {
   return L.divIcon({
-    html: `<div style="width:20px;height:20px;background:#ea580c;border:3px solid white;border-radius:50%;box-shadow:0 0 0 6px rgba(234,88,12,0.25);animation:live-pulse 2s ease-in-out infinite;"></div>`,
+    html: `<div style="width:20px;height:20px;background:#e67e22;border:3px solid white;border-radius:50%;box-shadow:0 0 0 6px rgba(230,126,34,0.25);animation:live-pulse 2s ease-in-out infinite;"></div>`,
     className: '', iconSize: [20, 20], iconAnchor: [10, 10]
   });
 }
@@ -484,9 +485,9 @@ function estimateETA(distanceKm, mode) {
   return `${h}h ${m}m`;
 }
 
-// ─── FIREBASE ─────────────────────────────────────────────────────────────────
-const FIREBASE_DB_URL = 'https://gentrike-75c7c-default-rtdb.asia-southeast1.firebasedatabase.app';
-const IMGBB_API_KEY   = '7416acef89ebb625100b3bf7a580770a';
+//  FIREBASE 
+const FIREBASE_DB_URL = window.__GG_CFG__?.dbUrl || 'https://gentrike-75c7c-default-rtdb.asia-southeast1.firebasedatabase.app';
+const IMGBB_API_KEY   = window.__GG_CFG__?.imgKey || '7416acef89ebb625100b3bf7a580770a';
 const LAST_REPORT_KEY = 'geoGensan_lastReportTime';
 const MAX_REPORTS     = 100;
 const COOLDOWN_MS     = 2 * 60 * 60 * 1000;
@@ -502,6 +503,11 @@ async function uploadToImgBB(base64DataUrl) {
 }
 
 async function fbPush(path, value) {
+  // Security: validate path is safe
+  if (!/^[a-zA-Z0-9_\-\/]+$/.test(path)) throw new Error('Invalid path');
+  // Security: cap payload size
+  const payloadStr = JSON.stringify(value);
+  if (payloadStr.length > 50000) throw new Error('Payload too large');
   const res = await fetch(`${FIREBASE_DB_URL}/${path}.json`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(value) });
   if (!res.ok) {
     const body = await res.text().catch(() => '(no body)');
@@ -546,7 +552,7 @@ function formatCooldown(ms) {
   if (h > 0) return `${h}h ${m}m`; if (m > 0) return `${m}m ${s}s`; return `${s}s`;
 }
 
-// ─── MAP INIT ─────────────────────────────────────────────────────────────────
+//  MAP INIT 
 function initMap() {
   const map = L.map('map', { zoomControl: true, minZoom: 8, maxZoom: 19 }).setView([6.116, 125.171], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
@@ -560,7 +566,7 @@ function initMap() {
   return map;
 }
 
-// ─── LIVE LOCATION ────────────────────────────────────────────────────────────
+//  LIVE LOCATION 
 // Helper: get distance from latlng to nearest point on a polyline
 function distanceToRoute(latlng, coords) {
   let minDist = Infinity;
@@ -663,12 +669,8 @@ function startLiveLocation() {
           // Switch if user is closer to a different route (threshold: 80m for snap, 300m for off-route warning)
           if (closestIdx !== currentIdx && closestDist < 80) {
             // User is clearly on the alternative route — switch display but KEEP original fare
-            // Force map redraw by clearing existing layers before switching
-            if (state.trike.primaryRouteLayer) { state.trike.primaryRouteLayer.remove(); state.trike.primaryRouteLayer = null; }
-            state.trike.altRouteLayers.forEach(l => l.remove());
-            state.trike.altRouteLayers = [];
             selectAlternativeRouteNoFareChange(closestIdx, _lockedFareData);
-            showToast(`Auto-switched to Route ${closestIdx + 1} (fare unchanged)`, 3000);
+            showToast(` Auto-switched to Route ${closestIdx + 1} (fare unchanged)`, 3000);
           } else if (closestDist > 300) {
             // User appears to be off all known routes
             showToast('You appear to be off the plotted route', 2500);
@@ -719,6 +721,8 @@ function selectAlternativeRouteNoFareChange(index, lockedFareData) {
 
   // Restore locked fare if available
   if (lockedFareData) displayFare(lockedFareData);
+  // Force map refresh to redraw tile layers after polyline changes
+  if (state.map) setTimeout(() => state.map.invalidateSize(), 50);
 }
 
 function stopLiveLocation() {
@@ -732,7 +736,7 @@ function stopLiveLocation() {
   showToast('Live location stopped');
 }
 
-// ─── MAP CLICK ────────────────────────────────────────────────────────────────
+//  MAP CLICK 
 function handleMapClick(e) {
   if (state.currentMode !== 'trike') return;
   const { startMarker, endMarker } = state.trike;
@@ -762,7 +766,7 @@ function handleMapClick(e) {
   updateTrikeRoute();
 }
 
-// ─── TRIKE ROUTE (multi-route) ───────────────────────────────────────────────
+//  TRIKE ROUTE (multi-route) 
 function clearTrikeRoutes() {
   if (state.trike.primaryRouteLayer) { state.trike.primaryRouteLayer.remove(); state.trike.primaryRouteLayer = null; }
   state.trike.altRouteLayers.forEach(l => l.remove());
@@ -847,6 +851,8 @@ async function updateTrikeRoute() {
     // Fit bounds
     const allCoords = routes.flatMap(r => r.geometry.coordinates.map(([lng, lat]) => [lat, lng]));
     state.map.fitBounds(L.latLngBounds(allCoords), { padding: [50, 50] });
+    // Force full tile/layer refresh
+    setTimeout(() => state.map.invalidateSize(), 100);
 
     const distanceKm = primary.distance / 1000;
     document.getElementById('distance-display').textContent = `${distanceKm.toFixed(2)} km`;
@@ -869,7 +875,7 @@ async function updateTrikeRoute() {
 
     if (routes.length > 1) {
       if (routes.length > 1) {
-      showToast('2 routes found — tap dashed line for alternative', 3500);
+      showToast(` 2 routes found — tap dashed line for the alternative`, 3500);
     }
     }
   } catch (err) {
@@ -919,7 +925,7 @@ function selectAlternativeRoute(index) {
     discountedPassengers: state.discountedPassengers
   }).then(displayFare);
 
-  showToast(`Route ${index + 1} selected (${distanceKm.toFixed(1)} km)`);
+  showToast(` Route ${index + 1} selected (${distanceKm.toFixed(1)} km)`);
 }
 
 function expandPanelOnMobile() {
@@ -989,7 +995,7 @@ function clearTrikeMarkers() {
   panel.classList.remove('expanded');
 }
 
-// ─── BUS/JEEP ROUTES ─────────────────────────────────────────────────────────
+//  BUS/JEEP ROUTES 
 async function showRoute(routeKey) {
   clearBusJeepRoute();
   const route = ROUTES[routeKey];
@@ -1037,7 +1043,7 @@ async function showRoute(routeKey) {
   const bounds = L.latLngBounds(waypoints);
   state.map.flyToBounds(bounds, { padding: [40, 40], duration: 1.2 });
   showRouteDetail(route);
-  showToast(`🚌 ${route.name} selected`);
+  showToast(` ${route.name} selected`);
 }
 
 function showRouteDetail(route) {
@@ -1075,7 +1081,7 @@ function clearBusJeepRoute() {
   document.getElementById('route-detail').style.display = 'none';
 }
 
-// ─── MODE SWITCH ──────────────────────────────────────────────────────────────
+//  MODE SWITCH 
 function switchMode(mode) {
   if (state.currentMode === mode) return;
   state.currentMode = mode;
@@ -1113,7 +1119,7 @@ function switchMode(mode) {
   setTimeout(() => state.map.invalidateSize(), 100);
 }
 
-// ─── PASSENGERS ──────────────────────────────────────────────────────────────
+//  PASSENGERS 
 function updatePassengerCount(type, delta) {
   if (type === 'regular') {
     const newVal = state.regularPassengers + delta;
@@ -1136,7 +1142,7 @@ function updatePassengerCount(type, delta) {
   }
 }
 
-// ─── DISCOUNT ────────────────────────────────────────────────────────────────
+//  DISCOUNT 
 function selectDiscount(discountType) {
   state.discountType = discountType;
   document.querySelectorAll('.discount-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.discount === discountType));
@@ -1151,20 +1157,20 @@ function selectDiscount(discountType) {
       Api.computeFare({ mode: 'trike', distanceKm: dist, discountType, regularPassengers: state.regularPassengers, discountedPassengers: state.discountedPassengers }).then(displayFare);
     }
   }
-  showToast(discountType === 'special' ? '💳 Special discount applied' : '👤 Regular fare');
+  showToast(discountType === 'special' ? ' Special discount applied' : ' Regular fare');
 }
 
-// ─── DARK MODE ────────────────────────────────────────────────────────────────
+//  DARK MODE 
 function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   const isDark = document.body.classList.contains('dark-mode');
   localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
   const lbl = document.getElementById('dark-mode-label');
   if (lbl) lbl.textContent = isDark ? 'Light' : 'Dark';
-  showToast(isDark ? '🌙 Dark mode on' : '☀️ Light mode on');
+  showToast(isDark ? ' Dark mode on' : ' Light mode on');
 }
 
-// ─── COMPLAINT SYSTEM ─────────────────────────────────────────────────────────
+//  COMPLAINT SYSTEM 
 let cooldownInterval = null;
 let pendingImageData = null;
 let pendingImageFile = null;
@@ -1222,16 +1228,16 @@ function initComplaintModal() {
     const plate = document.getElementById('complaint-plate').value.trim();
     const type = document.getElementById('complaint-type').value;
     const desc = document.getElementById('complaint-desc').value.trim();
-    if (!plate && !pendingImageData) { showToast('❌ Enter a plate number or attach a photo'); return; }
-    if (!type) { showToast('❌ Please select a report type'); return; }
-    if (!desc) { showToast('❌ Please enter a description'); return; }
-    if (!canSubmitReport()) { showToast('Please wait before submitting again'); return; }
+    if (!plate && !pendingImageData) { showToast('Enter a plate number or attach a photo'); return; }
+    if (!type) { showToast('Please select a report type'); return; }
+    if (!desc) { showToast('Please enter a description'); return; }
+    if (!canSubmitReport()) { showToast('⏳ Please wait before submitting again'); return; }
     submitBtn.disabled = true; submitBtn.textContent = '⏳ Submitting...';
     try {
       let imageUrl = null;
       if (pendingImageData) { showToast('Uploading photo...', 10000); imageUrl = await uploadToImgBB(pendingImageData); }
       await fbPush('reports', {
-        plate: plate.toUpperCase() || '(photo only)', type, description: desc,
+        plate: sanitizePlate(plate) || '(photo only)', type, description: desc,
         imageUrl: imageUrl || null, timestamp: Date.now(),
         date: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' })
       });
@@ -1255,7 +1261,7 @@ function initComplaintModal() {
       } else if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
         showToast('No internet connection', 4000);
       } else {
-        showToast(`❌ Submission failed: ${msg.slice(0, 60)}`, 5000);
+        showToast(` Submission failed: ${msg.slice(0, 60)}`, 5000);
       }
     } finally {
       submitBtn.disabled = false; submitBtn.textContent = 'Submit Report';
@@ -1281,7 +1287,7 @@ function updateCooldownUI() {
   }
 }
 
-// ─── PANEL DRAG ───────────────────────────────────────────────────────────────
+//  PANEL DRAG 
 function initPanelDrag() {
   const panel = document.getElementById('control-panel');
   const handle = document.querySelector('.panel-handle');
@@ -1314,7 +1320,7 @@ function initPanelDrag() {
   handle.addEventListener('click', (e) => { if (e.detail === 1) { panel.classList.toggle('minimized'); panel.classList.remove('expanded'); } });
 }
 
-// ─── MATRIX TABS ─────────────────────────────────────────────────────────────
+//  MATRIX TABS 
 function initMatrixTabs() {
   document.querySelectorAll('.matrix-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -1325,7 +1331,7 @@ function initMatrixTabs() {
   });
 }
 
-// ─── SEARCH SETUP ────────────────────────────────────────────────────────────
+//  SEARCH SETUP 
 function setupSearchField(inputId, labelId) {
   const inp = document.getElementById(inputId);
   const lbl = document.getElementById(labelId);
@@ -1336,7 +1342,7 @@ function setupSearchField(inputId, labelId) {
   inp.addEventListener('blur', () => { inp.classList.remove('is-active'); lbl.style.display = ''; inp.value = ''; });
 }
 
-// ─── EVENT LISTENERS ─────────────────────────────────────────────────────────
+//  EVENT LISTENERS 
 function initEventListeners() {
   document.querySelectorAll('.mode-btn').forEach(btn => btn.addEventListener('click', () => switchMode(btn.dataset.mode)));
   document.querySelectorAll('.discount-btn').forEach(btn => btn.addEventListener('click', () => selectDiscount(btn.dataset.discount)));
@@ -1438,7 +1444,7 @@ function initEventListeners() {
   });
 }
 
-// ─── INIT ─────────────────────────────────────────────────────────────────────
+//  INIT 
 function init() {
   initMap();
   ['start-display', 'end-display'].forEach(id => {
@@ -1471,23 +1477,43 @@ function init() {
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', () => { if (state.map) state.map.invalidateSize(); });
 
-// ═══════════════════════════════════════════════════════════════
+// 
 // LEFT TOOLS PANEL — Fare Calculator + Report Trike
-// ═══════════════════════════════════════════════════════════════
+// 
 
 (function initLeftPanel() {
 
-  // ── Panel open/close: bubble hides when panel is open ─────────
+  //  Panel open/close: bubble hides when panel is open 
   const bubbleBtn = document.getElementById('left-bubble-btn');
   const panel     = document.getElementById('left-tools-panel');
   const closeBtn  = document.getElementById('ltp-close');
 
-  function openPanel()  { panel.classList.add('open');    bubbleBtn.classList.add('panel-open'); }
-  function closePanel() { panel.classList.remove('open'); bubbleBtn.classList.remove('panel-open'); }
+  function openPanel()  { 
+    panel.classList.add('open');    
+    bubbleBtn.classList.add('panel-open');
+    // On mobile: hide fare/mode UI while tools panel is open
+    if (window.innerWidth <= 640) {
+      document.body.classList.add('left-panel-open');
+    }
+  }
+  function closePanel() { 
+    panel.classList.remove('open'); 
+    bubbleBtn.classList.remove('panel-open');
+    document.body.classList.remove('left-panel-open');
+  }
   bubbleBtn.addEventListener('click', () => panel.classList.contains('open') ? closePanel() : openPanel());
   closeBtn.addEventListener('click', closePanel);
+  // Close panel when tapping outside on mobile
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth > 640) return;
+    if (panel.classList.contains('open') &&
+        !panel.contains(e.target) &&
+        !bubbleBtn.contains(e.target)) {
+      closePanel();
+    }
+  });
 
-  // ── Tab switching ─────────────────────────────────────────────
+  //  Tab switching 
   document.querySelectorAll('.ltp-tab').forEach(tab => {
     tab.addEventListener('click', () => {
       document.querySelectorAll('.ltp-tab').forEach(t => t.classList.remove('active'));
@@ -1497,9 +1523,9 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     });
   });
 
-  // ══════════════════════════════════════════════════════════════
+  // 
   // FARE CALCULATOR — autocomplete From/To + OSRM distance fill
-  // ══════════════════════════════════════════════════════════════
+  // 
   let lfcReg = 1, lfcDisc = 0;
   const MAX_PAX = 6;
   // Resolved latlng for from/to
@@ -1509,12 +1535,12 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     document.getElementById('lfc-reg-count').textContent = lfcReg;
     document.getElementById('lfc-disc-count').textContent = lfcDisc;
   }
-  document.getElementById('lfc-reg-minus').addEventListener('click',  () => { if (lfcReg > 0) { lfcReg--; updateLfcPax(); } });
+  document.getElementById('lfc-reg-minus').addEventListener('click',  () => { if (lfcReg > 1) { lfcReg--; updateLfcPax(); } });
   document.getElementById('lfc-reg-plus').addEventListener('click',   () => { if (lfcReg + lfcDisc < MAX_PAX) { lfcReg++; updateLfcPax(); } });
   document.getElementById('lfc-disc-minus').addEventListener('click', () => { if (lfcDisc > 0) { lfcDisc--; updateLfcPax(); } });
   document.getElementById('lfc-disc-plus').addEventListener('click',  () => { if (lfcReg + lfcDisc < MAX_PAX) { lfcDisc++; updateLfcPax(); } });
 
-  // ── Autocomplete for From / To ────────────────────────────────
+  //  Autocomplete for From / To 
   function lfcSearchPlaces(query) {
     const q = query.toLowerCase().trim();
     if (!q) return [];
@@ -1541,13 +1567,13 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     if (!q && results.length) {
       const hdr = document.createElement('div');
       hdr.className = 'lfc-drop-header';
-      hdr.textContent = '🕐 Recent';
+      hdr.textContent = ' Recent';
       drop.appendChild(hdr);
     }
     results.forEach(place => {
       const item = document.createElement('div');
       item.className = 'lfc-drop-item';
-      item.innerHTML = `<span>${place.isHistory ? '🕐' : '📍'}</span><span>${place.name}</span>`;
+      item.innerHTML = `<span>${place.isHistory ? '' : ''}</span><span>${place.name}</span>`;
       const pick = (e) => {
         e.preventDefault();
         inputEl.value = place.name;
@@ -1579,7 +1605,7 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     return null;
   }
 
-  // ── Fetch driving distance via OSRM ──────────────────────────
+  //  Fetch driving distance via OSRM 
   async function fetchOsrmDistance(from, to) {
     const url = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=false`;
     const res  = await fetch(url);
@@ -1588,7 +1614,7 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     return null;
   }
 
-  // ── Set route status text ─────────────────────────────────────
+  //  Set route status text 
   function setRouteStatus(msg, isError) {
     const el = document.getElementById('lfc-route-status');
     if (!el) return;
@@ -1607,16 +1633,16 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
       const km = await fetchOsrmDistance(lfcFromLatLng, lfcToLatLng);
       if (km !== null) {
         kmEl.value = km.toFixed(2);
-        kmEl.style.borderColor = '#16a34a';
-        if (statusEl) statusEl.textContent = '✅';
+        kmEl.style.borderColor = 'var(--success, #16a34a)';
+        if (statusEl) statusEl.textContent = '';
         setRouteStatus(`Route found: ${km.toFixed(2)} km`);
       } else {
-        if (statusEl) statusEl.textContent = '⚠️';
+        if (statusEl) statusEl.textContent = '';
         setRouteStatus('Could not find route — enter km manually', true);
         kmEl.removeAttribute('readonly');
       }
     } catch {
-      if (statusEl) statusEl.textContent = '⚠️';
+      if (statusEl) statusEl.textContent = '';
       setRouteStatus('Network error — enter km manually', true);
       kmEl.removeAttribute('readonly');
     }
@@ -1662,21 +1688,23 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     this.removeAttribute('readonly');
   });
 
-  // ── Calculate fare ────────────────────────────────────────────
+  //  Calculate fare 
   document.getElementById('lfc-calc-btn').addEventListener('click', async () => {
     const fromVal = lfcFromEl.value.trim();
     const toVal   = lfcToEl.value.trim();
     const kmEl    = document.getElementById('lfc-km');
 
-    // From/To are optional — if both provided try to get route distance
-    // If km not filled yet and both locations exist, try geocoding/routing
+    // From and To are optional — calculator works with just km entered manually
+    // Only validate if km field is empty (need at least one way to get distance)
+
+    // If km not filled yet (locations typed but not picked from dropdown), try geocoding now
     if (!kmEl.value || parseFloat(kmEl.value) <= 0) {
-      if (fromVal && !lfcFromLatLng) {
+      if (!lfcFromLatLng) {
         setRouteStatus('Locating "From" address…');
         const r = await lfcGeocode(fromVal);
         if (r) { lfcFromLatLng = r; lfcFromEl.value = r.name; }
       }
-      if (toVal && !lfcToLatLng) {
+      if (!lfcToLatLng) {
         setRouteStatus('Locating "To" address…');
         const r = await lfcGeocode(toVal);
         if (r) { lfcToLatLng = r; lfcToEl.value = r.name; }
@@ -1704,7 +1732,7 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     const discTotal = discFare * lfcDisc;
     const total     = regTotal + discTotal;
 
-    const routeLabel = fromVal && toVal ? `${fromVal} → ${toVal}` : (fromVal || toVal || 'Custom Route');
+    const routeLabel = `${fromVal} → ${toVal}`;
     document.getElementById('lfc-result-route').textContent  = routeLabel;
     document.getElementById('lfc-result-dist').textContent   = `${kmInput.toFixed(2)} km`;
     document.getElementById('lfc-result-amount').textContent = `₱${total}`;
@@ -1725,7 +1753,7 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     document.getElementById('lfc-result').style.display = 'block';
   });
 
-  // ── History: editable names + individual delete ───────────────
+  //  History: editable names + individual delete 
   const HIST_KEY = 'geoGensan_fareHistory';
   function loadHistory() { try { return JSON.parse(localStorage.getItem(HIST_KEY) || '[]'); } catch { return []; } }
   function saveHistory(arr) { localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0, 50))); }
@@ -1739,9 +1767,9 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
         <div class="lfc-hist-top">
           <input class="lfc-hist-name-input" data-idx="${i}" value="${item.label || item.route}" title="Tap to rename" aria-label="Edit name">
           <span class="lfc-hist-amount">₱${item.total}</span>
-          <button class="lfc-hist-del-top" data-idx="${i}" title="Delete this entry">✕</button>
         </div>
         <div class="lfc-hist-meta">${item.km.toFixed(2)} km · ${item.reg} reg${item.disc ? ` + ${item.disc} special` : ''} · ${new Date(item.ts).toLocaleDateString('en-PH', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+        <button class="lfc-hist-del" data-idx="${i}" title="Delete this entry"> Delete</button>
       </div>
     `).join('');
 
@@ -1756,8 +1784,9 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     });
 
     // Individual delete
-    el.querySelectorAll('.lfc-hist-del-top').forEach(btn => {
+    el.querySelectorAll('.lfc-hist-del').forEach(btn => {
       btn.addEventListener('click', () => {
+        if (!confirm('Delete this saved fare?')) return;
         const arr = loadHistory();
         arr.splice(parseInt(btn.dataset.idx), 1);
         saveHistory(arr);
@@ -1776,8 +1805,8 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     saveHistory(arr);
     renderHistory();
     const btn = document.getElementById('lfc-save-btn');
-    btn.textContent = '✅ Saved!';
-    setTimeout(() => btn.textContent = '💾 Save', 1800);
+    btn.textContent = 'Saved!';
+    setTimeout(() => btn.textContent = 'Save', 1800);
   });
 
   document.getElementById('lfc-history-clear').addEventListener('click', () => {
@@ -1788,9 +1817,9 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
 
   renderHistory();
 
-  // ══════════════════════════════════════════════════════════════
+  // 
   // REPORT TRIKE — uses shared Firebase helpers (fbPush, uploadToImgBB)
-  // ══════════════════════════════════════════════════════════════
+  // 
   // Re-use the global COOLDOWN constants from the main report system
   const LTP_REPORT_KEY = LAST_REPORT_KEY; // same key → same 2hr cooldown across both UIs
   let ltpCooldownInterval = null;
@@ -1849,7 +1878,7 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
   document.getElementById('ltp-submit-btn').addEventListener('click', async () => {
     if (!ltpCanSubmit()) { showLtpCooldown(ltpGetRemaining()); return; }
 
-    const plate   = document.getElementById('ltp-plate').value.trim();
+    const plate   = sanitizePlate(document.getElementById('ltp-plate').value.trim());
     const type    = document.getElementById('ltp-type').value;
     const desc    = document.getElementById('ltp-desc').value.trim();
     const imgFile = ltpImgInput.files[0] || null;
@@ -1870,15 +1899,16 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
         try { imageUrl = await uploadToImgBB(base64); } catch { imageUrl = null; }
       }
 
+      const now = new Date();
       const payload = {
         plate,
         type,
-        description: desc,
+        description: sanitizeInput(desc),
         imageUrl,
-        timestamp: Date.now(),
+        timestamp: now.getTime(),
         source: 'left-panel',
-        date: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' }),
-        dateString: new Date().toISOString()
+        date: now.toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' }),
+        dateString: now.toISOString()
       };
 
       await fbPush('reports', payload);
@@ -1907,7 +1937,7 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
     }
   });
 
-  // ── Print / Save PDF ──────────────────────────────────────────
+  //  Print / Save PDF 
   document.getElementById('ltp-print-btn').addEventListener('click', () => {
     const plate = document.getElementById('ltp-plate').value.trim() || '(not filled)';
     const type  = document.getElementById('ltp-type').value || '(not selected)';
@@ -1930,7 +1960,7 @@ window.addEventListener('resize', () => { if (state.map) state.map.invalidateSiz
   .footer { margin-top: 40px; font-size: 10px; color: #bbb; border-top: 1px solid #eee; padding-top: 12px; }
   @media print { body { margin: 20px; } }
 </style></head><body>
-<h1>🚨 Tricycle Complaint Report</h1>
+<h1> Tricycle Complaint Report</h1>
 <div class="sub">GeoGensan · General Santos City · ${now}</div>
 <div class="field"><div class="lbl">Plate Number</div><div class="val plate">${plate}</div></div>
 ${imgSrc && imgSrc.length > 10 ? `<div class="field"><div class="lbl">Plate Photo</div><img class="photo" src="${imgSrc}"></div>` : ''}
